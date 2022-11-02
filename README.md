@@ -1,0 +1,1 @@
+# QSoft.MediaCapture
