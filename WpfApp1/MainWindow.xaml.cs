@@ -1,4 +1,5 @@
 ﻿using DirectN;
+using QSoft.MediaCapture;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,8 +31,10 @@ namespace WpfApp1
             //hr = pAttributes->SetGUID(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE,
             //    MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
             attribute.Set(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
-            var sources = attribute.EnumDeviceSources().Select(x=>x.GetString(MFConstants.MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME));
-
+            var sources = attribute.EnumDeviceSources();
+            WebCam_MF mf = new WebCam_MF();
+            mf.InitializeCaptureManager(IntPtr.Zero, sources.ElementAt(0));
+            mf.StartPreview();
             //MFFunctions.MFStartup();
             //var capturefac = Activator.CreateInstance(Type.GetTypeFromCLSID(DirectN.MFConstants.CLSID_MFCaptureEngineClassFactory)) as IMFCaptureEngineClassFactory;
             //object o;
@@ -40,75 +43,6 @@ namespace WpfApp1
 
             //var hr = CreateDX11Device(out g_pDX11Device, out m_pDeviceContext, out var level);
 
-        }
-        ID3D11Device g_pDX11Device;
-        ID3D11DeviceContext m_pDeviceContext;
-        HRESULT CreateDX11Device(out ID3D11Device ppDevice, out ID3D11DeviceContext ppDeviceContext, out D3D_FEATURE_LEVEL pFeatureLevel )
-        {
-            HRESULT hr = HRESULTS.S_OK;
-
-
-            D3D_FEATURE_LEVEL[] levels = new []{
-                D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_1,
-                D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_0,
-                D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_10_1,
-                D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_10_0,
-                D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_9_3,
-                D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_9_2,
-                D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_9_1
-            };
-
-            hr = DirectN.D3D11Functions.D3D11CreateDevice(
-                null,
-                D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE,
-                IntPtr.Zero,
-                (uint)DirectN.D3D11_CREATE_DEVICE_FLAG.D3D11_CREATE_DEVICE_VIDEO_SUPPORT,
-                levels,
-                (uint)levels.Length,
-                7,
-                out ppDevice,
-                out pFeatureLevel,
-                out ppDeviceContext
-                );
-
-            if (hr == HRESULTS.S_OK)
-            {
-                ID3D10Multithread pMultithread;
-                pMultithread = ppDevice as ID3D10Multithread;
-                //hr = ppDevice.QueryInterface(IID_PPV_ARGS(&pMultithread)));
-                if (hr == HRESULTS.S_OK)
-                {
-                    var bb = pMultithread.SetMultithreadProtected(true);
-                }
-                Marshal.ReleaseComObject(pMultithread);
-                
-            }
-
-            return hr;
-        }
-
-        uint g_ResetToken = 0;
-        ComObject<IMFDXGIDeviceManager> g_pDXGIMan;
-        HRESULT CreateD3DManager()
-        {
-            HRESULT hr = DirectN.HRESULTS.S_OK;
-            D3D_FEATURE_LEVEL FeatureLevel;
-            ID3D11DeviceContext pDX11DeviceContext;
-            hr = CreateDX11Device(out g_pDX11Device, out pDX11DeviceContext, out FeatureLevel);
-
-            if (hr == HRESULTS.S_OK)
-            {
-                g_pDXGIMan = DirectN.MFFunctions.MFCreateDXGIDeviceManager(out g_ResetToken);
-                //hr = MFCreateDXGIDeviceManager(&g_ResetToken, &g_pDXGIMan);
-            }
-
-            if (hr == HRESULTS.S_OK)
-            {
-                hr = g_pDXGIMan.Object.ResetDevice(g_pDX11Device, g_ResetToken);
-            }
-            Marshal.ReleaseComObject(pDX11DeviceContext);
-
-            return hr;
         }
 
         async private void a_Click(object sender, RoutedEventArgs e)

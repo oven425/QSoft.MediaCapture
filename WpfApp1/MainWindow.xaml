@@ -7,9 +7,14 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <StackPanel>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        
+        <!--<StackPanel>
             <Button x:Name="a" Click="a_Click">A</Button>
             <Button x:Name="b" Click="b_Click">B</Button>
-        </StackPanel>
+        </StackPanel>-->
     </Grid>
 </Window>
