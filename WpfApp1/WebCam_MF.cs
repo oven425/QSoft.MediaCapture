@@ -1,22 +1,24 @@
 ﻿using DirectN;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
-
+//https://github.com/MicrosoftDocs/win32/blob/docs/desktop-src/medfound/directx-surface-buffer.md
 namespace QSoft.MediaCapture
 {
     public enum MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM : uint
     {
-        MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM_FOR_VIDEO_PREVIEW = 0xfffffffa,
-        MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM_FOR_VIDEO_RECORD = 0xfffffff9,
-        MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM_FOR_PHOTO = 0xfffffff8,
-        MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM_FOR_AUDIO = 0xfffffff7,
-        MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM_FOR_METADATA = 0xfffffff6,
+        FOR_VIDEO_PREVIEW = 0xfffffffa,
+        FOR_VIDEO_RECORD = 0xfffffff9,
+        FOR_PHOTO = 0xfffffff8,
+        FOR_AUDIO = 0xfffffff7,
+        FOR_METADATA = 0xfffffff6,
         MF_CAPTURE_ENGINE_MEDIASOURCE = 0xffffffff
     }
     public class WebCam_MF: IMFCaptureEngineOnEventCallback
@@ -90,9 +92,11 @@ namespace QSoft.MediaCapture
 
             return hr;
         }
+        TaskCompletionSource<HRESULT> m_TaskCompelete;
         IntPtr m_hwndPreview;
-        public HRESULT InitializeCaptureManager(IntPtr hwndPreview, object videosource)
+        public Task<HRESULT> InitializeCaptureManager(IntPtr hwndPreview, object videosource)
         {
+            m_TaskCompelete = new TaskCompletionSource<HRESULT>();
             HRESULT hr = HRESULTS.S_OK;
             IMFAttributes pAttributes;
             IMFCaptureEngineClassFactory pFactory;
@@ -173,7 +177,8 @@ namespace QSoft.MediaCapture
             //    pFactory->Release();
             //    pFactory = NULL;
             //}
-            return hr;
+            //return hr;
+            return m_TaskCompelete.Task;
         }
 
         void DestroyCaptureEngine()
@@ -214,16 +219,21 @@ namespace QSoft.MediaCapture
         //HANDLE m_hpwrRequest;
         bool m_fPowerRequestSet;
 
-        public HRESULT StartPreview()
+        TaskCompletionSource<HRESULT> m_StartPreviewTask;
+        public Task<HRESULT> StartPreview()
         {
+            this.m_StartPreviewTask = new TaskCompletionSource<HRESULT>();
             if (m_pEngine == null)
             {
-                return HRESULTS.MF_E_NOT_INITIALIZED;
+                return Task.FromResult((HRESULT)HRESULTS.MF_E_NOT_INITIALIZED);
+                //return HRESULTS.MF_E_NOT_INITIALIZED;
             }
 
             if (m_bPreviewing == true)
             {
-                return HRESULTS.S_OK;
+                //return await Task.FromResult(HRESULTS.S_OK);
+                //return HRESULTS.S_OK;
+                return Task.FromResult((HRESULT)HRESULTS.S_OK);
             }
 
             IMFCaptureSink pSink = null;
@@ -260,14 +270,7 @@ namespace QSoft.MediaCapture
                 }
 
                 //// Configure the video format for the preview sink.
-                ////MF_CAPTURE_ENGINE_FIRST_SOURCE_VIDEO_STREAM
-                ////MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM_FOR_VIDEO_PREVIEW
-
-                //MF
-
-
-
-                hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM_FOR_VIDEO_PREVIEW, out pMediaType);
+                hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, out pMediaType);
                 if (hr != HRESULTS.S_OK)
                 {
                     goto done;
@@ -286,7 +289,9 @@ namespace QSoft.MediaCapture
                 }
 
                 // Connect the video stream to the preview sink.
-                hr = m_pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM_FOR_VIDEO_PREVIEW, pMediaType2, null, dwSinkStreamIndex);
+                
+                IntPtr pp = Marshal.AllocHGlobal(4);
+                hr = m_pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, pMediaType2, null, pp);
                 if (hr != HRESULTS.S_OK)
                 {
                     goto done;
@@ -313,6 +318,134 @@ namespace QSoft.MediaCapture
             Marshal.ReleaseComObject(pSource);
 
 
+            return m_StartPreviewTask.Task;
+        }
+
+        TaskCompletionSource<HRESULT> m_Takephoto;
+        public Task<HRESULT> TakePhoto(string pszFileName)
+        {
+            this.m_Takephoto = new TaskCompletionSource<HRESULT>();
+            IMFCaptureSink pSink = null;
+            IMFCapturePhotoSink pPhoto = null;
+            IMFCaptureSource pSource;
+            IMFMediaType pMediaType = null;
+            IMFMediaType pMediaType2 = null;
+            bool bHasPhotoStream = true;
+
+            // Get a pointer to the photo sink.
+            HRESULT hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_PHOTO, out pSink);
+            if (hr.IsError)
+            {
+                goto done;
+            }
+            pPhoto = pSink as IMFCapturePhotoSink;
+            //hr = pSink->QueryInterface(IID_PPV_ARGS(&pPhoto));
+            //if (hr.IsError)
+            //{
+            //    goto done;
+            //}
+
+            hr = m_pEngine.GetSource(out pSource);
+            if (hr.IsError)
+            {
+                goto done;
+            }
+
+            hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_PHOTO, out pMediaType);
+            if (hr.IsError)
+            {
+                goto done;
+            }
+            
+
+            //Configure the photo format
+            hr = CreatePhotoMediaType(pMediaType, out pMediaType2);
+            if (hr.IsError)
+            {
+                goto done;
+            }
+
+            hr = pPhoto.RemoveAllStreams();
+            if (hr.IsError)
+            {
+                goto done;
+            }
+
+            //DWORD dwSinkStreamIndex;
+            IntPtr pp = Marshal.AllocHGlobal(4);
+            // Try to connect the first still image stream to the photo sink
+            if (bHasPhotoStream)
+            {
+                hr = pPhoto.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_PHOTO, pMediaType2, null, pp);
+            }
+
+            if (hr.IsError)
+            {
+                goto done;
+            }
+
+            hr = pPhoto.SetOutputFileName(pszFileName);
+            if (hr.IsError)
+            {
+                goto done;
+            }
+
+            hr = m_pEngine.TakePhoto();
+            if (hr.IsError)
+            {
+                goto done;
+            }
+
+            m_bPhotoPending = true;
+
+        done:
+            //SafeRelease(&pSink);
+            //SafeRelease(&pPhoto);
+            //SafeRelease(&pSource);
+            //SafeRelease(&pMediaType);
+            //SafeRelease(&pMediaType2);
+            return this.m_Takephoto.Task;
+        }
+
+        HRESULT CreatePhotoMediaType(IMFMediaType pSrcMediaType, out IMFMediaType ppPhotoMediaType)
+        {
+            //*ppPhotoMediaType = NULL;
+            ppPhotoMediaType = null;
+            //const UINT32 uiFrameRateNumerator = 30;
+            //const UINT32 uiFrameRateDenominator = 1;
+
+            IMFMediaType pPhotoMediaType = null;
+
+            HRESULT hr = MFFunctions.MFCreateMediaType(out pPhotoMediaType);
+            if (hr.IsError)
+            {
+                goto done;
+            }
+
+            hr = pPhotoMediaType.SetGUID(MFConstants.MF_MT_MAJOR_TYPE, MFConstants.MFMediaType_Image);
+            if (hr.IsError)
+            {
+                goto done;
+            }
+
+            
+            hr = pPhotoMediaType.SetGUID(MFConstants.MF_MT_SUBTYPE, WICConstants.GUID_ContainerFormatJpeg);
+            if (hr.IsError)
+            {
+                goto done;
+            }
+
+            hr = CopyAttribute(pSrcMediaType, pPhotoMediaType, MFConstants.MF_MT_FRAME_SIZE);
+            if (hr.IsError)
+            {
+                goto done;
+            }
+
+            ppPhotoMediaType = pPhotoMediaType;
+        //(*ppPhotoMediaType)->AddRef();
+
+        done:
+            //SafeRelease(&pPhotoMediaType);
             return hr;
         }
 
@@ -383,7 +516,7 @@ namespace QSoft.MediaCapture
             return hr;
         }
 
-public HRESULT OnEvent(IMFMediaEvent pEvent)
+        public HRESULT OnEvent(IMFMediaEvent pEvent)
         {
             // We're about to fall asleep, that means we've just asked the CE to stop the preview
             // and record.  We need to handle it here since our message pump may be gone.
@@ -400,7 +533,11 @@ public HRESULT OnEvent(IMFMediaEvent pEvent)
             {
                 if(guidType == MFConstants.MF_CAPTURE_ENGINE_INITIALIZED)
                 {
-
+                    m_TaskCompelete.SetResult(HRESULTS.S_OK);
+                }
+                else if(guidType == MFConstants.MF_CAPTURE_ENGINE_PREVIEW_STARTED)
+                {
+                    m_StartPreviewTask.SetResult((HRESULT)HRESULTS.S_OK);
                 }
                 else if (guidType == MFConstants.MF_CAPTURE_ENGINE_PREVIEW_STOPPED)
                 {
@@ -409,8 +546,17 @@ public HRESULT OnEvent(IMFMediaEvent pEvent)
                 }
                 else if (guidType == MFConstants.MF_CAPTURE_ENGINE_RECORD_STARTED)
                 {
+                    m_StartRecordTask.SetResult(HRESULTS.S_OK); 
                     //m_pManager->OnRecordStopped(hrStatus);
                     //SetEvent(m_pManager->m_hEvent);
+                }
+                else if(guidType == MFConstants.MF_CAPTURE_ENGINE_RECORD_STOPPED)
+                {
+                    m_WaitStopRecord.SetResult(HRESULTS.S_OK);
+                }
+                else if(guidType == MFConstants.MF_CAPTURE_ENGINE_PHOTO_TAKEN)
+                {
+                    this.m_Takephoto.SetResult(HRESULTS.S_OK);
                 }
                 else
                 {
@@ -423,8 +569,402 @@ public HRESULT OnEvent(IMFMediaEvent pEvent)
             return HRESULTS.S_OK;
         }
 
-        
+        TaskCompletionSource<HRESULT> m_WaitStopRecord;
+        public Task<HRESULT> StopRecord()
+        {
+            m_WaitStopRecord = new TaskCompletionSource<HRESULT>();
+            HRESULT hr = HRESULTS.S_OK;
+
+            if (m_bRecording)
+            {
+                hr = m_pEngine.StopRecord(true, false);
+            }
+
+            return m_WaitStopRecord.Task;
+        }
+
+        TaskCompletionSource<HRESULTS> m_StartRecordTask;
+        public Task<HRESULTS> StartRecord(string pszDestinationFile)
+        {
+            if (m_pEngine == null)
+            {
+                return Task.FromResult(HRESULTS.MF_E_NOT_INITIALIZED);
+            }
+
+            if (m_bRecording == true)
+            {
+                return Task.FromResult(HRESULTS.MF_E_INVALIDREQUEST);
+            }
+            m_StartRecordTask = new TaskCompletionSource<HRESULTS>();
+            System.IO.FileInfo fileinfo = new System.IO.FileInfo(pszDestinationFile);
+            var pszExt = fileinfo.Extension;
+
+            Guid guidVideoEncoding = Guid.Empty;
+            Guid guidAudioEncoding = Guid.Empty;
+            switch (pszExt)
+            {
+                case ".mp4":
+                    {
+                        guidVideoEncoding = MFConstants.MFVideoFormat_H264;
+                        guidAudioEncoding = MFConstants.MFAudioFormat_AAC;
+                    }
+                    break;
+                case ".wmv":
+                    {
+                        guidVideoEncoding = MFConstants.MFVideoFormat_H264;
+                        guidAudioEncoding = MFConstants.MFAudioFormat_AAC;
+                    }
+                    break;
+                case ".wma":
+                    {
+                        guidVideoEncoding = Guid.Empty;
+                        guidAudioEncoding = MFConstants.MFAudioFormat_WMAudioV9;
+                    }
+                    break;
+                default:
+                    {
+                        return Task.FromResult(HRESULTS.MF_E_INVALIDMEDIATYPE);
+                    }
+            }
+            //if (wcscmp(pszExt, L".mp4") == 0)
+            //{
+            //    guidVideoEncoding = MFVideoFormat_H264;
+            //    guidAudioEncoding = MFAudioFormat_AAC;
+            //}
+            //else if (wcscmp(pszExt, L".wmv") == 0)
+            //{
+            //    guidVideoEncoding = MFVideoFormat_WMV3;
+            //    guidAudioEncoding = MFAudioFormat_WMAudioV9;
+            //}
+            //else if (wcscmp(pszExt, L".wma") == 0)
+            //{
+            //    guidVideoEncoding = GUID_NULL;
+            //    guidAudioEncoding = MFAudioFormat_WMAudioV9;
+            //}
+            //else
+            //{
+            //    return HRESULTS.MF_E_INVALIDMEDIATYPE;
+            //}
+
+            IMFCaptureSink pSink = null;
+            IMFCaptureRecordSink pRecord = null;
+            IMFCaptureSource pSource = null;
+
+            HRESULT hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_RECORD, out pSink);
+            if (hr.IsError)
+            {
+                goto done;
+            }
+            pRecord = pSink as IMFCaptureRecordSink;
+            //hr = pSink->QueryInterface(IID_PPV_ARGS(&pRecord));
+            //if (FAILED(hr))
+            //{
+            //    goto done;
+            //}
+
+            hr = m_pEngine.GetSource(out pSource);
+            if (hr.IsError)
+            {
+                goto done;
+            }
+
+            // Clear any existing streams from previous recordings.
+            hr = pRecord.RemoveAllStreams();
+            if (hr.IsError)
+            {
+                goto done;
+            }
+
+            hr = pRecord.SetOutputFileName(pszDestinationFile);
+            if (hr.IsError)
+            {
+                goto done;
+            }
+
+            // Configure the video and audio streams.
+            if (guidVideoEncoding != Guid.Empty)
+            {
+                hr = ConfigureVideoEncoding(pSource, pRecord, ref guidVideoEncoding);
+                if (hr.IsError)
+                {
+                    goto done;
+                }
+            }
+
+            if (guidAudioEncoding != Guid.Empty)
+            {
+                hr = ConfigureAudioEncoding(pSource, pRecord, guidAudioEncoding);
+                if (hr.IsError)
+                {
+                    goto done;
+                }
+            }
+
+            hr = m_pEngine.StartRecord();
+            if (hr.IsError)
+            {
+                goto done;
+            }
+
+            m_bRecording = true;
+
+        done:
+            //SafeRelease(&pSink);
+            //SafeRelease(&pSource);
+            //SafeRelease(&pRecord);
+
+            return m_StartRecordTask.Task;
+        }
+
+        // Helper function to get the frame size from a video media type.
+        HRESULT GetFrameSize(IMFMediaType pType, out uint pWidth, out uint pHeight)
+        {
+            return MFFunctions1.MFGetAttributeSize(pType, MFConstants.MF_MT_FRAME_SIZE, out pWidth, out pHeight);
+        }
+
+        // Helper function to get the frame rate from a video media type.
+        HRESULT GetFrameRate(IMFMediaType pType, out uint pNumerator, out uint pDenominator)
+        {
+            return MFFunctions1.MFGetAttributeRatio(pType, MFConstants.MF_MT_FRAME_RATE, out pNumerator, out pDenominator);
+        }
+
+        HRESULT GetEncodingBitrate(IMFMediaType pMediaType, out uint uiEncodingBitrate)
+        {
+            uiEncodingBitrate = 0;
+            uint uiWidth;
+            uint uiHeight;
+            float uiBitrate;
+            uint uiFrameRateNum;
+            uint uiFrameRateDenom;
+
+            HRESULT hr = GetFrameSize(pMediaType, out uiWidth, out uiHeight);
+            if (hr.IsError)
+            {
+                goto done;
+            }
+
+            hr = GetFrameRate(pMediaType, out uiFrameRateNum, out uiFrameRateDenom);
+            if (hr.IsError)
+            {
+                goto done;
+            }
+
+            uiBitrate = uiWidth / 3.0f * uiHeight * uiFrameRateNum / uiFrameRateDenom;
+
+            uiEncodingBitrate = (uint)uiBitrate;
+
+        done:
+
+            return hr;
+        }
+
+
+        HRESULT ConfigureVideoEncoding(IMFCaptureSource pSource, IMFCaptureRecordSink pRecord, ref Guid guidEncodingType)
+        {
+            IMFMediaType pMediaType = null;
+            IMFMediaType pMediaType2 = null;
+            Guid guidSubType = Guid.Empty;
+
+            // Configure the video format for the recording sink.
+            HRESULT hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_RECORD, out pMediaType);
+            if (hr.IsError)
+            {
+                goto done;
+            }
+
+            hr = CloneVideoMediaType(pMediaType, guidEncodingType,  out pMediaType2);
+            if (hr.IsError)
+            {
+                goto done;
+            }
+
+
+            hr = pMediaType.GetGUID(MFConstants.MF_MT_SUBTYPE, out guidSubType);
+            if (hr.IsError)
+            {
+                goto done;
+            }
+
+            if (guidSubType == MFConstants.MFVideoFormat_H264_ES || guidSubType == MFConstants.MFVideoFormat_H264)
+            {
+                //When the webcam supports H264_ES or H264, we just bypass the stream. The output from Capture engine shall be the same as the native type supported by the webcam
+                hr = pMediaType2.SetGUID(MFConstants.MF_MT_SUBTYPE, MFConstants.MFVideoFormat_H264);
+            }
+            else
+            {
+                uint uiEncodingBitrate;
+                hr = GetEncodingBitrate(pMediaType2, out uiEncodingBitrate);
+                if (hr.IsError)
+                {
+                    goto done;
+                }
+                //uiEncodingBitrate = uiEncodingBitrate / 2;
+                hr = pMediaType2.SetUINT32(MFConstants.MF_MT_AVG_BITRATE, uiEncodingBitrate);
+            }
+
+            if (hr.IsError)
+            {
+                goto done;
+            }
+
+            // Connect the video stream to the recording sink.
+            //DWORD dwSinkStreamIndex;
+            IntPtr dwSinkStreamIndex = Marshal.AllocHGlobal(4);
+            hr = pRecord.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_RECORD, pMediaType2, null, dwSinkStreamIndex);
+
+        done:
+            //SafeRelease(&pMediaType);
+            //SafeRelease(&pMediaType2);
+            return hr;
+        }
+
+        HRESULT ConfigureAudioEncoding(IMFCaptureSource pSource, IMFCaptureRecordSink pRecord, Guid guidEncodingType)
+        {
+            IMFCollection pAvailableTypes = null;
+            IMFMediaType pMediaType = null;
+            IMFAttributes pAttributes = null;
+
+            // Configure the audio format for the recording sink.
+
+            HRESULT hr = MFFunctions.MFCreateAttributes(out pAttributes, 1);
+            if (hr.IsError)
+            {
+                goto done;
+            }
+
+            // Enumerate low latency media types
+            hr = pAttributes.SetUINT32(MFConstants.MF_LOW_LATENCY, 1);
+            if (hr.IsError)
+            {
+                goto done;
+            }
+
+
+            //// Get a list of encoded output formats that are supported by the encoder.
+            //hr = MFFunctions.MFTranscodeGetAudioOutputAvailableTypes(guidEncodingType, MFT_ENUM_FLAG_ALL | MFT_ENUM_FLAG_SORTANDFILTER,
+            //    pAttributes, out pAvailableTypes);
+            //if (hr.IsError)
+            //{
+            //    goto done;
+            //}
+            //DirectN._MFT_ENUM_FLAG
+
+            //MFT_ENUM_FLAG_SORTANDFILTER
+            uint flag = (uint)(DirectN._MFT_ENUM_FLAG.MFT_ENUM_FLAG_ALL | DirectN._MFT_ENUM_FLAG.MFT_ENUM_FLAG_SORTANDFILTER);
+            
+            IMFCollection colptr;
+            hr = MFFunctions1.MFTranscodeGetAudioOutputAvailableTypes(guidEncodingType, flag, pAttributes, out colptr);
+
+
+            //            // Gets an interface pointer from a Media Foundation collection.
+            //            template <class IFACE>
+            //HRESULT GetCollectionObject(IMFCollection* pCollection, DWORD index, IFACE** ppObject)
+            //        {
+            //            IUnknown* pUnk;
+            //            HRESULT hr = pCollection->GetElement(index, &pUnk);
+            //            if (SUCCEEDED(hr))
+            //            {
+            //                hr = pUnk->QueryInterface(IID_PPV_ARGS(ppObject));
+            //                pUnk->Release();
+            //            }
+            //            return hr;
+            //        }
+
+            hr = colptr.GetElement(0, out var punk);
+            if(hr.IsSuccess)
+            {
+                pMediaType = punk as IMFMediaType;
+            }
+            //// Pick the first format from the list.
+            //hr = GetCollectionObject(pAvailableTypes, 0, &pMediaType);
+            //if (hr.IsError)
+            //{
+            //    goto done;
+            //}
+
+            // Connect the audio stream to the recording sink.
+            IntPtr pp = Marshal.AllocHGlobal(4);
+            hr = pRecord.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_AUDIO, pMediaType, null, pp);
+            if (hr == HRESULTS.MF_E_INVALIDSTREAMNUMBER)
+            {
+                //If an audio device is not present, allow video only recording
+                hr = HRESULTS.S_OK;
+            }
+        done:
+            //SafeRelease(&pAvailableTypes);
+            //SafeRelease(&pMediaType);
+            //SafeRelease(&pAttributes);
+            return hr;
+        }
+
+
+
     }
 
-    
+    public static class MFFunctions1
+    {
+        [DllImport("mf", ExactSpelling = true)]
+        public static extern HRESULT MFTranscodeGetAudioOutputAvailableTypes([MarshalAs(UnmanagedType.LPStruct)] Guid guidSubType, uint dwMFTFlags, IMFAttributes pCodecConfig, out IMFCollection ppAvailableTypes);
+
+
+        //public static void GetAll(this IMFCaptureSource src)
+        //{
+        //    src.GetAvailableDeviceMediaType(src.GetType(), out var mediaType);
+        //    while(true)
+        //    {
+
+        //    }
+        //}
+        public static HRESULT MFGetAttributeRatio(
+            IMFAttributes pAttributes,
+            Guid guidKey,
+            out uint punNumerator,
+            out uint punDenominator
+            )
+        {
+            return MFGetAttribute2UINT32asUINT64(pAttributes, guidKey, out punNumerator, out punDenominator);
+        }
+
+        public static HRESULT MFGetAttributeSize(
+            IMFAttributes pAttributes,
+            Guid guidKey,
+            out uint punWidth,
+            out uint punHeight
+            )
+        {
+            return MFGetAttribute2UINT32asUINT64(pAttributes, guidKey, out punWidth, out punHeight);
+        }
+
+        public static HRESULT MFGetAttribute2UINT32asUINT64(
+            IMFAttributes pAttributes,
+            Guid guidKey,
+            out uint punHigh32,
+            out uint punLow32
+            )
+        {
+            ulong unPacked;
+            HRESULT hr;
+
+            hr = pAttributes.GetUINT64(guidKey, out unPacked);
+            if (hr.IsError)
+            {
+                punHigh32 = punLow32 = 0;
+                return hr;
+            }
+            Unpack2UINT32AsUINT64(unPacked, out punHigh32, out punLow32);
+
+            return hr;
+        }
+
+        public static void Unpack2UINT32AsUINT64(
+            ulong unPacked,
+            out uint punHigh,
+            out uint punLow
+            )
+        {
+            ulong ul = (ulong)unPacked;
+            punHigh = (uint)(ul >> 32);
+            punLow = (uint)(ul & 0xffffffff);
+        }
+    }
 }

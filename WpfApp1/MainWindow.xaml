@@ -5,13 +5,32 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms" 
+        Title="MainWindow" Height="450" Width="800"
+        Loaded="Window_Loaded">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>
-            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        
+        <WindowsFormsHost >
+            <wf:Button x:Name="mtbDate"/>
+        </WindowsFormsHost>
+        <StackPanel Grid.Row="1" Orientation="Horizontal">
+            <Button x:Name="button_takephoto" Click="button_takephoto_Click">TaskPhtot</Button>
+            <ToggleButton Click="ToggleButton_Click">
+                <ToggleButton.Style>
+                    <Style TargetType="ToggleButton">
+                        <Setter Property="Content" Value="開始錄影"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter Property="Content" Value="停止錄影"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ToggleButton.Style>
+            </ToggleButton>
+        </StackPanel>
         <!--<StackPanel>
             <Button x:Name="a" Click="a_Click">A</Button>
             <Button x:Name="b" Click="b_Click">B</Button>
