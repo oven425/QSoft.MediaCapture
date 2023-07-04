@@ -24,7 +24,7 @@ namespace WpfApp1
     /// <summary>
     /// MainWindow.xaml 的互動邏輯
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, IMFCaptureEngineOnSampleCallback
     {
         public MainWindow()
         {
@@ -60,7 +60,8 @@ namespace WpfApp1
                 IMFActivate ddd = sources[0].Object;
                 
                 await mf.InitializeCaptureManager(this.mtbDate.Handle, ddd);
-                await mf.StartPreview();
+                await mf.StartPreview(this.mtbDate.Handle);
+                await mf.StartPreview(x => { });
             }
             
         }
@@ -88,6 +89,14 @@ namespace WpfApp1
                 await mf.StopRecord();
             }
         }
+
+        public HRESULT OnSample(IMFSample pSample)
+        {
+            System.Diagnostics.Trace.WriteLine("OnSample");
+            
+            Marshal.ReleaseComObject(pSample);
+            return HRESULTS.S_OK;
+        }
     }
 
 
@@ -97,4 +106,18 @@ namespace WpfApp1
     }
 
     
+    public class SampleRecv: IMFCaptureEngineOnSampleCallback
+    {
+        int m_Data;
+        public SampleRecv(int data)
+        {
+            this.m_Data = data;
+        }
+        public HRESULT OnSample(IMFSample pSample)
+        {
+            System.Diagnostics.Trace.WriteLine($"SampleRecv:{this.m_Data}");
+            Marshal.ReleaseComObject(pSample);
+            return HRESULTS.S_OK;
+        }
+    }
 }

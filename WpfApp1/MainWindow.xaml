@@ -13,6 +13,14 @@
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+        <!--<UniformGrid Columns="2">
+            <WindowsFormsHost >
+                <wf:Button x:Name="mtbDate"/>
+            </WindowsFormsHost>
+            <WindowsFormsHost >
+                <wf:Button x:Name="mtbDate1"/>
+            </WindowsFormsHost>
+        </UniformGrid>-->
         <WindowsFormsHost >
             <wf:Button x:Name="mtbDate"/>
         </WindowsFormsHost>

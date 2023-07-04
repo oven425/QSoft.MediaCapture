@@ -227,7 +227,7 @@ public:
         m_errorID = 0;  
     }
 
-
+    
 
     bool    IsPreviewing() const { return m_bPreviewing; }
     bool    IsRecording() const { return m_bRecording; }
