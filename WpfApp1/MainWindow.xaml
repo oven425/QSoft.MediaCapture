@@ -13,17 +13,15 @@
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <!--<UniformGrid Columns="2">
+        <UniformGrid Columns="2">
             <WindowsFormsHost >
                 <wf:Button x:Name="mtbDate"/>
             </WindowsFormsHost>
-            <WindowsFormsHost >
-                <wf:Button x:Name="mtbDate1"/>
-            </WindowsFormsHost>
-        </UniformGrid>-->
-        <WindowsFormsHost >
+            <Image x:Name="image_preview"></Image>
+        </UniformGrid>
+        <!--<WindowsFormsHost >
             <wf:Button x:Name="mtbDate"/>
-        </WindowsFormsHost>
+        </WindowsFormsHost>-->
         <StackPanel Grid.Row="1" Orientation="Horizontal">
             <Button x:Name="button_takephoto" Click="button_takephoto_Click">TaskPhtot</Button>
             <ToggleButton Click="ToggleButton_Click">

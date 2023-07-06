@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 //https://github.com/MicrosoftDocs/win32/blob/docs/desktop-src/medfound/directx-surface-buffer.md
 namespace QSoft.MediaCapture
@@ -103,23 +104,6 @@ namespace QSoft.MediaCapture
             IMFCaptureEngineClassFactory pFactory;
             
             DestroyCaptureEngine();
-
-            //m_hEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-            //if (NULL == m_hEvent)
-            //{
-            //    hr = HRESULT_FROM_WIN32(GetLastError());
-            //    goto Exit;
-            //}
-
-            //m_pCallback = new(std::nothrow) CaptureEngineCB(m_hwndEvent);
-            //if (m_pCallback == NULL)
-            //{
-            //    hr = E_OUTOFMEMORY;
-            //    goto Exit;
-            //}
-
-            //m_pCallback->m_pManager = this;
-            //m_hwndPreview = hwndPreview;
 
             //Create a D3D Manager
             hr = CreateD3DManager();
@@ -240,7 +224,7 @@ namespace QSoft.MediaCapture
             IMFMediaType pMediaType = null;
             IMFMediaType pMediaType2 = null;
             IMFCaptureSource pSource = null;
-            IntPtr dwSinkStreamIndex = IntPtr.Zero;
+            //IntPtr dwSinkStreamIndex = IntPtr.Zero;
             HRESULT hr = HRESULTS.S_OK;
             // Get a pointer to the preview sink.
             if (m_pPreview == null)
@@ -263,7 +247,7 @@ namespace QSoft.MediaCapture
                 {
                     goto done;
                 }
-
+                this.Mirror(pSource, (uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW);
                 //// Configure the video format for the preview sink.
                 hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, out pMediaType);
                 if (hr != HRESULTS.S_OK)
@@ -284,14 +268,18 @@ namespace QSoft.MediaCapture
                 }
 
                 // Connect the video stream to the preview sink.
-                
-                IntPtr pp = Marshal.AllocHGlobal(4);
-                hr = m_pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, pMediaType2, null, pp);
-                if (hr != HRESULTS.S_OK)
+
+                using (var cm = new ComMemory(Marshal.SizeOf<uint>()))
                 {
-                    goto done;
+                    hr = m_pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, pMediaType2, null, cm.Pointer);
+                    if (hr != HRESULTS.S_OK)
+                    {
+                        goto done;
+                    }
+                    dwSinkStreamIndex = (uint)Marshal.ReadInt32(cm.Pointer);
                 }
-                m_pPreview.SetRotation(0, 90);
+                
+                //m_pPreview.SetRotation(0, 90);
             }
 
 
@@ -316,9 +304,9 @@ namespace QSoft.MediaCapture
 
             return m_StartPreviewTask.Task;
         }
-
+        MFCaptureEngineOnSampleCallback m_PreviewCallback;
         uint dwSinkStreamIndex = 0;
-        public Task<HRESULT> StartPreview(Action<WriteableBitmap> data)
+        public Task<HRESULT> StartPreview(Action<WriteableBitmap> action)
         {
             if (m_pEngine == null)
             {
@@ -374,7 +362,7 @@ namespace QSoft.MediaCapture
                     goto done;
                 }
 
-                hr = CloneVideoMediaType(pMediaType, MFConstants.MFVideoFormat_RGB32, out pMediaType2);
+                hr = CloneVideoMediaType(pMediaType, MFConstants.MFVideoFormat_RGB24, out pMediaType2);
                 if (hr != HRESULTS.S_OK)
                 {
                     goto done;
@@ -387,7 +375,6 @@ namespace QSoft.MediaCapture
                 }
 
                 // Connect the video stream to the preview sink.
-
                 using (var cm = new ComMemory(Marshal.SizeOf<uint>()))
                 {
                     hr = m_pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, pMediaType2, null, cm.Pointer);
@@ -397,15 +384,22 @@ namespace QSoft.MediaCapture
                     }
                     dwSinkStreamIndex = (uint)Marshal.ReadInt32(cm.Pointer);
                 }
-
-
-                hr = m_pPreview.SetSampleCallback(dwSinkStreamIndex, new MFCaptureEngineOnSampleCallback(null));
+                this.Mirror(pSource, dwSinkStreamIndex);
+                uint w = 0;
+                uint h = 0;
+                MFFunctions1.MFGetAttributeSize(pMediaType2, MFConstants.MF_MT_FRAME_SIZE, out w, out h);
+                m_PreviewBmp = new WriteableBitmap((int)w, (int)h, 96, 96, PixelFormats.Bgr24, null);
+                m_PreviewCallback = new MFCaptureEngineOnSampleCallback(m_PreviewBmp);
+                hr = m_pPreview.SetSampleCallback(dwSinkStreamIndex, m_PreviewCallback);
                 if (hr != HRESULTS.S_OK)
                 {
                     goto done;
                 }
+               
+                
+                action(m_PreviewBmp);
             }
-            
+
 
             hr = m_pEngine.StartPreview();
         //if (!m_fPowerRequestSet && m_hpwrRequest != INVALID_HANDLE_VALUE)
@@ -428,6 +422,40 @@ namespace QSoft.MediaCapture
 
             return m_StartPreviewTask.Task;
         }
+
+        void Mirror(IMFCaptureSource source, uint streamindex)
+        {
+            //IMFVideoProcessorControl
+            //source.AddEffect()
+            IMFMediaType pMediaType;
+            source.GetCurrentDeviceMediaType(streamindex, out pMediaType);
+            var vp = Activator.CreateInstance(Type.GetTypeFromCLSID(DirectN.MFConstants.CLSID_VideoProcessorMFT)) as IMFVideoProcessorControl;
+            var hr=vp.SetMirror(_MF_VIDEO_PROCESSOR_MIRROR.MIRROR_HORIZONTAL);
+            IMFTransform mft = vp as IMFTransform;
+            hr = mft.SetInputType(0, pMediaType, 0);
+            //if (COMBase.Failed(hr))
+            //{
+            //    System.Diagnostics.Trace.WriteLine($"SetInputType  {hr}");
+            //    goto done;
+            //}
+
+
+            hr = mft.SetOutputType(0, pMediaType, 0);
+            //if (COMBase.Failed(hr))
+            //{
+            //    System.Diagnostics.Trace.WriteLine($"SetOutputType  {hr}");
+            //    goto done;
+            //}
+
+
+            hr = source.AddEffect(streamindex, vp);
+            //object o;
+            //pFactory.CreateInstance(DirectN.MFConstants.CLSID_MFCaptureEngine, typeof(IMFCaptureEngine).GUID, out o);
+            //m_pEngine = o as IMFVideoProcessorControl;
+
+        }
+
+        WriteableBitmap m_PreviewBmp;
 
         TaskCompletionSource<HRESULT> m_Takephoto;
         public Task<HRESULT> TakePhoto(string pszFileName)
@@ -1089,14 +1117,42 @@ namespace QSoft.MediaCapture
 
     public class MFCaptureEngineOnSampleCallback : IMFCaptureEngineOnSampleCallback
     {
+        [DllImport("kernel32.dll", EntryPoint = "CopyMemory", SetLastError = false)]
+        public static extern void CopyMemory(IntPtr dest, IntPtr src, uint count);
         WriteableBitmap m_Bmp;
         public MFCaptureEngineOnSampleCallback(WriteableBitmap data)
         {
             this.m_Bmp = data;
         }
+        byte[] m_Buffer;
+        object m_Lock = new object();
         public HRESULT OnSample(IMFSample pSample)
         {
-            Marshal.ReleaseComObject(pSample);
+            if(System.Threading.Monitor.TryEnter(this.m_Lock) == true)
+            {
+                pSample.GetBufferByIndex(0, out var buf);
+                var ptr = buf.Lock(out var max, out var cur);
+                //m_Buffer = new byte[cur];
+                //Marshal.Copy(ptr, m_Buffer, 0, m_Buffer.Length);
+                m_Bmp.Dispatcher.Invoke(() =>
+                {
+                    m_Bmp.Lock();
+                    CopyMemory(m_Bmp.BackBuffer, ptr, cur);
+                    //Marshal.Copy(this.m_Buffer, 0, m_Bmp.BackBuffer, this.m_Buffer.Length);
+                    m_Bmp.AddDirtyRect(new System.Windows.Int32Rect(0,0, m_Bmp.PixelWidth, m_Bmp.PixelHeight));
+                    m_Bmp.Unlock();
+                }, System.Windows.Threading.DispatcherPriority.Background);
+                
+                buf.Unlock();
+                Marshal.ReleaseComObject(buf);
+                Marshal.ReleaseComObject(pSample);
+                System.Threading.Monitor.Exit(this.m_Lock);
+            }
+            else
+            {
+                Marshal.ReleaseComObject(pSample);
+            }
+            
             return HRESULTS.S_OK;
         }
     }

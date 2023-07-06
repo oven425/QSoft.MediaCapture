@@ -60,8 +60,9 @@ namespace WpfApp1
                 IMFActivate ddd = sources[0].Object;
                 
                 await mf.InitializeCaptureManager(this.mtbDate.Handle, ddd);
-                await mf.StartPreview(this.mtbDate.Handle);
-                await mf.StartPreview(x => { });
+                //await mf.StartPreview(this.mtbDate.Handle);
+                await mf.StartPreview(x => { this.image_preview.Source = x; });
+
             }
             
         }
