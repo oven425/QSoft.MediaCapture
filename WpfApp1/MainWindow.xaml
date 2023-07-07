@@ -23,6 +23,7 @@
             <wf:Button x:Name="mtbDate"/>
         </WindowsFormsHost>-->
         <StackPanel Grid.Row="1" Orientation="Horizontal">
+            <ComboBox/>
             <Button x:Name="button_takephoto" Click="button_takephoto_Click">TaskPhtot</Button>
             <ToggleButton Click="ToggleButton_Click">
                 <ToggleButton.Style>

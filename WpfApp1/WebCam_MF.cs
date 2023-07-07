@@ -1027,24 +1027,39 @@ namespace QSoft.MediaCapture
             VIDEO_STREAM = 0xFFFFFFFC,
             AUDIO_STREAM = 0xFFFFFFFD
         }
-        public static void GetAllMediaType(this IMFCaptureSource src)
+        public static List<IMFMediaType> GetAllMediaType(this IMFCaptureSource src, uint streamindex)
         {
-            //MF_CAPTURE_ENGINE_FIRST_SOURCE_PHOTO_STREAM
+            List<IMFMediaType> medias = new List<IMFMediaType>();
             uint index = 0;
             while(true)
             {
                 IMFMediaType mediaType;
-                var hr = src.GetAvailableDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_PHOTO, index, out mediaType);
-                if(hr == HRESULTS.MF_E_NO_MORE_TYPES)
+                var hr = src.GetAvailableDeviceMediaType(streamindex, index, out mediaType);
+                if (hr == HRESULTS.MF_E_NO_MORE_TYPES)
                 {
                     break;
                 }
+                medias.Add(mediaType);
+                index++;
                 uint w;
                 uint h;
                 MFFunctions1.MFGetAttributeSize(mediaType, MFConstants.MF_MT_FRAME_SIZE, out w, out h);
-
-
             }
+            return medias;
+        }
+
+        public static Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, List<IMFMediaType>> GetAllMediaType(this IMFCaptureSource src)
+        {
+            Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, List<IMFMediaType>> result = new Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, List<IMFMediaType>>();
+            var hr1 = src.GetDeviceStreamCount(out var count);
+            for (uint i = 0; i < count; i++)
+            {
+                src.GetDeviceStreamCategory(i, out var caegory);
+                var medias = src.GetAllMediaType(i);
+                result[caegory] = medias;
+            }
+
+            return result;
         }
     }
 
@@ -1054,14 +1069,14 @@ namespace QSoft.MediaCapture
         public static extern HRESULT MFTranscodeGetAudioOutputAvailableTypes([MarshalAs(UnmanagedType.LPStruct)] Guid guidSubType, uint dwMFTFlags, IMFAttributes pCodecConfig, out IMFCollection ppAvailableTypes);
 
 
-        //public static void GetAll(this IMFCaptureSource src)
-        //{
-        //    src.GetAvailableDeviceMediaType(src.GetType(), out var mediaType);
-        //    while(true)
-        //    {
+        public static void GetAll(this IMFCaptureSource src)
+        {
+            //src.GetAvailableDeviceMediaType(, out var mediaType);
+            //while (true)
+            //{
 
-        //    }
-        //}
+            //}
+        }
         public static HRESULT MFGetAttributeRatio(
             IMFAttributes pAttributes,
             Guid guidKey,
