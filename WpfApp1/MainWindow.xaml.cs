@@ -24,7 +24,7 @@ namespace WpfApp1
     /// <summary>
     /// MainWindow.xaml 的互動邏輯
     /// </summary>
-    public partial class MainWindow : Window, IMFCaptureEngineOnSampleCallback
+    public partial class MainWindow : Window
     {
         public MainWindow()
         {
@@ -59,7 +59,7 @@ namespace WpfApp1
                 var sources = attribute.EnumDeviceSources().ToList();
                 IMFActivate ddd = sources[0].Object;
                 
-                await mf.InitializeCaptureManager(this.mtbDate.Handle, ddd);
+                await mf.InitializeCaptureManager(ddd);
                 //await mf.StartPreview(this.mtbDate.Handle);
                 await mf.StartPreview(x => { this.image_preview.Source = x; });
 
@@ -73,7 +73,7 @@ namespace WpfApp1
             var photo = System.IO.Path.Combine(Environment.CurrentDirectory, "aa.jpg");
             
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-            await mf.TakePhoto($"{m_JpgIndex++}.jpg");
+            await mf.TakePhoto($"{m_JpgIndex++}.jpg", ()=>(1280,720));
             sw.Stop();
             System.Diagnostics.Trace.WriteLine($"takephoto: {sw.ElapsedMilliseconds}ms");
         }
@@ -89,14 +89,6 @@ namespace WpfApp1
             {
                 await mf.StopRecord();
             }
-        }
-
-        public HRESULT OnSample(IMFSample pSample)
-        {
-            System.Diagnostics.Trace.WriteLine("OnSample");
-            
-            Marshal.ReleaseComObject(pSample);
-            return HRESULTS.S_OK;
         }
     }
 

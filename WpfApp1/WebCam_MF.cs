@@ -95,13 +95,14 @@ namespace QSoft.MediaCapture
             return hr;
         }
         TaskCompletionSource<HRESULT> m_TaskCompelete;
-        //IntPtr m_hwndPreview;
-        public Task<HRESULT> InitializeCaptureManager(IntPtr hwndPreview, object videosource)
+        bool m_IsMirror = false;
+        public Task<HRESULT> InitializeCaptureManager(object videosource, bool ismirror=false)
         {
+            m_IsMirror = ismirror;
             m_TaskCompelete = new TaskCompletionSource<HRESULT>();
             HRESULT hr = HRESULTS.S_OK;
-            IMFAttributes pAttributes;
-            IMFCaptureEngineClassFactory pFactory;
+            IMFAttributes pAttributes = null;
+            IMFCaptureEngineClassFactory pFactory = null;
             
             DestroyCaptureEngine();
 
@@ -131,38 +132,24 @@ namespace QSoft.MediaCapture
             {
                 goto Exit;
             }
-        //// Create the factory object for the capture engine.
-        //hr = CoCreateInstance(CLSID_MFCaptureEngineClassFactory, NULL,
-        //    CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pFactory));
-        //if (hr != HRESULTS.S_OK)
-        //{
-        //    goto Exit;
-        //}
-
-        //// Create and initialize the capture engine.
-        //hr = pFactory->CreateInstance(CLSID_MFCaptureEngine, IID_PPV_ARGS(&m_pEngine));
-        //if (hr != HRESULTS.S_OK)
-        //{
-        //    goto Exit;
-        //}
-        //hr = m_pEngine->Initialize(m_pCallback, pAttributes, NULL, pUnk);
-        //if (hr != HRESULTS.S_OK)
-        //{
-        //    goto Exit;
-        //}
+            if(ismirror == true)
+            {
+                
+            }
 
         Exit:
-            //if (NULL != pAttributes)
-            //{
-            //    pAttributes->Release();
-            //    pAttributes = NULL;
-            //}
-            //if (NULL != pFactory)
-            //{
-            //    pFactory->Release();
-            //    pFactory = NULL;
-            //}
-            //return hr;
+            if (null != pAttributes)
+            {
+                SafeRelease(pAttributes);
+                //pAttributes->Release();
+                //pAttributes = NULL;
+            }
+            if (null != pFactory)
+            {
+                SafeRelease(pFactory);
+                //pFactory->Release();
+                //pFactory = NULL;
+            }
             return m_TaskCompelete.Task;
         }
 
@@ -173,16 +160,16 @@ namespace QSoft.MediaCapture
             //    CloseHandle(m_hEvent);
             //    m_hEvent = NULL;
             //}
-            //SafeRelease(&m_pPreview);
-            //SafeRelease(&m_pEngine);
-            //SafeRelease(&m_pCallback);
+            SafeRelease(m_pPreview);
+            SafeRelease(m_pEngine);
+            //SafeRelease(m_pCallback);
 
-            //if (g_pDXGIMan)
-            //{
-            //    g_pDXGIMan->ResetDevice(g_pDX11Device, g_ResetToken);
-            //}
-            //SafeRelease(&g_pDX11Device);
-            //SafeRelease(&g_pDXGIMan);
+            if (g_pDXGIMan!=null)
+            {
+                g_pDXGIMan.ResetDevice(g_pDX11Device, g_ResetToken);
+            }
+            SafeRelease(g_pDX11Device);
+            SafeRelease(g_pDXGIMan);
 
             //m_bPreviewing = false;
             //m_bRecording = false;
@@ -210,13 +197,10 @@ namespace QSoft.MediaCapture
             if (m_pEngine == null)
             {
                 return Task.FromResult((HRESULT)HRESULTS.MF_E_NOT_INITIALIZED);
-                //return HRESULTS.MF_E_NOT_INITIALIZED;
             }
 
             if (m_bPreviewing == true)
             {
-                //return await Task.FromResult(HRESULTS.S_OK);
-                //return HRESULTS.S_OK;
                 return Task.FromResult((HRESULT)HRESULTS.S_OK);
             }
 
@@ -423,6 +407,37 @@ namespace QSoft.MediaCapture
             return m_StartPreviewTask.Task;
         }
 
+        TaskCompletionSource<HRESULTS> m_StopPreviewTask;
+        public Task<HRESULTS> StopPreview()
+        {
+            HRESULT hr = HRESULTS.S_OK;
+
+            if (m_pEngine == null)
+            {
+                return Task.FromResult(HRESULTS.MF_E_NOT_INITIALIZED);
+            }
+
+            this.m_StopPreviewTask = new TaskCompletionSource<HRESULTS>(hr);
+            if (!m_bPreviewing)
+            {
+                return Task.FromResult(HRESULTS.S_OK);
+            }
+            hr = m_pEngine.StopPreview();
+            if (hr.IsError)
+            {
+                goto done;
+            }
+            //WaitForResult();
+
+            //if (m_fPowerRequestSet && m_hpwrRequest != INVALID_HANDLE_VALUE)
+            //{
+            //    PowerClearRequest(m_hpwrRequest, PowerRequestExecutionRequired);
+            //    m_fPowerRequestSet = false;
+            //}
+        done:
+            return this.m_StopPreviewTask.Task;
+        }
+
         void Mirror(IMFCaptureSource source, uint streamindex)
         {
             //IMFVideoProcessorControl
@@ -458,12 +473,12 @@ namespace QSoft.MediaCapture
         WriteableBitmap m_PreviewBmp;
 
         TaskCompletionSource<HRESULT> m_Takephoto;
-        public Task<HRESULT> TakePhoto(string pszFileName)
+        public Task<HRESULT> TakePhoto(string pszFileName, Func<(int width, int height)> size)
         {
             this.m_Takephoto = new TaskCompletionSource<HRESULT>();
             IMFCaptureSink pSink = null;
             IMFCapturePhotoSink pPhoto = null;
-            IMFCaptureSource pSource;
+            IMFCaptureSource pSource = null;
             IMFMediaType pMediaType = null;
             IMFMediaType pMediaType2 = null;
             bool bHasPhotoStream = true;
@@ -481,12 +496,18 @@ namespace QSoft.MediaCapture
             {
                 goto done;
             }
-            pSource.GetAllMediaType();
+
+            if(size != null)
+            {
+                pSource.SetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_PHOTO, null);
+            }
+            
             hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_PHOTO, out pMediaType);
             if (hr.IsError)
             {
                 goto done;
             }
+
             
 
             //Configure the photo format
@@ -530,11 +551,11 @@ namespace QSoft.MediaCapture
             m_bPhotoPending = true;
 
         done:
-            //SafeRelease(&pSink);
-            //SafeRelease(&pPhoto);
-            //SafeRelease(&pSource);
-            //SafeRelease(&pMediaType);
-            //SafeRelease(&pMediaType2);
+            SafeRelease(pSink);
+            SafeRelease(pPhoto);
+            SafeRelease(pSource);
+            SafeRelease(pMediaType);
+            SafeRelease(pMediaType2);
             return this.m_Takephoto.Task;
         }
 
@@ -672,6 +693,7 @@ namespace QSoft.MediaCapture
                 }
                 else if (guidType == MFConstants.MF_CAPTURE_ENGINE_PREVIEW_STOPPED)
                 {
+                    m_StopPreviewTask?.SetResult(HRESULTS.S_OK);
                     //m_pManager->OnPreviewStopped(hrStatus);
                     //SetEvent(m_pManager->m_hEvent);
                 }
@@ -688,6 +710,10 @@ namespace QSoft.MediaCapture
                 else if(guidType == MFConstants.MF_CAPTURE_ENGINE_PHOTO_TAKEN)
                 {
                     this.m_Takephoto.SetResult(HRESULTS.S_OK);
+                }
+                else if(guidType == MFConstants.MF_CAPTURE_ENGINE_EFFECT_ADDED)
+                {
+
                 }
                 else
                 {
@@ -992,12 +1018,6 @@ namespace QSoft.MediaCapture
             {
                 pMediaType = punk as IMFMediaType;
             }
-            //// Pick the first format from the list.
-            //hr = GetCollectionObject(pAvailableTypes, 0, &pMediaType);
-            //if (hr.IsError)
-            //{
-            //    goto done;
-            //}
 
             // Connect the audio stream to the recording sink.
             using (var cm = new ComMemory(Marshal.SizeOf<uint>()))
@@ -1017,16 +1037,18 @@ namespace QSoft.MediaCapture
             //SafeRelease(&pAttributes);
             return hr;
         }
+
+        void SafeRelease<T>(T obj) where T : class
+        {
+            if (obj != null)
+            {
+                Marshal.ReleaseComObject(obj);
+            }
+        }
     }
 
     public static class IMFCaptureSourceEx
     {
-        enum MF_CAPTURE_ENGINE_FIRST_SOURCE:uint
-        {
-            PHOTO_STREAM= 0xFFFFFFFB,
-            VIDEO_STREAM = 0xFFFFFFFC,
-            AUDIO_STREAM = 0xFFFFFFFD
-        }
         public static List<IMFMediaType> GetAllMediaType(this IMFCaptureSource src, uint streamindex)
         {
             List<IMFMediaType> medias = new List<IMFMediaType>();
@@ -1048,8 +1070,11 @@ namespace QSoft.MediaCapture
             return medias;
         }
 
+
+
         public static Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, List<IMFMediaType>> GetAllMediaType(this IMFCaptureSource src)
         {
+            
             Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, List<IMFMediaType>> result = new Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, List<IMFMediaType>>();
             var hr1 = src.GetDeviceStreamCount(out var count);
             for (uint i = 0; i < count; i++)
@@ -1061,6 +1086,11 @@ namespace QSoft.MediaCapture
 
             return result;
         }
+
+        public static void Mirror(this IMFCaptureSource src)
+        {
+
+        }
     }
 
     public static class MFFunctions1
@@ -1068,15 +1098,6 @@ namespace QSoft.MediaCapture
         [DllImport("mf", ExactSpelling = true)]
         public static extern HRESULT MFTranscodeGetAudioOutputAvailableTypes([MarshalAs(UnmanagedType.LPStruct)] Guid guidSubType, uint dwMFTFlags, IMFAttributes pCodecConfig, out IMFCollection ppAvailableTypes);
 
-
-        public static void GetAll(this IMFCaptureSource src)
-        {
-            //src.GetAvailableDeviceMediaType(, out var mediaType);
-            //while (true)
-            //{
-
-            //}
-        }
         public static HRESULT MFGetAttributeRatio(
             IMFAttributes pAttributes,
             Guid guidKey,
