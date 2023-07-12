@@ -1,3 +1,4 @@
+using Microsoft.Graphics.Display;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -14,7 +15,6 @@ using System.Threading.Tasks;
 using Windows.Devices.Enumeration;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
-using Windows.Graphics.Display;
 using Windows.Media.Capture;
 using Windows.Media.Core;
 
