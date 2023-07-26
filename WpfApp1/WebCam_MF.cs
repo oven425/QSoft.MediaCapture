@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,7 +26,10 @@ namespace QSoft.MediaCapture
     }
     public class WebCam_MF: IMFCaptureEngineOnEventCallback
     {
-
+        static WebCam_MF Photo()
+        {
+            return null;
+        }
         uint g_ResetToken = 0;
         IMFDXGIDeviceManager g_pDXGIMan;
         HRESULT CreateD3DManager()
@@ -132,11 +136,13 @@ namespace QSoft.MediaCapture
             {
                 goto Exit;
             }
-            if(ismirror == true)
+            hr = m_pEngine.GetSource(out var pSource);
+            if (hr != HRESULTS.S_OK)
             {
-                
+                goto Exit;
             }
-
+            var medias = pSource.GetAllMediaType();
+            var mm = medias[MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE].GetVideoData().GroupBy(x=>x.format);
         Exit:
             if (null != pAttributes)
             {
@@ -1063,18 +1069,39 @@ namespace QSoft.MediaCapture
                 }
                 medias.Add(mediaType);
                 index++;
-                uint w;
-                uint h;
-                MFFunctions1.MFGetAttributeSize(mediaType, MFConstants.MF_MT_FRAME_SIZE, out w, out h);
+                //uint w;
+                //uint h;
+                //mediaType.GetGUID(MFConstants.MF_MT_SUBTYPE, out var subtype);
+                //if(subtype == MFConstants.MFImageFormat_JPEG)
+                //{
+
+                //}
+                //MFFunctions1.MFGetAttributeSize(mediaType, MFConstants.MF_MT_FRAME_SIZE, out w, out h);
             }
             return medias;
         }
 
+        public static IEnumerable<(Guid format, uint width, uint height, double fps)> GetVideoData(this IEnumerable<IMFMediaType> src)
+        {
+            foreach(var oo in src)
+            {
+                uint w;
+                uint h;
+                oo.GetGUID(MFConstants.MF_MT_SUBTYPE, out var subtype);
+                if (subtype == MFConstants.MFImageFormat_JPEG)
+                {
 
+                }
+                MFFunctions1.MFGetAttributeSize(oo, MFConstants.MF_MT_FRAME_SIZE, out w, out h);
+
+                MFFunctions1.MFGetAttributeRatio(oo, MFConstants.MF_MT_FRAME_RATE, out var numerator, out var denominator);
+                var fps = (double)numerator/(double)denominator;
+                yield return (subtype, w, h, fps);
+            }
+        }
 
         public static Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, List<IMFMediaType>> GetAllMediaType(this IMFCaptureSource src)
         {
-            
             Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, List<IMFMediaType>> result = new Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, List<IMFMediaType>>();
             var hr1 = src.GetDeviceStreamCount(out var count);
             for (uint i = 0; i < count; i++)

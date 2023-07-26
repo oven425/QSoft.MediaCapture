@@ -41,26 +41,26 @@ namespace App1
         MediaCapture mediaCapture;
         async private void myButton_Click(object sender, RoutedEventArgs e)
         {
-            DisplayInformation _displayInformation = DisplayInformation.GetForCurrentView();
-            var allVideoDevices = await DeviceInformation.FindAllAsync(DeviceClass.VideoCapture);
-            DeviceInformation desiredDevice = allVideoDevices.FirstOrDefault(x => x.EnclosureLocation != null
-                && x.EnclosureLocation.Panel == Windows.Devices.Enumeration.Panel.Front);
-            _cameraDevice = desiredDevice ?? allVideoDevices.FirstOrDefault();
+            //DisplayInformation _displayInformation = DisplayInformation.GetForCurrentView();
+            //var allVideoDevices = await DeviceInformation.FindAllAsync(DeviceClass.VideoCapture);
+            //DeviceInformation desiredDevice = allVideoDevices.FirstOrDefault(x => x.EnclosureLocation != null
+            //    && x.EnclosureLocation.Panel == Windows.Devices.Enumeration.Panel.Front);
+            //_cameraDevice = desiredDevice ?? allVideoDevices.FirstOrDefault();
 
 
-            if (_cameraDevice == null)
-            {
-                System.Diagnostics.Debug.WriteLine("No camera device found!");
-                return;
-            }
-            try
-            {
-                _rotationHelper = new CameraRotationHelper(_cameraDevice.EnclosureLocation);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine(ex.Message);
-            }
+            //if (_cameraDevice == null)
+            //{
+            //    System.Diagnostics.Debug.WriteLine("No camera device found!");
+            //    return;
+            //}
+            //try
+            //{
+            //    _rotationHelper = new CameraRotationHelper(_cameraDevice.EnclosureLocation);
+            //}
+            //catch (Exception ex)
+            //{
+            //    System.Diagnostics.Debug.WriteLine(ex.Message);
+            //}
             
             _rotationHelper.OrientationChanged += _rotationHelper_OrientationChanged;
             var settings = new MediaCaptureInitializationSettings { VideoDeviceId = _cameraDevice.Id };
