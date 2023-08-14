@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -52,19 +53,42 @@ namespace WpfApp1
         {
             if(this.m_MainUI == null)
             {
-                this.DataContext = this.m_MainUI = new MainUI();
-
                 var attribute = MFFunctions.MFCreateAttributes();
                 attribute.Set(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
-                var sources = attribute.EnumDeviceSources().ToList();
-                IMFActivate ddd = sources[0].Object;
+                var cameras = attribute.EnumDeviceSources().Select(x => new { obj = x, name = x.GetString(MFConstants.MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME) }).ToList();
+                foreach (var oo in cameras)
+                {
+                    System.Diagnostics.Trace.WriteLine(oo);
+                    WebCam_MF mf = new WebCam_MF();
+                    await mf.InitializeCaptureManager(oo.obj.Object);
+                    foreach(var video in mf.VideoFormats)
+                    {
+                        System.Diagnostics.Trace.WriteLine($"{video.Key}");
+                        foreach(var item in video.Value.GroupBy(x=>x.format))
+                        {
+                            System.Diagnostics.Trace.WriteLine($"{item.Key}");
+                            foreach(var format in item)
+                            {
+                                System.Diagnostics.Trace.WriteLine($"{format}");
+                            }
+                            
+                        }
+                    }
+                    
+                    //await mf.StartPreview(x => mf.Preview = x);
+                }
+                this.DataContext = this.m_MainUI = new MainUI();
+
+                //var attribute = MFFunctions.MFCreateAttributes();
+                //attribute.Set(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
+                //var sources = attribute.EnumDeviceSources().ToList();
+                //IMFActivate ddd = sources[0].Object;
                 
-                await mf.InitializeCaptureManager(ddd);
-                //await mf.StartPreview(this.mtbDate.Handle);
-                await mf.StartPreview(x => { this.image_preview.Source = x; });
+                //await mf.InitializeCaptureManager(ddd);
+                ////await mf.StartPreview(this.mtbDate.Handle);
+                //await mf.StartPreview(x => { this.image_preview.Source = x; });
 
             }
-            
         }
 
         int m_JpgIndex = 0;

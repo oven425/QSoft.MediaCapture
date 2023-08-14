@@ -98,6 +98,8 @@ namespace QSoft.MediaCapture
 
             return hr;
         }
+        public Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, List<(Guid format, uint width, uint height, double fps)>> VideoFormats = new Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, List<(Guid format, uint width, uint height, double fps)>>();
+
         TaskCompletionSource<HRESULT> m_TaskCompelete;
         bool m_IsMirror = false;
         public Task<HRESULT> InitializeCaptureManager(object videosource, bool ismirror=false)
@@ -142,7 +144,12 @@ namespace QSoft.MediaCapture
                 goto Exit;
             }
             var medias = pSource.GetAllMediaType();
-            var mm = medias[MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE].GetVideoData().GroupBy(x=>x.format);
+            //var mm = medias[MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE].GetVideoData().GroupBy(x=>x.format);
+            //Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, List<(Guid format, uint width, uint height, double fps)>> videos = new Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, List<(Guid format, uint width, uint height, double fps)>>();
+            foreach(var media in medias)
+            {
+                VideoFormats[media.Key] = media.Value.GetVideoData().ToList();
+            }
         Exit:
             if (null != pAttributes)
             {
@@ -1034,9 +1041,7 @@ namespace QSoft.MediaCapture
                     //If an audio device is not present, allow video only recording
                     hr = HRESULTS.S_OK;
                 }
-                
             }
-            
         done:
             //SafeRelease(&pAvailableTypes);
             //SafeRelease(&pMediaType);
