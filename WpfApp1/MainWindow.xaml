@@ -9,38 +9,62 @@
         Title="MainWindow" Height="450" Width="800"
         Loaded="Window_Loaded">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <UniformGrid Columns="2">
-            <WindowsFormsHost >
-                <wf:Button x:Name="mtbDate"/>
-            </WindowsFormsHost>
-            <Image x:Name="image_preview"></Image>
-        </UniformGrid>
-        <!--<WindowsFormsHost >
+        <Grid>
+            <ItemsControl ItemsSource="{Binding WebCams}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="{Binding Name}"/>
+                            <Image Source="{Binding Preview}" Grid.Row="1"/>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </Grid>
+        <Grid Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <UniformGrid Columns="2">
+                <WindowsFormsHost >
+                    <wf:Button x:Name="mtbDate"/>
+                </WindowsFormsHost>
+                <Image x:Name="image_preview"></Image>
+            </UniformGrid>
+            <!--<WindowsFormsHost >
             <wf:Button x:Name="mtbDate"/>
         </WindowsFormsHost>-->
-        <StackPanel Grid.Row="1" Orientation="Horizontal">
-            <ComboBox/>
-            <Button x:Name="button_takephoto" Click="button_takephoto_Click">TaskPhtot</Button>
-            <ToggleButton Click="ToggleButton_Click">
-                <ToggleButton.Style>
-                    <Style TargetType="ToggleButton">
-                        <Setter Property="Content" Value="開始錄影"/>
-                        <Style.Triggers>
-                            <Trigger Property="IsChecked" Value="True">
-                                <Setter Property="Content" Value="停止錄影"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </ToggleButton.Style>
-            </ToggleButton>
-        </StackPanel>
-        <!--<StackPanel>
+            <StackPanel Grid.Row="1" Orientation="Horizontal">
+                <ComboBox/>
+                <Button x:Name="button_takephoto" Click="button_takephoto_Click">TaskPhtot</Button>
+                <ToggleButton Click="ToggleButton_Click">
+                    <ToggleButton.Style>
+                        <Style TargetType="ToggleButton">
+                            <Setter Property="Content" Value="開始錄影"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter Property="Content" Value="停止錄影"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ToggleButton.Style>
+                </ToggleButton>
+            </StackPanel>
+            <!--<StackPanel>
             <Button x:Name="a" Click="a_Click">A</Button>
             <Button x:Name="b" Click="b_Click">B</Button>
         </StackPanel>-->
+        </Grid>
+
     </Grid>
 </Window>
