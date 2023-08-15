@@ -3,9 +3,9 @@ using QSoft.MediaCapture;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -53,29 +53,42 @@ namespace WpfApp1
         {
             if(this.m_MainUI == null)
             {
-                this.DataContext = this.m_MainUI = new MainUI();
-
                 var attribute = MFFunctions.MFCreateAttributes();
                 attribute.Set(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
-                var names = attribute.EnumDeviceSources().Select(x => new { obj = x, name= x.GetString(MFConstants.MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME) }).ToList();
-                foreach (var oo in names.Where(x => x.name.Contains("SC")).Take(2))
+                var cameras = attribute.EnumDeviceSources().Select(x => new { obj = x, name = x.GetString(MFConstants.MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME) }).ToList();
+                foreach (var oo in cameras)
                 {
                     System.Diagnostics.Trace.WriteLine(oo);
-                    var mf = new WebCam();
-                    mf.Name = oo.name;
-                    await mf.Camera.InitializeCaptureManager(oo.obj.Object);
-                    await mf.Camera.StartPreview(x => mf.Preview = x);
-                    this.m_MainUI.WebCams.Add(mf);
+                    WebCam_MF mf = new WebCam_MF();
+                    await mf.InitializeCaptureManager(oo.obj.Object);
+                    foreach(var video in mf.VideoFormats)
+                    {
+                        System.Diagnostics.Trace.WriteLine($"{video.Key}");
+                        foreach(var item in video.Value.GroupBy(x=>x.format))
+                        {
+                            System.Diagnostics.Trace.WriteLine($"{item.Key}");
+                            foreach(var format in item)
+                            {
+                                System.Diagnostics.Trace.WriteLine($"{format}");
+                            }
+                            
+                        }
+                    }
+                    
+                    //await mf.StartPreview(x => mf.Preview = x);
                 }
+                this.DataContext = this.m_MainUI = new MainUI();
+
+                //var attribute = MFFunctions.MFCreateAttributes();
+                //attribute.Set(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
                 //var sources = attribute.EnumDeviceSources().ToList();
-                //IMFActivate ddd = sources[1].Object;
+                //IMFActivate ddd = sources[0].Object;
                 
                 //await mf.InitializeCaptureManager(ddd);
                 ////await mf.StartPreview(this.mtbDate.Handle);
                 //await mf.StartPreview(x => { this.image_preview.Source = x; });
 
             }
-            
         }
 
         int m_JpgIndex = 0;
@@ -107,22 +120,6 @@ namespace WpfApp1
     public class MainUI
     {
         public ObservableCollection<string> Cameras { set; get; } = new ObservableCollection<string>();
-        public ObservableCollection<WebCam> WebCams { set; get; } = new ObservableCollection<WebCam>();
-    }
-
-    public class WebCam : INotifyPropertyChanged
-    {
-        public string Name { set; get; }
-        public WebCam_MF Camera { set; get; } = new WebCam_MF();
-        WriteableBitmap m_Preview;
-        public WriteableBitmap Preview
-        { set { this.m_Preview = value; this.Update("Preview"); } get { return this.m_Preview; } }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        void Update(string name)
-        {
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
     }
 
     
