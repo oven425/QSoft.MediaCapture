@@ -53,40 +53,107 @@ namespace WpfApp1
         {
             if(this.m_MainUI == null)
             {
-                var attribute = MFFunctions.MFCreateAttributes();
-                attribute.Set(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
-                var cameras = attribute.EnumDeviceSources().Select(x => new { obj = x, name = x.GetString(MFConstants.MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME) }).ToList();
-                foreach (var oo in cameras)
-                {
-                    System.Diagnostics.Trace.WriteLine(oo);
-                    WebCam_MF mf = new WebCam_MF();
-                    await mf.InitializeCaptureManager(oo.obj.Object);
-                    foreach(var video in mf.VideoFormats)
-                    {
-                        System.Diagnostics.Trace.WriteLine($"{video.Key}");
-                        foreach(var item in video.Value.GroupBy(x=>x.format))
-                        {
-                            System.Diagnostics.Trace.WriteLine($"{item.Key}");
-                            foreach(var format in item)
-                            {
-                                System.Diagnostics.Trace.WriteLine($"{format}");
-                            }
-                            
-                        }
-                    }
-                    
-                    //await mf.StartPreview(x => mf.Preview = x);
-                }
-                this.DataContext = this.m_MainUI = new MainUI();
-
                 //var attribute = MFFunctions.MFCreateAttributes();
                 //attribute.Set(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
-                //var sources = attribute.EnumDeviceSources().ToList();
-                //IMFActivate ddd = sources[0].Object;
-                
-                //await mf.InitializeCaptureManager(ddd);
-                ////await mf.StartPreview(this.mtbDate.Handle);
-                //await mf.StartPreview(x => { this.image_preview.Source = x; });
+                //var cameras = attribute.EnumDeviceSources().Select(x => new { obj = x, name = x.GetString(MFConstants.MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME) }).ToList();
+                //foreach (var oo in cameras)
+                //{
+                //    System.Diagnostics.Trace.WriteLine(oo);
+                //    WebCam_MF mf = new WebCam_MF();
+                //    await mf.InitializeCaptureManager(oo.obj.Object);
+                //    foreach(var video in mf.VideoFormats)
+                //    {
+                //        System.Diagnostics.Trace.WriteLine($"{video.Key}");
+                //        foreach (var item in video.Value.GroupBy(x => x.format))
+                //        {
+                //            System.Diagnostics.Trace.WriteLine($"{item.Key}");
+                //            foreach (var format in item)
+                //            {
+                //                System.Diagnostics.Trace.WriteLine($"{format}");
+                //            }
+
+                //        }
+                //    }
+                //    mf.Dispose();
+                //    //await mf.StartPreview(x => mf.Preview = x);
+                //}
+                this.DataContext = this.m_MainUI = new MainUI();
+
+                var attribute = MFFunctions.MFCreateAttributes();
+                attribute.Set(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
+                var sources = attribute.EnumDeviceSources().ToList();
+                IMFActivate ddd = sources[0].Object;
+
+                await mf.InitializeCaptureManager(ddd);
+                if(mf.VideoFormats.ContainsKey(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT))
+                {
+                    var vvs = mf.VideoFormats[MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT]
+                        .GroupBy(x => x.format, (x, y) => new { list=y.OrderByDescending(z => z.width) }) ;
+                    foreach(var oo in vvs)
+                    {
+                        
+                    }
+                    foreach (var oo in vvs.SelectMany(x => x.list))
+                    {
+                        var name = "";
+                        if(oo.format == MFConstants.MFVideoFormat_NV12)
+                        {
+                            name = "NV12";
+                        }
+                        else if(oo.format == MFConstants.MFVideoFormat_MJPG)
+                        {
+                            name = "MJPG";
+                        }
+                        else if(oo.format == MFConstants.MFVideoFormat_YUY2)
+                        {
+                            name = "YUY2";
+                        }
+                        else
+                        {
+
+                        }
+                        this.m_MainUI.PhotoFormats.Add(new VideoFormat() {Format= name, Width =oo.width, Height = oo.height });
+                    }
+                    
+                }
+                else if(mf.VideoFormats.ContainsKey(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE))
+                {
+                    var vvs = mf.VideoFormats[MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE]
+                        .GroupBy(x => x.format, (x, y) => new { list = y.OrderByDescending(z => z.width) });
+                    foreach (var oo in vvs.SelectMany(x => x.list))
+                    {
+                        var name = "";
+                        if (oo.format == MFConstants.MFVideoFormat_NV12)
+                        {
+                            name = "NV12";
+                        }
+                        else if (oo.format == MFConstants.MFVideoFormat_MJPG)
+                        {
+                            name = "MJPG";
+                        }
+                        else if (oo.format == MFConstants.MFVideoFormat_YUY2)
+                        {
+                            name = "YUY2";
+                        }
+                        else
+                        {
+
+                        }
+
+                        
+
+                        this.m_MainUI.PhotoFormats.Add(new VideoFormat() { Format = name, Width = oo.width, Height = oo.height });
+                        this.m_MainUI.RecordFormats.Add(new VideoFormat() { Format = name, Width = oo.width, Height = oo.height, FPS = oo.fps });
+
+                    }
+
+                    var view = new CollectionViewSource();
+                    view.GroupDescriptions.Add(new PropertyGroupDescription("Format"));
+                    view.Source = this.m_MainUI.RecordFormats;
+                    this.m_MainUI.CollectionView = view;
+                }
+                //await mf.StartPreview(this.mtbDate.Handle);
+                await mf.StartPreview(x => { this.image_preview.Source = x; });
 
             }
         }
@@ -114,27 +181,38 @@ namespace WpfApp1
                 await mf.StopRecord();
             }
         }
+
+        private void radiobutton_photo_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void radiobutton_record_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 
-
+    public enum Modes
+    {
+        Photo,
+        Record
+    }
     public class MainUI
     {
+        public CollectionViewSource CollectionView { get; set; }
+        public Modes Mode { set; get; } = Modes.Photo;
         public ObservableCollection<string> Cameras { set; get; } = new ObservableCollection<string>();
+        public ObservableCollection<VideoFormat> PhotoFormats { set; get; } = new ObservableCollection<VideoFormat>();
+        public ObservableCollection<VideoFormat> RecordFormats { set; get; } = new ObservableCollection<VideoFormat>();
     }
 
-    
-    public class SampleRecv: IMFCaptureEngineOnSampleCallback
+
+    public class VideoFormat
     {
-        int m_Data;
-        public SampleRecv(int data)
-        {
-            this.m_Data = data;
-        }
-        public HRESULT OnSample(IMFSample pSample)
-        {
-            System.Diagnostics.Trace.WriteLine($"SampleRecv:{this.m_Data}");
-            Marshal.ReleaseComObject(pSample);
-            return HRESULTS.S_OK;
-        }
+        public string Format { set; get; }
+        public uint Width { set; get; }
+        public uint Height { set; get; }
+        public double FPS { set; get; }
     }
 }

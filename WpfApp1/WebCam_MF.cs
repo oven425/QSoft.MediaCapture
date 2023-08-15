@@ -24,12 +24,8 @@ namespace QSoft.MediaCapture
         FOR_METADATA = 0xfffffff6,
         MF_CAPTURE_ENGINE_MEDIASOURCE = 0xffffffff
     }
-    public class WebCam_MF: IMFCaptureEngineOnEventCallback
+    public class WebCam_MF : IMFCaptureEngineOnEventCallback, IDisposable
     {
-        static WebCam_MF Photo()
-        {
-            return null;
-        }
         uint g_ResetToken = 0;
         IMFDXGIDeviceManager g_pDXGIMan;
         HRESULT CreateD3DManager()
@@ -98,16 +94,18 @@ namespace QSoft.MediaCapture
 
             return hr;
         }
+        public Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, List<(Guid format, uint width, uint height, double fps)>> VideoFormats = new Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, List<(Guid format, uint width, uint height, double fps)>>();
+
         TaskCompletionSource<HRESULT> m_TaskCompelete;
         bool m_IsMirror = false;
-        public Task<HRESULT> InitializeCaptureManager(object videosource, bool ismirror=false)
+        async public Task<HRESULT> InitializeCaptureManager(object videosource, bool ismirror = false)
         {
             m_IsMirror = ismirror;
             m_TaskCompelete = new TaskCompletionSource<HRESULT>();
             HRESULT hr = HRESULTS.S_OK;
             IMFAttributes pAttributes = null;
             IMFCaptureEngineClassFactory pFactory = null;
-            
+
             DestroyCaptureEngine();
 
             //Create a D3D Manager
@@ -141,8 +139,15 @@ namespace QSoft.MediaCapture
             {
                 goto Exit;
             }
+            hr = await m_TaskCompelete.Task;
             var medias = pSource.GetAllMediaType();
-            var mm = medias[MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE].GetVideoData().GroupBy(x=>x.format);
+            //var mm = medias[MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE].GetVideoData().GroupBy(x=>x.format);
+            //Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, List<(Guid format, uint width, uint height, double fps)>> videos = new Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, List<(Guid format, uint width, uint height, double fps)>>();
+            foreach (var media in medias)
+            {
+                VideoFormats[media.Key] = media.Value.GetVideoData().ToList();
+            }
+            SafeRelease(pSource);
         Exit:
             if (null != pAttributes)
             {
@@ -156,7 +161,7 @@ namespace QSoft.MediaCapture
                 //pFactory->Release();
                 //pFactory = NULL;
             }
-            return m_TaskCompelete.Task;
+            return hr;
         }
 
         void DestroyCaptureEngine()
@@ -170,7 +175,7 @@ namespace QSoft.MediaCapture
             SafeRelease(m_pEngine);
             //SafeRelease(m_pCallback);
 
-            if (g_pDXGIMan!=null)
+            if (g_pDXGIMan != null)
             {
                 g_pDXGIMan.ResetDevice(g_pDX11Device, g_ResetToken);
             }
@@ -245,7 +250,7 @@ namespace QSoft.MediaCapture
                     goto done;
                 }
 
-                hr = CloneVideoMediaType(pMediaType,MFConstants.MFVideoFormat_RGB32, out pMediaType2);
+                hr = CloneVideoMediaType(pMediaType, MFConstants.MFVideoFormat_RGB32, out pMediaType2);
                 if (hr != HRESULTS.S_OK)
                 {
                     goto done;
@@ -268,23 +273,23 @@ namespace QSoft.MediaCapture
                     }
                     dwSinkStreamIndex = (uint)Marshal.ReadInt32(cm.Pointer);
                 }
-                
+
                 //m_pPreview.SetRotation(0, 90);
             }
 
 
             hr = m_pEngine.StartPreview();
-            //if (!m_fPowerRequestSet && m_hpwrRequest != INVALID_HANDLE_VALUE)
-            //{
-            //    // NOTE:  By calling this, on SOC systems (AOAC enabled), we're asking the system to not go
-            //    // into sleep/connected standby while we're streaming.  However, since we don't want to block
-            //    // the device from ever entering connected standby/sleep, we're going to latch ourselves to
-            //    // the monitor on/off notification (RegisterPowerSettingNotification(GUID_MONITOR_POWER_ON)).
-            //    // On SOC systems, this notification will fire when the user decides to put the device in
-            //    // connected standby mode--we can trap this, turn off our media streams and clear this
-            //    // power set request to allow the device to go into the lower power state.
-            //    m_fPowerRequestSet = (TRUE == PowerSetRequest(m_hpwrRequest, PowerRequestExecutionRequired));
-            //}
+        //if (!m_fPowerRequestSet && m_hpwrRequest != INVALID_HANDLE_VALUE)
+        //{
+        //    // NOTE:  By calling this, on SOC systems (AOAC enabled), we're asking the system to not go
+        //    // into sleep/connected standby while we're streaming.  However, since we don't want to block
+        //    // the device from ever entering connected standby/sleep, we're going to latch ourselves to
+        //    // the monitor on/off notification (RegisterPowerSettingNotification(GUID_MONITOR_POWER_ON)).
+        //    // On SOC systems, this notification will fire when the user decides to put the device in
+        //    // connected standby mode--we can trap this, turn off our media streams and clear this
+        //    // power set request to allow the device to go into the lower power state.
+        //    m_fPowerRequestSet = (TRUE == PowerSetRequest(m_hpwrRequest, PowerRequestExecutionRequired));
+        //}
         done:
             Marshal.ReleaseComObject(pSink);
             Marshal.ReleaseComObject(pMediaType);
@@ -310,7 +315,7 @@ namespace QSoft.MediaCapture
                 //return HRESULTS.S_OK;
                 return Task.FromResult((HRESULT)HRESULTS.S_OK);
             }
-            if(this.m_StartPreviewTask.Task.IsCompleted ==true)
+            if (this.m_StartPreviewTask.Task.IsCompleted == true)
             {
                 return Task.FromResult((HRESULT)HRESULTS.S_OK);
             }
@@ -319,7 +324,7 @@ namespace QSoft.MediaCapture
             IMFMediaType pMediaType = null;
             IMFMediaType pMediaType2 = null;
             IMFCaptureSource pSource = null;
-            
+
             HRESULT hr = HRESULTS.S_OK;
             // Get a pointer to the preview sink.
             if (m_pPreview == null)
@@ -337,7 +342,7 @@ namespace QSoft.MediaCapture
                 //    goto done;
                 //}
 
-                
+
 
                 hr = m_pEngine.GetSource(out pSource);
                 if (hr != HRESULTS.S_OK)
@@ -385,8 +390,8 @@ namespace QSoft.MediaCapture
                 {
                     goto done;
                 }
-               
-                
+
+
                 action(m_PreviewBmp);
             }
 
@@ -433,13 +438,13 @@ namespace QSoft.MediaCapture
             {
                 goto done;
             }
-            //WaitForResult();
+        //WaitForResult();
 
-            //if (m_fPowerRequestSet && m_hpwrRequest != INVALID_HANDLE_VALUE)
-            //{
-            //    PowerClearRequest(m_hpwrRequest, PowerRequestExecutionRequired);
-            //    m_fPowerRequestSet = false;
-            //}
+        //if (m_fPowerRequestSet && m_hpwrRequest != INVALID_HANDLE_VALUE)
+        //{
+        //    PowerClearRequest(m_hpwrRequest, PowerRequestExecutionRequired);
+        //    m_fPowerRequestSet = false;
+        //}
         done:
             return this.m_StopPreviewTask.Task;
         }
@@ -451,7 +456,7 @@ namespace QSoft.MediaCapture
             IMFMediaType pMediaType;
             source.GetCurrentDeviceMediaType(streamindex, out pMediaType);
             var vp = Activator.CreateInstance(Type.GetTypeFromCLSID(DirectN.MFConstants.CLSID_VideoProcessorMFT)) as IMFVideoProcessorControl;
-            var hr=vp.SetMirror(_MF_VIDEO_PROCESSOR_MIRROR.MIRROR_HORIZONTAL);
+            var hr = vp.SetMirror(_MF_VIDEO_PROCESSOR_MIRROR.MIRROR_HORIZONTAL);
             IMFTransform mft = vp as IMFTransform;
             hr = mft.SetInputType(0, pMediaType, 0);
             //if (COMBase.Failed(hr))
@@ -503,18 +508,18 @@ namespace QSoft.MediaCapture
                 goto done;
             }
 
-            if(size != null)
+            if (size != null)
             {
                 pSource.SetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_PHOTO, null);
             }
-            
+
             hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_PHOTO, out pMediaType);
             if (hr.IsError)
             {
                 goto done;
             }
 
-            
+
 
             //Configure the photo format
             hr = CreatePhotoMediaType(pMediaType, out pMediaType2);
@@ -586,7 +591,7 @@ namespace QSoft.MediaCapture
                 goto done;
             }
 
-            
+
             hr = pPhotoMediaType.SetGUID(MFConstants.MF_MT_SUBTYPE, WICConstants.GUID_ContainerFormatJpeg);
             if (hr.IsError)
             {
@@ -654,7 +659,7 @@ namespace QSoft.MediaCapture
             }
 
             ppNewMediaType = pNewMediaType;
-            //(ppNewMediaType).AddRef();
+        //(ppNewMediaType).AddRef();
 
         done:
             //SafeRelease(&pNewMediaType);
@@ -664,8 +669,8 @@ namespace QSoft.MediaCapture
         HRESULT CopyAttribute(IMFAttributes pSrc, IMFAttributes pDest, Guid key)
         {
             PropVariant var = new PropVariant();
-                //PropVariantInit( &var );
-                HRESULT hr = pSrc.GetItem(key, var);
+            //PropVariantInit( &var );
+            HRESULT hr = pSrc.GetItem(key, var);
             if (hr == HRESULTS.S_OK)
             {
                 hr = pDest.SetItem(key, var);
@@ -689,11 +694,11 @@ namespace QSoft.MediaCapture
             hr = pEvent.GetExtendedType(out guidType);
             if (hr == HRESULTS.S_OK)
             {
-                if(guidType == MFConstants.MF_CAPTURE_ENGINE_INITIALIZED)
+                if (guidType == MFConstants.MF_CAPTURE_ENGINE_INITIALIZED)
                 {
                     m_TaskCompelete.SetResult(HRESULTS.S_OK);
                 }
-                else if(guidType == MFConstants.MF_CAPTURE_ENGINE_PREVIEW_STARTED)
+                else if (guidType == MFConstants.MF_CAPTURE_ENGINE_PREVIEW_STARTED)
                 {
                     m_StartPreviewTask.SetResult((HRESULT)HRESULTS.S_OK);
                 }
@@ -705,24 +710,25 @@ namespace QSoft.MediaCapture
                 }
                 else if (guidType == MFConstants.MF_CAPTURE_ENGINE_RECORD_STARTED)
                 {
-                    m_StartRecordTask.SetResult(HRESULTS.S_OK); 
+                    m_StartRecordTask.SetResult(HRESULTS.S_OK);
                     //m_pManager->OnRecordStopped(hrStatus);
                     //SetEvent(m_pManager->m_hEvent);
                 }
-                else if(guidType == MFConstants.MF_CAPTURE_ENGINE_RECORD_STOPPED)
+                else if (guidType == MFConstants.MF_CAPTURE_ENGINE_RECORD_STOPPED)
                 {
                     m_WaitStopRecord.SetResult(HRESULTS.S_OK);
                 }
-                else if(guidType == MFConstants.MF_CAPTURE_ENGINE_PHOTO_TAKEN)
+                else if (guidType == MFConstants.MF_CAPTURE_ENGINE_PHOTO_TAKEN)
                 {
                     this.m_Takephoto.SetResult(HRESULTS.S_OK);
                 }
-                else if(guidType == MFConstants.MF_CAPTURE_ENGINE_EFFECT_ADDED)
+                else if (guidType == MFConstants.MF_CAPTURE_ENGINE_EFFECT_ADDED)
                 {
 
                 }
                 else
                 {
+                    System.Diagnostics.Trace.WriteLine(guidType);
                     // This is an event we don't know about, we don't really care and there's
                     // no clean way to report the error so just set the event and fall through.
                     //SetEvent(m_pManager->m_hEvent);
@@ -935,7 +941,7 @@ namespace QSoft.MediaCapture
                 goto done;
             }
 
-            hr = CloneVideoMediaType(pMediaType, guidEncodingType,  out pMediaType2);
+            hr = CloneVideoMediaType(pMediaType, guidEncodingType, out pMediaType2);
             if (hr.IsError)
             {
                 goto done;
@@ -1014,13 +1020,13 @@ namespace QSoft.MediaCapture
 
             //MFT_ENUM_FLAG_SORTANDFILTER
             uint flag = (uint)(DirectN._MFT_ENUM_FLAG.MFT_ENUM_FLAG_ALL | DirectN._MFT_ENUM_FLAG.MFT_ENUM_FLAG_SORTANDFILTER);
-            
+
             IMFCollection colptr;
             hr = MFFunctions1.MFTranscodeGetAudioOutputAvailableTypes(guidEncodingType, flag, pAttributes, out colptr);
 
 
             hr = colptr.GetElement(0, out var punk);
-            if(hr.IsSuccess)
+            if (hr.IsSuccess)
             {
                 pMediaType = punk as IMFMediaType;
             }
@@ -1034,9 +1040,7 @@ namespace QSoft.MediaCapture
                     //If an audio device is not present, allow video only recording
                     hr = HRESULTS.S_OK;
                 }
-                
             }
-            
         done:
             //SafeRelease(&pAvailableTypes);
             //SafeRelease(&pMediaType);
@@ -1051,6 +1055,11 @@ namespace QSoft.MediaCapture
                 Marshal.ReleaseComObject(obj);
             }
         }
+
+        public void Dispose()
+        {
+            this.DestroyCaptureEngine();
+        }
     }
 
     public static class IMFCaptureSourceEx
@@ -1059,7 +1068,7 @@ namespace QSoft.MediaCapture
         {
             List<IMFMediaType> medias = new List<IMFMediaType>();
             uint index = 0;
-            while(true)
+            while (true)
             {
                 IMFMediaType mediaType;
                 var hr = src.GetAvailableDeviceMediaType(streamindex, index, out mediaType);
@@ -1083,7 +1092,7 @@ namespace QSoft.MediaCapture
 
         public static IEnumerable<(Guid format, uint width, uint height, double fps)> GetVideoData(this IEnumerable<IMFMediaType> src)
         {
-            foreach(var oo in src)
+            foreach (var oo in src)
             {
                 uint w;
                 uint h;
@@ -1095,7 +1104,7 @@ namespace QSoft.MediaCapture
                 MFFunctions1.MFGetAttributeSize(oo, MFConstants.MF_MT_FRAME_SIZE, out w, out h);
 
                 MFFunctions1.MFGetAttributeRatio(oo, MFConstants.MF_MT_FRAME_RATE, out var numerator, out var denominator);
-                var fps = (double)numerator/(double)denominator;
+                var fps = (double)numerator / (double)denominator;
                 yield return (subtype, w, h, fps);
             }
         }
@@ -1104,6 +1113,7 @@ namespace QSoft.MediaCapture
         {
             Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, List<IMFMediaType>> result = new Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, List<IMFMediaType>>();
             var hr1 = src.GetDeviceStreamCount(out var count);
+            System.Diagnostics.Trace.WriteLine($"GetDeviceStreamCount :hr1:{hr1} count:{count}");
             for (uint i = 0; i < count; i++)
             {
                 src.GetDeviceStreamCategory(i, out var caegory);
@@ -1191,7 +1201,7 @@ namespace QSoft.MediaCapture
         object m_Lock = new object();
         public HRESULT OnSample(IMFSample pSample)
         {
-            if(System.Threading.Monitor.TryEnter(this.m_Lock) == true)
+            if (System.Threading.Monitor.TryEnter(this.m_Lock) == true)
             {
                 pSample.GetBufferByIndex(0, out var buf);
                 var ptr = buf.Lock(out var max, out var cur);
@@ -1202,10 +1212,10 @@ namespace QSoft.MediaCapture
                     m_Bmp.Lock();
                     CopyMemory(m_Bmp.BackBuffer, ptr, cur);
                     //Marshal.Copy(this.m_Buffer, 0, m_Bmp.BackBuffer, this.m_Buffer.Length);
-                    m_Bmp.AddDirtyRect(new System.Windows.Int32Rect(0,0, m_Bmp.PixelWidth, m_Bmp.PixelHeight));
+                    m_Bmp.AddDirtyRect(new System.Windows.Int32Rect(0, 0, m_Bmp.PixelWidth, m_Bmp.PixelHeight));
                     m_Bmp.Unlock();
                 }, System.Windows.Threading.DispatcherPriority.Background);
-                
+
                 buf.Unlock();
                 Marshal.ReleaseComObject(buf);
                 Marshal.ReleaseComObject(pSample);
@@ -1215,7 +1225,7 @@ namespace QSoft.MediaCapture
             {
                 Marshal.ReleaseComObject(pSample);
             }
-            
+
             return HRESULTS.S_OK;
         }
     }

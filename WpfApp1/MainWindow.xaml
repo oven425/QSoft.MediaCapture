@@ -9,7 +9,7 @@
         Title="MainWindow" Height="450" Width="800"
         Loaded="Window_Loaded">
     <Grid>
-        <Grid>
+        <!--<Grid>
             <ItemsControl ItemsSource="{Binding WebCams}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
@@ -19,7 +19,7 @@
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
                             <TextBlock Text="{Binding Name}"/>
-                            <Image Source="{Binding Preview}" Grid.Row="1"/>
+                            <Image Source="{Binding Preview}"  Grid.Row="1"/>
                         </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
@@ -29,8 +29,8 @@
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
             </ItemsControl>
-        </Grid>
-        <Grid Visibility="Collapsed">
+        </Grid>-->
+        <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition Height="Auto"/>
@@ -45,8 +45,26 @@
             <wf:Button x:Name="mtbDate"/>
         </WindowsFormsHost>-->
             <StackPanel Grid.Row="1" Orientation="Horizontal">
-                <ComboBox/>
+                <GroupBox Header="Mode">
+                    <StackPanel Orientation="Horizontal">
+                        <RadioButton x:Name="radiobutton_photo" Click="radiobutton_photo_Click">Photo</RadioButton>
+                        <RadioButton x:Name="radiobutton_record" Click="radiobutton_record_Click">Record</RadioButton>
+                    </StackPanel>
+                </GroupBox>
+                
                 <Button x:Name="button_takephoto" Click="button_takephoto_Click">TaskPhtot</Button>
+                <ComboBox ItemsSource="{Binding PhotoFormats}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock>
+                                <Run Text="{Binding Format}" />
+                                <Run Text="{Binding Width}" />
+                                <Run Text="x" />
+                                <Run Text="{Binding Height}" />
+                            </TextBlock>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
                 <ToggleButton Click="ToggleButton_Click">
                     <ToggleButton.Style>
                         <Style TargetType="ToggleButton">
@@ -59,6 +77,29 @@
                         </Style>
                     </ToggleButton.Style>
                 </ToggleButton>
+                <ComboBox VerticalContentAlignment="Center" ItemsSource="{Binding CollectionView.View}">
+                    <ComboBox.GroupStyle>
+                        <GroupStyle>
+                            <GroupStyle.HeaderTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}"/>
+                                </DataTemplate>
+                            </GroupStyle.HeaderTemplate>
+                        </GroupStyle>
+                    </ComboBox.GroupStyle>
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock>
+                                <!--<Run Text="{Binding Format}" />-->
+                                <Run Text="{Binding Width}" />
+                                <Run Text="x" />
+                                <Run Text="{Binding Height}" />
+                                <Run Text="{Binding FPS}" />
+                                <Run Text="fps" />
+                            </TextBlock>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
             </StackPanel>
             <!--<StackPanel>
             <Button x:Name="a" Click="a_Click">A</Button>
