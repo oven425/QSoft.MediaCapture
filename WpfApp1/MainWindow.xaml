@@ -77,8 +77,8 @@
                         </Style>
                     </ToggleButton.Style>
                 </ToggleButton>
-                <ComboBox VerticalContentAlignment="Center" ItemsSource="{Binding CollectionView.View}">
-                    <ComboBox.GroupStyle>
+                <ComboBox VerticalContentAlignment="Center" ItemsSource="{Binding RecordFormats}">
+                    <!--<ComboBox.GroupStyle>
                         <GroupStyle>
                             <GroupStyle.HeaderTemplate>
                                 <DataTemplate>
@@ -86,11 +86,11 @@
                                 </DataTemplate>
                             </GroupStyle.HeaderTemplate>
                         </GroupStyle>
-                    </ComboBox.GroupStyle>
+                    </ComboBox.GroupStyle>-->
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock>
-                                <!--<Run Text="{Binding Format}" />-->
+                                <Run Text="{Binding Format}" />
                                 <Run Text="{Binding Width}" />
                                 <Run Text="x" />
                                 <Run Text="{Binding Height}" />

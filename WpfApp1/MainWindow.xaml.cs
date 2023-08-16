@@ -116,7 +116,7 @@ namespace WpfApp1
                     }
                     
                 }
-                else if(mf.VideoFormats.ContainsKey(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE))
+                if(mf.VideoFormats.ContainsKey(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE))
                 {
                     var vvs = mf.VideoFormats[MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE]
                         .GroupBy(x => x.format, (x, y) => new { list = y.OrderByDescending(z => z.width) });
@@ -141,16 +141,18 @@ namespace WpfApp1
                         }
 
                         
-
-                        this.m_MainUI.PhotoFormats.Add(new VideoFormat() { Format = name, Width = oo.width, Height = oo.height });
+                        if (this.m_MainUI.PhotoFormats?.Count == 0)
+                        {
+                            this.m_MainUI.PhotoFormats.Add(new VideoFormat() { Format = name, Width = oo.width, Height = oo.height });
+                        }
                         this.m_MainUI.RecordFormats.Add(new VideoFormat() { Format = name, Width = oo.width, Height = oo.height, FPS = oo.fps });
 
                     }
 
-                    var view = new CollectionViewSource();
-                    view.GroupDescriptions.Add(new PropertyGroupDescription("Format"));
-                    view.Source = this.m_MainUI.RecordFormats;
-                    this.m_MainUI.CollectionView = view;
+                    //var view = new CollectionViewSource();
+                    //view.GroupDescriptions.Add(new PropertyGroupDescription("Format"));
+                    //view.Source = this.m_MainUI.RecordFormats;
+                    //this.m_MainUI.CollectionView = view;
                 }
                 //await mf.StartPreview(this.mtbDate.Handle);
                 await mf.StartPreview(x => { this.image_preview.Source = x; });
