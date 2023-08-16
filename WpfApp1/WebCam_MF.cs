@@ -94,7 +94,7 @@ namespace QSoft.MediaCapture
 
             return hr;
         }
-        public Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, List<(Guid format, uint width, uint height, double fps)>> VideoFormats = new Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, List<(Guid format, uint width, uint height, double fps)>>();
+        public Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, List<(Guid format, uint width, uint height, double fps, IMFMediaType mediatype)>> VideoFormats = new Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, List<(Guid format, uint width, uint height, double fps, IMFMediaType mediatype)>>();
 
         TaskCompletionSource<HRESULT> m_TaskCompelete;
         bool m_IsMirror = false;
@@ -202,17 +202,17 @@ namespace QSoft.MediaCapture
         //HANDLE m_hpwrRequest;
         bool m_fPowerRequestSet;
 
-        TaskCompletionSource<HRESULT> m_StartPreviewTask = new TaskCompletionSource<HRESULT>();
-        public Task<HRESULT> StartPreview(IntPtr hwnd)
+        TaskCompletionSource<HRESULTS> m_StartPreviewTask = new TaskCompletionSource<HRESULTS>();
+        async public Task<HRESULTS> StartPreview(IntPtr hwnd)
         {
             if (m_pEngine == null)
             {
-                return Task.FromResult((HRESULT)HRESULTS.MF_E_NOT_INITIALIZED);
+                return HRESULTS.MF_E_NOT_INITIALIZED;
             }
 
             if (m_bPreviewing == true)
             {
-                return Task.FromResult((HRESULT)HRESULTS.S_OK);
+                return HRESULTS.S_OK;
             }
 
             IMFCaptureSink pSink = null;
@@ -297,15 +297,16 @@ namespace QSoft.MediaCapture
             Marshal.ReleaseComObject(pSource);
 
 
-            return m_StartPreviewTask.Task;
+            return await m_StartPreviewTask.Task;
         }
+        TaskCompletionSource<HRESULTS> m_SetMediaTypeTask;
         MFCaptureEngineOnSampleCallback m_PreviewCallback;
         uint dwSinkStreamIndex = 0;
-        public Task<HRESULT> StartPreview(Action<WriteableBitmap> action)
+        public async Task<HRESULTS> StartPreview(Action<WriteableBitmap> action)
         {
             if (m_pEngine == null)
             {
-                return Task.FromResult((HRESULT)HRESULTS.MF_E_NOT_INITIALIZED);
+                return HRESULTS.MF_E_NOT_INITIALIZED;
                 //return HRESULTS.MF_E_NOT_INITIALIZED;
             }
 
@@ -313,11 +314,11 @@ namespace QSoft.MediaCapture
             {
                 //return await Task.FromResult(HRESULTS.S_OK);
                 //return HRESULTS.S_OK;
-                return Task.FromResult((HRESULT)HRESULTS.S_OK);
+                return HRESULTS.S_OK;
             }
             if (this.m_StartPreviewTask.Task.IsCompleted == true)
             {
-                return Task.FromResult((HRESULT)HRESULTS.S_OK);
+                return HRESULTS.S_OK;
             }
 
             IMFCaptureSink pSink = null;
@@ -349,14 +350,25 @@ namespace QSoft.MediaCapture
                 {
                     goto done;
                 }
-
+                if(this.VideoFormats.ContainsKey(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE))
+                {
+                    var aa = this.VideoFormats[MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE].OrderByDescending(x => x.width).ThenByDescending(x => x.fps);
+                    m_SetMediaTypeTask = new TaskCompletionSource<HRESULTS>();
+                    hr = pSource.SetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, aa.First().mediatype);
+                    if (hr != HRESULTS.S_OK)
+                    {
+                        goto done;
+                    }
+                    hr = await m_SetMediaTypeTask.Task;
+                }
+                
                 //// Configure the video format for the preview sink.
                 hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, out pMediaType);
                 if (hr != HRESULTS.S_OK)
                 {
                     goto done;
                 }
-
+                
                 hr = CloneVideoMediaType(pMediaType, MFConstants.MFVideoFormat_RGB24, out pMediaType2);
                 if (hr != HRESULTS.S_OK)
                 {
@@ -379,7 +391,11 @@ namespace QSoft.MediaCapture
                     }
                     dwSinkStreamIndex = (uint)Marshal.ReadInt32(cm.Pointer);
                 }
-                this.Mirror(pSource, dwSinkStreamIndex);
+                if(this.m_IsMirror == true)
+                {
+                    this.Mirror(pSource, dwSinkStreamIndex);
+                }
+                
                 uint w = 0;
                 uint h = 0;
                 MFFunctions1.MFGetAttributeSize(pMediaType2, MFConstants.MF_MT_FRAME_SIZE, out w, out h);
@@ -415,8 +431,11 @@ namespace QSoft.MediaCapture
             Marshal.ReleaseComObject(pSource);
 
 
-            return m_StartPreviewTask.Task;
+            return await m_StartPreviewTask.Task;
         }
+
+        
+
 
         TaskCompletionSource<HRESULTS> m_StopPreviewTask;
         public Task<HRESULTS> StopPreview()
@@ -700,7 +719,7 @@ namespace QSoft.MediaCapture
                 }
                 else if (guidType == MFConstants.MF_CAPTURE_ENGINE_PREVIEW_STARTED)
                 {
-                    m_StartPreviewTask.SetResult((HRESULT)HRESULTS.S_OK);
+                    m_StartPreviewTask.SetResult(HRESULTS.S_OK);
                 }
                 else if (guidType == MFConstants.MF_CAPTURE_ENGINE_PREVIEW_STOPPED)
                 {
@@ -725,6 +744,10 @@ namespace QSoft.MediaCapture
                 else if (guidType == MFConstants.MF_CAPTURE_ENGINE_EFFECT_ADDED)
                 {
 
+                }
+                else if(guidType == MFConstants.MF_CAPTURE_SOURCE_CURRENT_DEVICE_MEDIA_TYPE_SET)
+                {
+                    this.m_SetMediaTypeTask.SetResult(HRESULTS.S_OK);
                 }
                 else
                 {
@@ -1090,7 +1113,7 @@ namespace QSoft.MediaCapture
             return medias;
         }
 
-        public static IEnumerable<(Guid format, uint width, uint height, double fps)> GetVideoData(this IEnumerable<IMFMediaType> src)
+        public static IEnumerable<(Guid format, uint width, uint height, double fps, IMFMediaType mediatype)> GetVideoData(this IEnumerable<IMFMediaType> src)
         {
             foreach (var oo in src)
             {
@@ -1105,7 +1128,7 @@ namespace QSoft.MediaCapture
 
                 MFFunctions1.MFGetAttributeRatio(oo, MFConstants.MF_MT_FRAME_RATE, out var numerator, out var denominator);
                 var fps = (double)numerator / (double)denominator;
-                yield return (subtype, w, h, fps);
+                yield return (subtype, w, h, fps, oo);
             }
         }
 
@@ -1197,12 +1220,23 @@ namespace QSoft.MediaCapture
         {
             this.m_Bmp = data;
         }
+        int samplecount = 0;
+        DateTime time = DateTime.Now;
         byte[] m_Buffer;
         object m_Lock = new object();
         public HRESULT OnSample(IMFSample pSample)
         {
             if (System.Threading.Monitor.TryEnter(this.m_Lock) == true)
             {
+                samplecount++;
+                if(samplecount > 100)
+                {
+                    var ts = DateTime.Now - time;
+                    var fps = samplecount / ts.TotalSeconds;
+                    samplecount = 0;
+                    time = DateTime.Now;
+                    System.Diagnostics.Trace.WriteLine($"fps:{fps}");
+                }
                 pSample.GetBufferByIndex(0, out var buf);
                 var ptr = buf.Lock(out var max, out var cur);
                 //m_Buffer = new byte[cur];
