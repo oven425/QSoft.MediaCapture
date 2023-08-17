@@ -166,7 +166,7 @@ namespace WpfApp1
             var photo = System.IO.Path.Combine(Environment.CurrentDirectory, "aa.jpg");
             
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-            await mf.TakePhoto($"{m_JpgIndex++}.jpg", ()=>(1280,720));
+            await mf.TakePhoto($"{m_JpgIndex++}.jpg", ()=>(width: 1280, height:720));
             sw.Stop();
             System.Diagnostics.Trace.WriteLine($"takephoto: {sw.ElapsedMilliseconds}ms");
         }
