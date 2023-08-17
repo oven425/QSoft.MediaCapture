@@ -140,11 +140,11 @@ namespace WpfApp1
 
                         }
 
-                        
-                        if (this.m_MainUI.PhotoFormats?.Count == 0)
+                        if(mf.VideoFormats.ContainsKey(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT)==false)
                         {
                             this.m_MainUI.PhotoFormats.Add(new VideoFormat() { Format = name, Width = oo.width, Height = oo.height });
                         }
+                        
                         this.m_MainUI.RecordFormats.Add(new VideoFormat() { Format = name, Width = oo.width, Height = oo.height, FPS = oo.fps });
 
                     }
