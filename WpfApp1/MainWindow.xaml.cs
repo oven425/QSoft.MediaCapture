@@ -155,7 +155,7 @@ namespace WpfApp1
                     //this.m_MainUI.CollectionView = view;
                 }
                 //await mf.StartPreview(this.mtbDate.Handle);
-                await mf.StartPreview(x => { this.image_preview.Source = x; });
+                //await mf.StartPreview(x => { this.image_preview.Source = x; });
 
             }
         }

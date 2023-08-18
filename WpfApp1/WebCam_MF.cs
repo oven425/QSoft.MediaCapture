@@ -26,6 +26,14 @@ namespace QSoft.MediaCapture
     }
     public class WebCam_MF : IMFCaptureEngineOnEventCallback, IDisposable
     {
+        public static WebCam_MF PhotoMode()
+        {
+            return new WebCam_MF();
+        }
+        public static WebCam_MF RecordMode()
+        {
+            return new WebCam_MF();
+        }
         uint g_ResetToken = 0;
         IMFDXGIDeviceManager g_pDXGIMan;
         HRESULT CreateD3DManager()
