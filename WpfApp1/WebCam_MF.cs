@@ -12,6 +12,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Xml.Linq;
 //https://github.com/MicrosoftDocs/win32/blob/docs/desktop-src/medfound/directx-surface-buffer.md
 namespace QSoft.MediaCapture
 {
@@ -621,7 +622,7 @@ namespace QSoft.MediaCapture
             }
             return hr;
         }
-        public delegate void FailDelegate();
+        public delegate void FailDelegate(WebCam_MF obj, int error);
         public event FailDelegate OnFail;
         public HRESULT OnEvent(IMFMediaEvent pEvent)
         {
@@ -679,8 +680,8 @@ namespace QSoft.MediaCapture
                     var aa = Marshal.GetExceptionForHR(hrStatus.Value).Message;
                     if (OnFail != null)
                     {
-                        
-                        OnFail();
+
+                        OnFail(this, hrStatus.Value);
                     }
                 }
                 else
@@ -998,6 +999,15 @@ namespace QSoft.MediaCapture
         {
             this.DestroyCaptureEngine();
         }
+
+        public static List<(string name, IComObject<IMFActivate> obj)> EnumDeviceSources()
+        {
+            var attribute = MFFunctions.MFCreateAttributes();
+            attribute.Set(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
+            var sources = attribute.EnumDeviceSources().Select(x => (x.GetString(MFConstants.MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME), x)).ToList();
+            return sources;
+        }
+
     }
 
     public static class IMFCaptureSourceEx

@@ -79,12 +79,16 @@ namespace WpfApp1
                 //}
                 this.DataContext = this.m_MainUI = new MainUI();
 
-                var attribute = MFFunctions.MFCreateAttributes();
-                attribute.Set(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
-                var sources = attribute.EnumDeviceSources().ToList();
-                IMFActivate ddd = sources[0].Object;
+                //var attribute = MFFunctions.MFCreateAttributes();
+                //attribute.Set(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
+                //var sources = attribute.EnumDeviceSources().ToList();
+                //IMFActivate ddd = sources[0].Object;
+                IMFActivate ddd = WebCam_MF.EnumDeviceSources()[0].obj.Object;
+                mf.OnFail += (WebCam_MF obj, int error) =>
+                {
 
-                await mf.InitializeCaptureManager(ddd);
+                };
+                await mf.InitializeCaptureManager(ddd, true);
                 if(mf.VideoFormats.ContainsKey(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT))
                 {
                     var vvs = mf.VideoFormats[MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT]
@@ -156,7 +160,6 @@ namespace WpfApp1
                 }
                 //await mf.StartPreview(this.mtbDate.Handle);
                 await mf.StartPreview(x => { this.image_preview.Source = x; });
-
             }
         }
 
