@@ -1105,22 +1105,12 @@ namespace QSoft.MediaCapture
             return MFGetAttribute2UINT32asUINT64(pAttributes, guidKey, out punNumerator, out punDenominator);
         }
 
-        public static HRESULT MFGetAttributeSize(
-            IMFAttributes pAttributes,
-            Guid guidKey,
-            out uint punWidth,
-            out uint punHeight
-            )
+        public static HRESULT MFGetAttributeSize(IMFAttributes pAttributes, Guid guidKey, out uint punWidth, out uint punHeight)
         {
             return MFGetAttribute2UINT32asUINT64(pAttributes, guidKey, out punWidth, out punHeight);
         }
 
-        public static HRESULT MFGetAttribute2UINT32asUINT64(
-            IMFAttributes pAttributes,
-            Guid guidKey,
-            out uint punHigh32,
-            out uint punLow32
-            )
+        public static HRESULT MFGetAttribute2UINT32asUINT64(IMFAttributes pAttributes, Guid guidKey, out uint punHigh32, out uint punLow32)
         {
             ulong unPacked;
             HRESULT hr;
@@ -1136,15 +1126,20 @@ namespace QSoft.MediaCapture
             return hr;
         }
 
-        public static void Unpack2UINT32AsUINT64(
-            ulong unPacked,
-            out uint punHigh,
-            out uint punLow
-            )
+        public static void Unpack2UINT32AsUINT64(ulong unPacked, out uint punHigh, out uint punLow)
         {
             ulong ul = (ulong)unPacked;
             punHigh = (uint)(ul >> 32);
             punLow = (uint)(ul & 0xffffffff);
+        }
+
+        public static string FormatToString(this Guid src)
+        {
+            if (src == MFConstants.MFVideoFormat_MJPG) return "MJPG";
+            else if (src == MFConstants.MFVideoFormat_NV12) return "NV12";
+            else if (src == MFConstants.MFVideoFormat_YUY2) return "YUY2";
+            else if (src == MFConstants.MFAudioFormat_AAC) return "AAC";
+            return "Unkknow";
         }
     }
 

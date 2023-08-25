@@ -99,23 +99,7 @@ namespace WpfApp1
                     }
                     foreach (var oo in vvs.SelectMany(x => x.list))
                     {
-                        var name = "";
-                        if(oo.format == MFConstants.MFVideoFormat_NV12)
-                        {
-                            name = "NV12";
-                        }
-                        else if(oo.format == MFConstants.MFVideoFormat_MJPG)
-                        {
-                            name = "MJPG";
-                        }
-                        else if(oo.format == MFConstants.MFVideoFormat_YUY2)
-                        {
-                            name = "YUY2";
-                        }
-                        else
-                        {
-
-                        }
+                        var name = oo.format.FormatToString();
                         this.m_MainUI.PhotoFormats.Add(new VideoFormat() {Format= name, Width =oo.width, Height = oo.height });
                     }
                     
@@ -126,23 +110,7 @@ namespace WpfApp1
                         .GroupBy(x => x.format, (x, y) => new { list = y.OrderByDescending(z => z.width) });
                     foreach (var oo in vvs.SelectMany(x => x.list))
                     {
-                        var name = "";
-                        if (oo.format == MFConstants.MFVideoFormat_NV12)
-                        {
-                            name = "NV12";
-                        }
-                        else if (oo.format == MFConstants.MFVideoFormat_MJPG)
-                        {
-                            name = "MJPG";
-                        }
-                        else if (oo.format == MFConstants.MFVideoFormat_YUY2)
-                        {
-                            name = "YUY2";
-                        }
-                        else
-                        {
-
-                        }
+                        var name = oo.format.FormatToString();
 
                         if(mf.VideoFormats.ContainsKey(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT)==false)
                         {
