@@ -89,44 +89,73 @@ namespace WpfApp1
 
                 };
                 await mf.InitializeCaptureManager(ddd, true);
-                if(mf.VideoFormats.ContainsKey(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT))
-                {
-                    var vvs = mf.VideoFormats[MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT]
-                        .GroupBy(x => x.format, (x, y) => new { list=y.OrderByDescending(z => z.width) }) ;
-                    foreach(var oo in vvs)
-                    {
+                //var vvsq = mf.VideoFormats[MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE]
+                //    .OrderByDescending(x => x.width * x.height)
+                //    .ThenByDescending(x => x.fps)
+                //    .ThenBy(x => x.bitrate)
+                //    .GroupBy(x => new { x.width, x.height });
+
+                //foreach (var group in vvsq)
+                //{
+                //    System.Diagnostics.Trace.WriteLine($"key:{group.Key}");
+                //    foreach (var v in group)
+                //    {
+                //        System.Diagnostics.Trace.WriteLine($"format:{v.format_str} {v.width} {v.height} {v.fps} {v.bitrate}");
+                //    }
+                //}
+
+                //System.Diagnostics.Trace.WriteLine("-----");
+                //foreach(var v in vvsq.Select(x=>x.First()))
+                //{
+                //    System.Diagnostics.Trace.WriteLine($"format:{v.format_str} {v.width} {v.height} {v.fps} {v.bitrate}");
+                //}
+                //if (mf.VideoFormats.ContainsKey(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT))
+                //{
+                //    var vvs = mf.VideoFormats[MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT]
+                //        .GroupBy(x => x.format, (x, y) => new { list=y.OrderByDescending(z => z.width) }) ;
+                //    foreach(var oo in vvs)
+                //    {
                         
-                    }
-                    foreach (var oo in vvs.SelectMany(x => x.list))
-                    {
-                        var name = oo.format.FormatToString();
-                        this.m_MainUI.PhotoFormats.Add(new VideoFormat() {Format= name, Width =oo.width, Height = oo.height });
-                    }
+                //    }
+                //    foreach (var oo in vvs.SelectMany(x => x.list))
+                //    {
+                //        var name = oo.format.FormatToString();
+                //        this.m_MainUI.PhotoFormats.Add(new VideoFormat() {Format= name, Width =oo.width, Height = oo.height });
+                //    }
                     
-                }
-                if(mf.VideoFormats.ContainsKey(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE))
-                {
-                    var vvs = mf.VideoFormats[MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE]
-                        .GroupBy(x => x.format, (x, y) => new { list = y.OrderByDescending(z => z.width) });
-                    foreach (var oo in vvs.SelectMany(x => x.list))
-                    {
-                        var name = oo.format.FormatToString();
+                //}
+                //if(mf.VideoFormats.ContainsKey(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE))
+                //{
+                //    var vvs = mf.VideoFormats[MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE]
+                //        .GroupBy(x => x.format, (x, y) => new { list = y.OrderByDescending(z => z.width).ThenBy(z=>z.fps) });
+                //    foreach (var oo in vvs.SelectMany(x => x.list))
+                //    {
+                //        var name = oo.format.FormatToString();
 
-                        if(mf.VideoFormats.ContainsKey(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT)==false)
-                        {
-                            this.m_MainUI.PhotoFormats.Add(new VideoFormat() { Format = name, Width = oo.width, Height = oo.height });
-                        }
+                //        if(mf.VideoFormats.ContainsKey(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT)==false)
+                //        {
+                //            this.m_MainUI.PhotoFormats.Add(new VideoFormat() { Format = name, Width = oo.width, Height = oo.height });
+                //        }
                         
-                        this.m_MainUI.RecordFormats.Add(new VideoFormat() { Format = name, Width = oo.width, Height = oo.height, FPS = oo.fps });
+                //        this.m_MainUI.RecordFormats.Add(new VideoFormat() { Format = name, Width = oo.width, Height = oo.height, FPS = oo.fps, Bitrate=oo.bitrate });
 
-                    }
+                //    }
 
-                    //var view = new CollectionViewSource();
-                    //view.GroupDescriptions.Add(new PropertyGroupDescription("Format"));
-                    //view.Source = this.m_MainUI.RecordFormats;
-                    //this.m_MainUI.CollectionView = view;
+                //    //var view = new CollectionViewSource();
+                //    //view.GroupDescriptions.Add(new PropertyGroupDescription("Format"));
+                //    //view.Source = this.m_MainUI.RecordFormats;
+                //    //this.m_MainUI.CollectionView = view;
+                //}
+                ////await mf.StartPreview(this.mtbDate.Handle);
+                
+                foreach(var oo in mf.RecordForamts)
+                {
+                    this.m_MainUI.RecordFormats.Add(new VideoFormat() { Format = oo.format_str, Width = oo.width, Height = oo.height, FPS = oo.fps, Bitrate = oo.bitrate });
                 }
-                //await mf.StartPreview(this.mtbDate.Handle);
+                foreach (var oo in mf.PhotoForamts)
+                {
+                    this.m_MainUI.PhotoFormats.Add(new VideoFormat() { Format = oo.format_str, Width = oo.width, Height = oo.height, FPS = oo.fps, Bitrate = oo.bitrate });
+                }
                 await mf.StartPreview(x => { this.image_preview.Source = x; });
             }
         }
@@ -137,7 +166,7 @@ namespace WpfApp1
             var photo = System.IO.Path.Combine(Environment.CurrentDirectory, "aa.jpg");
             
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-            await mf.TakePhoto($"{m_JpgIndex++}.jpg", ()=>(width: 1280, height:720));
+            //await mf.TakePhoto($"{m_JpgIndex++}.jpg", ()=>(width: 1280, height:720));
             sw.Stop();
             System.Diagnostics.Trace.WriteLine($"takephoto: {sw.ElapsedMilliseconds}ms");
         }
@@ -157,7 +186,11 @@ namespace WpfApp1
 
         private void radiobutton_photo_Click(object sender, RoutedEventArgs e)
         {
-
+            
+            var aa = WebCam_MF.EnumDeviceSources()[0];
+            WebCam_MF webcam = new WebCam_MF();
+            //await webcam.InitializeCaptureManager(aa, true);
+            //webcam.StartPreview();
         }
 
         private void radiobutton_record_Click(object sender, RoutedEventArgs e)
@@ -187,5 +220,6 @@ namespace WpfApp1
         public uint Width { set; get; }
         public uint Height { set; get; }
         public double FPS { set; get; }
+        public uint Bitrate { set; get; }
     }
 }

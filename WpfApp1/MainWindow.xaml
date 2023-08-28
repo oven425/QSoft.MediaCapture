@@ -53,7 +53,7 @@
                 </GroupBox>
                 
                 <Button x:Name="button_takephoto" Click="button_takephoto_Click">TaskPhtot</Button>
-                <ComboBox ItemsSource="{Binding PhotoFormats}">
+                <ComboBox VerticalContentAlignment="Center" ItemsSource="{Binding PhotoFormats}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock>
@@ -96,6 +96,8 @@
                                 <Run Text="{Binding Height}" />
                                 <Run Text="{Binding FPS}" />
                                 <Run Text="fps" />
+                                <Run Text=",bitrate:" />
+                                <Run Text="{Binding Bitrate}" />
                             </TextBlock>
                         </DataTemplate>
                     </ComboBox.ItemTemplate>

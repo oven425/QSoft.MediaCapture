@@ -25,16 +25,10 @@ namespace QSoft.MediaCapture
         FOR_METADATA = 0xfffffff6,
         MF_CAPTURE_ENGINE_MEDIASOURCE = 0xffffffff
     }
+
     public class WebCam_MF : IMFCaptureEngineOnEventCallback, IDisposable
     {
-        public static WebCam_MF PhotoMode()
-        {
-            return new WebCam_MF();
-        }
-        public static WebCam_MF RecordMode()
-        {
-            return new WebCam_MF();
-        }
+        
         uint g_ResetToken = 0;
         IMFDXGIDeviceManager g_pDXGIMan;
         HRESULT CreateD3DManager()
@@ -103,7 +97,14 @@ namespace QSoft.MediaCapture
 
             return hr;
         }
-        public Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, List<(Guid format, uint width, uint height, double fps, uint bitrate, IMFMediaType mediatype)>> VideoFormats = new Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, List<(Guid format, uint width, uint height, double fps, uint bitrate, IMFMediaType mediatype)>>();
+        public Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, List<(string format_str, Guid format, uint width, uint height, double fps, uint bitrate, IMFMediaType mediatype)>> VideoFormats { private set; get; } = new Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, List<(string format_str, Guid format, uint width, uint height, double fps, uint bitrate, IMFMediaType mediatype)>>();
+        public List<(string format_str, Guid format, uint width, uint height, double fps, uint bitrate, IMFMediaType mediatype)> RecordForamts { private set; get; } = new List<(string format_str, Guid format, uint width, uint height, double fps, uint bitrate, IMFMediaType mediatype)>();
+        public List<(string format_str, Guid format, uint width, uint height, double fps, uint bitrate, IMFMediaType mediatype)> PhotoForamts { private set; get; } = new List<(string format_str, Guid format, uint width, uint height, double fps, uint bitrate, IMFMediaType mediatype)>();
+
+        public void PhotoMode(int width, int height)
+        {
+            
+        }
 
         TaskCompletionSource<HRESULT> m_Tasknitialize;
         bool m_IsMirror = false;
@@ -156,6 +157,31 @@ namespace QSoft.MediaCapture
             {
                 VideoFormats[media.Key] = media.Value.GetVideoData().ToList();
             }
+            var vvsq = VideoFormats[MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE]
+                    .OrderByDescending(x => x.width * x.height)
+                    .ThenByDescending(x => x.fps)
+                    .ThenBy(x => x.bitrate)
+                    .GroupBy(x => new { x.width, x.height });
+            foreach (var oo in vvsq.Select(x => x.First()))
+            {
+                this.RecordForamts.Add(oo);
+                this.PhotoForamts.Add(oo);
+            }
+
+            if (this.VideoFormats.ContainsKey(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT))
+            {
+                this.PhotoForamts.Clear();
+                var photos = VideoFormats[MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE]
+                    .OrderByDescending(x => x.width * x.height)
+                    .ThenByDescending(x => x.fps)
+                    .ThenBy(x => x.bitrate)
+                    .GroupBy(x => new { x.width, x.height });
+                foreach (var oo in vvsq.Select(x => x.First()))
+                {
+                    this.PhotoForamts.Add(oo);
+                }
+            }
+            
             SafeRelease(pSource);
         Exit:
             if (null != pAttributes)
@@ -428,7 +454,7 @@ namespace QSoft.MediaCapture
         WriteableBitmap m_PreviewBmp;
 
         TaskCompletionSource<HRESULT> m_TakeTakephoto;
-        public async Task<HRESULT> TakePhoto(string pszFileName, Func<(int width, int height)> size)
+        public async Task<HRESULT> TakePhoto(string pszFileName, int width=0, int height=0)
         {
             this.m_TakeTakephoto = new TaskCompletionSource<HRESULT>();
             IMFCaptureSink pSink = null;
@@ -452,10 +478,14 @@ namespace QSoft.MediaCapture
                 goto done;
             }
 
-            if (size != null)
+            if(this.VideoFormats.ContainsKey(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT))
             {
-                pSource.SetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_PHOTO, null);
+                var type = this.PhotoForamts.FirstOrDefault(x => x.width == width && x.height == height);
+                {
+                    pSource.SetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_PHOTO, type.mediatype);
+                }
             }
+
 
             hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_PHOTO, out pMediaType);
             if (hr.IsError)
@@ -1038,7 +1068,7 @@ namespace QSoft.MediaCapture
             return medias;
         }
 
-        public static IEnumerable<(Guid format, uint width, uint height, double fps, uint bitrate, IMFMediaType mediatype)> GetVideoData(this IEnumerable<IMFMediaType> src)
+        public static IEnumerable<(string name, Guid format, uint width, uint height, double fps, uint bitrate, IMFMediaType mediatype)> GetVideoData(this IEnumerable<IMFMediaType> src)
         {
             foreach (var oo in src)
             {
@@ -1070,7 +1100,7 @@ namespace QSoft.MediaCapture
                 //MF_MT_AVG_BITRATE
                 var hr =MFFunctions1.MFGetAttributeRatio(oo, MFConstants.MF_MT_PIXEL_ASPECT_RATIO, out var numerator1, out var denominator2);
                 //System.Diagnostics.Trace.WriteLine($"{numerator1}:{denominator2}");
-                yield return (subtype, w, h, fps, bitrate, oo);
+                yield return (subtype.FormatToString(), subtype, w, h, fps, bitrate, oo);
             }
         }
 
