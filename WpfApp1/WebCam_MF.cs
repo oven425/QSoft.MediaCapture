@@ -26,6 +26,14 @@ namespace QSoft.MediaCapture
         MF_CAPTURE_ENGINE_MEDIASOURCE = 0xffffffff
     }
 
+    public class Setting
+    {
+        //public object VideoSource { set; get; }
+        public (int width, int height) Photo { set; get; }
+        public (int width, int height) Record { set; get; }
+        public bool Mirror { set; get; }
+    }
+
     public class WebCam_MF : IMFCaptureEngineOnEventCallback, IDisposable
     {
         
@@ -101,16 +109,13 @@ namespace QSoft.MediaCapture
         public List<(string format_str, Guid format, uint width, uint height, double fps, uint bitrate, IMFMediaType mediatype)> RecordForamts { private set; get; } = new List<(string format_str, Guid format, uint width, uint height, double fps, uint bitrate, IMFMediaType mediatype)>();
         public List<(string format_str, Guid format, uint width, uint height, double fps, uint bitrate, IMFMediaType mediatype)> PhotoForamts { private set; get; } = new List<(string format_str, Guid format, uint width, uint height, double fps, uint bitrate, IMFMediaType mediatype)>();
 
-        public void PhotoMode(int width, int height)
-        {
-            
-        }
-
+        
         TaskCompletionSource<HRESULT> m_Tasknitialize;
-        bool m_IsMirror = false;
-        async public Task<HRESULT> InitializeCaptureManager(object videosource, bool ismirror = false)
+        //bool m_IsMirror = false;
+        Setting m_Setting;
+        async public Task<HRESULT> InitializeCaptureManager(object videosource, Setting setting)
         {
-            m_IsMirror = ismirror;
+            this.m_Setting = setting;
             m_Tasknitialize = new TaskCompletionSource<HRESULT>();
             HRESULT hr = HRESULTS.S_OK;
             IMFAttributes pAttributes = null;
@@ -181,7 +186,16 @@ namespace QSoft.MediaCapture
                     this.PhotoForamts.Add(oo);
                 }
             }
-            
+
+            var ratio = this.PhotoForamts.GroupBy(x => (double)x.width / (double)x.height);
+            foreach(var oo in ratio)
+            {
+                System.Diagnostics.Trace.WriteLine(oo.Key);
+                foreach(var o1 in oo)
+                {
+                    System.Diagnostics.Trace.WriteLine($"w:{o1.width} h:{o1.height}");
+                }
+            }
             SafeRelease(pSource);
         Exit:
             if (null != pAttributes)
@@ -217,8 +231,8 @@ namespace QSoft.MediaCapture
             SafeRelease(g_pDX11Device);
             SafeRelease(g_pDXGIMan);
 
-            //m_bPreviewing = false;
-            //m_bRecording = false;
+            m_bPreviewing = false;
+            m_bRecording = false;
             //m_bPhotoPending = false;
             //m_errorID = 0;
         }
@@ -340,7 +354,7 @@ namespace QSoft.MediaCapture
                     }
                     dwSinkStreamIndex = (uint)Marshal.ReadInt32(cm.Pointer);
                 }
-                if (this.m_IsMirror == true)
+                if (this.m_Setting?.Mirror == true)
                 {
                     this.Mirror(pSource, dwSinkStreamIndex);
                 }
