@@ -39,26 +39,26 @@ namespace WpfApp1
             {
                 this.DataContext = this.m_MainUI = new MainUI();
 
-                IMFActivate ddd = WebCam_MF.EnumDeviceSources()[0].obj.Object;
-                mf.OnFail += (WebCam_MF obj, int error) =>
-                {
+                //IMFActivate ddd = WebCam_MF.EnumDeviceSources()[0].obj.Object;
+                //mf.OnFail += (WebCam_MF obj, int error) =>
+                //{
 
-                };
-                await mf.InitializeCaptureManager(ddd, new Setting()
-                {
-                    Mirror = true,
-                });
+                //};
+                //await mf.InitializeCaptureManager(ddd, new Setting()
+                //{
+                //    Mirror = true,
+                //});
 
                 
-                foreach(var oo in mf.RecordForamts)
-                {
-                    this.m_MainUI.RecordFormats.Add(new VideoFormat() { Format = oo.format_str, Width = oo.width, Height = oo.height, FPS = oo.fps, Bitrate = oo.bitrate });
-                }
-                foreach (var oo in mf.PhotoForamts)
-                {
-                    this.m_MainUI.PhotoFormats.Add(new VideoFormat() { Format = oo.format_str, Width = oo.width, Height = oo.height, FPS = oo.fps, Bitrate = oo.bitrate });
-                }
-                await mf.StartPreview(x => { this.image_preview.Source = x; });
+                //foreach(var oo in mf.RecordForamts)
+                //{
+                //    this.m_MainUI.RecordFormats.Add(new VideoFormat() { Format = oo.format_str, Width = oo.width, Height = oo.height, FPS = oo.fps, Bitrate = oo.bitrate });
+                //}
+                //foreach (var oo in mf.PhotoForamts)
+                //{
+                //    this.m_MainUI.PhotoFormats.Add(new VideoFormat() { Format = oo.format_str, Width = oo.width, Height = oo.height, FPS = oo.fps, Bitrate = oo.bitrate });
+                //}
+                //await mf.StartPreview(x => { this.image_preview.Source = x; });
             }
         }
 
@@ -69,7 +69,7 @@ namespace WpfApp1
             var photo = System.IO.Path.Combine(Environment.CurrentDirectory, "aa.jpg");
             
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-            //await mf.TakePhoto($"{m_JpgIndex++}.jpg", ()=>(width: 1280, height:720));
+            //await mf.TakePhoto($"{m_JpgIndex++}.jpg", () => (width: 1280, height: 720));
             sw.Stop();
             System.Diagnostics.Trace.WriteLine($"takephoto: {sw.ElapsedMilliseconds}ms");
         }

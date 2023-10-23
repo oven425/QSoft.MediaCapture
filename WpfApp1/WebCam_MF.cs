@@ -1043,14 +1043,24 @@ namespace QSoft.MediaCapture
         {
             this.DestroyCaptureEngine();
         }
+        public string Name { get; private set; }
 
-        public static List<(string name, IComObject<IMFActivate> obj)> EnumDeviceSources()
+        public static List<WebCam_MF> EnumDeviceSources()
         {
-            var attribute = MFFunctions.MFCreateAttributes();
-            attribute.Set(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
-            var sources = attribute.EnumDeviceSources().Select(x => (x.GetString(MFConstants.MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME), x)).ToList();
-            return sources;
+            //var attribute = MFFunctions.MFCreateAttributes();
+            //attribute.Set(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
+            //var sources = attribute.EnumDeviceSources().Select(x => (x.GetString(MFConstants.MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME), x)).ToList();
+            //return sources;
+            return new List<WebCam_MF>();
         }
+
+        //public static List<(string name, IComObject<IMFActivate> obj)> EnumDeviceSources()
+        //{
+        //    var attribute = MFFunctions.MFCreateAttributes();
+        //    attribute.Set(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
+        //    var sources = attribute.EnumDeviceSources().Select(x => (x.GetString(MFConstants.MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME), x)).ToList();
+        //    return sources;
+        //}
 
     }
 

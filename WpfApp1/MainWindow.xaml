@@ -51,7 +51,7 @@
                         <RadioButton x:Name="radiobutton_record" Click="radiobutton_record_Click">Record</RadioButton>
                     </StackPanel>
                 </GroupBox>
-                
+                <ComboBox></ComboBox>
                 <Button x:Name="button_takephoto" Click="button_takephoto_Click">TaskPhtot</Button>
                 <ComboBox VerticalContentAlignment="Center" ItemsSource="{Binding PhotoFormats}">
                     <ComboBox.ItemTemplate>
@@ -103,10 +103,6 @@
                     </ComboBox.ItemTemplate>
                 </ComboBox>
             </StackPanel>
-            <!--<StackPanel>
-            <Button x:Name="a" Click="a_Click">A</Button>
-            <Button x:Name="b" Click="b_Click">B</Button>
-        </StackPanel>-->
         </Grid>
 
     </Grid>
