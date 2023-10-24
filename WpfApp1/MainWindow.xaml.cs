@@ -32,13 +32,14 @@ namespace WpfApp1
             InitializeComponent();
         }
         MainUI m_MainUI;
-        WebCam_MF mf = new WebCam_MF();
-        async private void Window_Loaded(object sender, RoutedEventArgs e)
+        WebCam_MF mf;
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             if(this.m_MainUI == null)
             {
                 this.DataContext = this.m_MainUI = new MainUI();
-
+                var webcams = WebCam_MF.EnumDeviceSources();
+                this.m_MainUI.WebCams = new ObservableCollection<WebCam_MF>(webcams);
                 //IMFActivate ddd = WebCam_MF.EnumDeviceSources()[0].obj.Object;
                 //mf.OnFail += (WebCam_MF obj, int error) =>
                 //{
@@ -67,38 +68,64 @@ namespace WpfApp1
         async private void button_takephoto_Click(object sender, RoutedEventArgs e)
         {
             var photo = System.IO.Path.Combine(Environment.CurrentDirectory, "aa.jpg");
-            
+
+            var vd = combobox_photos.SelectedItem as VideoFormat;
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-            //await mf.TakePhoto($"{m_JpgIndex++}.jpg", () => (width: 1280, height: 720));
+            if(vd == null)
+            {
+                await mf.TakePhoto($"{m_JpgIndex++}.jpg");
+            }
+            else
+            {
+                await mf.TakePhoto($"{m_JpgIndex++}.jpg", vd.Width, vd.Height);
+            }
+           
             sw.Stop();
             System.Diagnostics.Trace.WriteLine($"takephoto: {sw.ElapsedMilliseconds}ms");
         }
 
-        async private void ToggleButton_Click(object sender, RoutedEventArgs e)
+
+
+
+        private async void combobox_webcams_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ToggleButton toggle = sender as ToggleButton;
-            if(toggle.IsChecked == true)
+            this.m_MainUI.RecordFormats.Clear();
+            this.m_MainUI.PhotoFormats.Clear();
+            var combobox = sender as ComboBox;
+            this.mf = combobox.SelectedItem as WebCam_MF;
+            await this.mf.InitializeCaptureManager(this.mf.VideoDevice.Object, new Setting() { Mirror = this.m_MainUI.IsMirror});
+            foreach (var oo in mf.RecordForamts)
             {
-                await mf.StartRecord("aa.mp4");
+                this.m_MainUI.RecordFormats.Add(new VideoFormat() { Format = oo.format_str, Width = oo.width, Height = oo.height, FPS = oo.fps, Bitrate = oo.bitrate });
             }
-            else
+            foreach (var oo in mf.PhotoForamts)
             {
-                await mf.StopRecord();
+                this.m_MainUI.PhotoFormats.Add(new VideoFormat() { Format = oo.format_str, Width = oo.width, Height = oo.height, FPS = oo.fps, Bitrate = oo.bitrate });
             }
         }
 
-        private void radiobutton_photo_Click(object sender, RoutedEventArgs e)
+        async private void button_startpreview_Click(object sender, RoutedEventArgs e)
         {
-            
-            var aa = WebCam_MF.EnumDeviceSources()[0];
-            WebCam_MF webcam = new WebCam_MF();
-            //await webcam.InitializeCaptureManager(aa, true);
-            //webcam.StartPreview();
+            await mf?.StartPreview(x =>
+            {
+                this.image_preview.Source = x;
+            });
         }
 
-        private void radiobutton_record_Click(object sender, RoutedEventArgs e)
+        private void button_stoppreview_Click(object sender, RoutedEventArgs e)
         {
+            mf?.StopPreview();
+        }
 
+        private async void button_startrecord_Click(object sender, RoutedEventArgs e)
+        {
+            var filename = $"{mf?.Name}_{DateTime.Now.ToString("HHmmss")}.mp4";
+            await mf?.StartRecord(filename);
+        }
+
+        async private void button_stoprecord_Click(object sender, RoutedEventArgs e)
+        {
+            await mf?.StopRecord();
         }
     }
 
@@ -112,8 +139,10 @@ namespace WpfApp1
         public CollectionViewSource CollectionView { get; set; }
         public Modes Mode { set; get; } = Modes.Photo;
         public ObservableCollection<string> Cameras { set; get; } = new ObservableCollection<string>();
+        public ObservableCollection<WebCam_MF> WebCams { set; get; } = new ObservableCollection<WebCam_MF>();
         public ObservableCollection<VideoFormat> PhotoFormats { set; get; } = new ObservableCollection<VideoFormat>();
         public ObservableCollection<VideoFormat> RecordFormats { set; get; } = new ObservableCollection<VideoFormat>();
+        public bool IsMirror { set; get; }
     }
 
 

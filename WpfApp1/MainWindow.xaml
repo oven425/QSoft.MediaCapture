@@ -9,27 +9,6 @@
         Title="MainWindow" Height="450" Width="800"
         Loaded="Window_Loaded">
     <Grid>
-        <!--<Grid>
-            <ItemsControl ItemsSource="{Binding WebCams}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <TextBlock Text="{Binding Name}"/>
-                            <Image Source="{Binding Preview}"  Grid.Row="1"/>
-                        </Grid>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <UniformGrid/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
-        </Grid>-->
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition/>
@@ -41,67 +20,66 @@
                 </WindowsFormsHost>
                 <Image x:Name="image_preview"></Image>
             </UniformGrid>
-            <!--<WindowsFormsHost >
-            <wf:Button x:Name="mtbDate"/>
-        </WindowsFormsHost>-->
             <StackPanel Grid.Row="1" Orientation="Horizontal">
-                <GroupBox Header="Mode">
+                <StackPanel>
+                    <TextBlock Text="WebCam: " VerticalAlignment="Center"/>
+                    <CheckBox IsChecked="{Binding IsMirror}">Mirror</CheckBox>
+                </StackPanel>
+                
+                <ComboBox x:Name="combobox_webcams" SelectionChanged="combobox_webcams_SelectionChanged" ItemsSource="{Binding WebCams}" Width="140" VerticalContentAlignment="Center">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <GroupBox Header="Preview">
+                    <WrapPanel ItemWidth="60">
+                        <Button x:Name="button_startpreview" Click="button_startpreview_Click" Margin="1,0">Start</Button>
+                        <Button x:Name="button_stoppreview" Click="button_stoppreview_Click" Margin="1,0">Stop</Button>
+                    </WrapPanel>
+                </GroupBox>
+                <GroupBox Header="Photo">
                     <StackPanel Orientation="Horizontal">
-                        <RadioButton x:Name="radiobutton_photo" Click="radiobutton_photo_Click">Photo</RadioButton>
-                        <RadioButton x:Name="radiobutton_record" Click="radiobutton_record_Click">Record</RadioButton>
+                        <Button x:Name="button_takephoto" Click="button_takephoto_Click" Margin="1,0">TaskPhtot</Button>
+                        <ComboBox x:Name="combobox_photos" ItemsSource="{Binding PhotoFormats}" Width="130">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock>
+                <Run Text="{Binding Format}" />
+                <Run Text="{Binding Width}" />
+                <Run Text="x" />
+                <Run Text="{Binding Height}" />
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
                     </StackPanel>
                 </GroupBox>
-                <ComboBox></ComboBox>
-                <Button x:Name="button_takephoto" Click="button_takephoto_Click">TaskPhtot</Button>
-                <ComboBox VerticalContentAlignment="Center" ItemsSource="{Binding PhotoFormats}">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock>
-                                <Run Text="{Binding Format}" />
-                                <Run Text="{Binding Width}" />
-                                <Run Text="x" />
-                                <Run Text="{Binding Height}" />
-                            </TextBlock>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
-                <ToggleButton Click="ToggleButton_Click">
-                    <ToggleButton.Style>
-                        <Style TargetType="ToggleButton">
-                            <Setter Property="Content" Value="開始錄影"/>
-                            <Style.Triggers>
-                                <Trigger Property="IsChecked" Value="True">
-                                    <Setter Property="Content" Value="停止錄影"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ToggleButton.Style>
-                </ToggleButton>
-                <ComboBox VerticalContentAlignment="Center" ItemsSource="{Binding RecordFormats}">
-                    <!--<ComboBox.GroupStyle>
-                        <GroupStyle>
-                            <GroupStyle.HeaderTemplate>
+                <GroupBox Header="Record">
+                    <StackPanel Orientation="Horizontal">
+                        <WrapPanel ItemWidth="60">
+                            <Button x:Name="button_startrecord" Click="button_startrecord_Click" Margin="1,0,1,0">Start</Button>
+                            <Button x:Name="button_stoprecord" Click="button_stoprecord_Click" Margin="1,0">Stop</Button>
+                        </WrapPanel>
+                        <ComboBox ItemsSource="{Binding RecordFormats}" Width="130">
+                            <ComboBox.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Name}"/>
+                                    <TextBlock>
+                <Run Text="{Binding Format}" />
+                <Run Text="{Binding Width}" />
+                <Run Text="x" />
+                <Run Text="{Binding Height}" />
+                <Run Text="{Binding FPS}" />
+                <Run Text="fps" />
+                <Run Text=",bitrate:" />
+                <Run Text="{Binding Bitrate}" />
+                                    </TextBlock>
                                 </DataTemplate>
-                            </GroupStyle.HeaderTemplate>
-                        </GroupStyle>
-                    </ComboBox.GroupStyle>-->
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock>
-                                <Run Text="{Binding Format}" />
-                                <Run Text="{Binding Width}" />
-                                <Run Text="x" />
-                                <Run Text="{Binding Height}" />
-                                <Run Text="{Binding FPS}" />
-                                <Run Text="fps" />
-                                <Run Text=",bitrate:" />
-                                <Run Text="{Binding Bitrate}" />
-                            </TextBlock>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+                </GroupBox>
             </StackPanel>
         </Grid>
 

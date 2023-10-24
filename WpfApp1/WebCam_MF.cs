@@ -35,8 +35,13 @@ namespace QSoft.MediaCapture
     }
 
     public class WebCam_MF : IMFCaptureEngineOnEventCallback, IDisposable
-    {
-        
+    {   
+        public IComObject<IMFActivate> VideoDevice { get; protected set; }
+        public WebCam_MF(string name, IComObject<IMFActivate> obj)
+        {
+            this.Name = name;
+            VideoDevice = obj;
+        }
         uint g_ResetToken = 0;
         IMFDXGIDeviceManager g_pDXGIMan;
         HRESULT CreateD3DManager()
@@ -413,16 +418,15 @@ namespace QSoft.MediaCapture
             }
 
             this.m_TaskStopPreview = new TaskCompletionSource<HRESULT>(hr);
-            if (!m_bPreviewing)
-            {
-                return HRESULTS.S_OK;
-            }
+            //if (!m_bPreviewing)
+            //{
+            //    return HRESULTS.S_OK;
+            //}
             hr = m_pEngine.StopPreview();
             if (hr.IsError)
             {
                 goto done;
             }
-        //WaitForResult();
 
         //if (m_fPowerRequestSet && m_hpwrRequest != INVALID_HANDLE_VALUE)
         //{
@@ -468,7 +472,7 @@ namespace QSoft.MediaCapture
         WriteableBitmap m_PreviewBmp;
 
         TaskCompletionSource<HRESULT> m_TakeTakephoto;
-        public async Task<HRESULT> TakePhoto(string pszFileName, int width=0, int height=0)
+        public async Task<HRESULT> TakePhoto(string pszFileName, uint width=0, uint height=0)
         {
             this.m_TakeTakephoto = new TaskCompletionSource<HRESULT>();
             IMFCaptureSink pSink = null;
@@ -495,8 +499,9 @@ namespace QSoft.MediaCapture
             if(this.VideoFormats.ContainsKey(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT))
             {
                 var type = this.PhotoForamts.FirstOrDefault(x => x.width == width && x.height == height);
+                if(type.mediatype != null)
                 {
-                    pSource.SetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_PHOTO, type.mediatype);
+                    hr = pSource.SetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_PHOTO, type.mediatype);
                 }
             }
 
@@ -1047,11 +1052,10 @@ namespace QSoft.MediaCapture
 
         public static List<WebCam_MF> EnumDeviceSources()
         {
-            //var attribute = MFFunctions.MFCreateAttributes();
-            //attribute.Set(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
-            //var sources = attribute.EnumDeviceSources().Select(x => (x.GetString(MFConstants.MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME), x)).ToList();
-            //return sources;
-            return new List<WebCam_MF>();
+            var attribute = MFFunctions.MFCreateAttributes();
+            attribute.Set(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
+            var sources = attribute.EnumDeviceSources().Select(x => new WebCam_MF(x.GetString(MFConstants.MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME), x)).ToList();
+            return sources;
         }
 
         //public static List<(string name, IComObject<IMFActivate> obj)> EnumDeviceSources()
