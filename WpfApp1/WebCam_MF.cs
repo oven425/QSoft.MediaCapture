@@ -530,9 +530,14 @@ namespace QSoft.MediaCapture
             //DWORD dwSinkStreamIndex;
             IntPtr pp = Marshal.AllocHGlobal(4);
             // Try to connect the first still image stream to the photo sink
+            uint dwSinkStreamIndex = 0;
             if (bHasPhotoStream)
             {
-                hr = pPhoto.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_PHOTO, pMediaType2, null, pp);
+                using (var cm = new ComMemory(Marshal.SizeOf<uint>()))
+                {
+                    hr = pPhoto.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_PHOTO, pMediaType2, null, cm.Pointer);
+                    dwSinkStreamIndex = (uint)Marshal.ReadInt32(cm.Pointer);
+                }
             }
 
             if (hr.IsError)
