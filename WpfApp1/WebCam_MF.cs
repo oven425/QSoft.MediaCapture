@@ -12,6 +12,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Media.Media3D;
 using System.Xml.Linq;
 //https://github.com/MicrosoftDocs/win32/blob/docs/desktop-src/medfound/directx-surface-buffer.md
 namespace QSoft.MediaCapture
@@ -35,7 +36,7 @@ namespace QSoft.MediaCapture
     }
 
     public class WebCam_MF : IMFCaptureEngineOnEventCallback, IDisposable
-    {   
+    {
         public IComObject<IMFActivate> VideoDevice { get; protected set; }
         public WebCam_MF(string name, IComObject<IMFActivate> obj)
         {
@@ -114,7 +115,7 @@ namespace QSoft.MediaCapture
         public List<(string format_str, Guid format, uint width, uint height, double fps, uint bitrate, IMFMediaType mediatype)> RecordForamts { private set; get; } = new List<(string format_str, Guid format, uint width, uint height, double fps, uint bitrate, IMFMediaType mediatype)>();
         public List<(string format_str, Guid format, uint width, uint height, double fps, uint bitrate, IMFMediaType mediatype)> PhotoForamts { private set; get; } = new List<(string format_str, Guid format, uint width, uint height, double fps, uint bitrate, IMFMediaType mediatype)>();
 
-        
+
         TaskCompletionSource<HRESULT> m_Tasknitialize;
         //bool m_IsMirror = false;
         Setting m_Setting;
@@ -193,14 +194,30 @@ namespace QSoft.MediaCapture
             }
 
             var ratio = this.PhotoForamts.GroupBy(x => (double)x.width / (double)x.height);
-            foreach(var oo in ratio)
+            foreach (var oo in ratio)
             {
                 System.Diagnostics.Trace.WriteLine(oo.Key);
-                foreach(var o1 in oo)
+                foreach (var o1 in oo)
                 {
                     System.Diagnostics.Trace.WriteLine($"w:{o1.width} h:{o1.height}");
                 }
             }
+            //IMFVideoProcessor
+
+            IMFMediaSource source;
+            hr = pSource.GetCaptureDeviceSource(MF_CAPTURE_ENGINE_DEVICE_TYPE.MF_CAPTURE_ENGINE_DEVICE_TYPE_VIDEO, out source);
+            var brightness = source as IAMCameraControl;
+            if (brightness == null)
+            {
+                System.Diagnostics.Trace.WriteLine($"brightness == null");
+            }
+            long max;
+            long min;
+            long defaultt;
+            long step;
+            long flag;
+            hr = brightness.GetRange((int)tagCameraControlProperty.CameraControl_Exposure, out min, out max, out step, out defaultt, out flag);
+            System.Diagnostics.Trace.WriteLine($"CameraControl_Exposure:{hr}");
             SafeRelease(pSource);
         Exit:
             if (null != pAttributes)
@@ -217,6 +234,54 @@ namespace QSoft.MediaCapture
             }
             return hr;
         }
+
+        public class CameraProperty
+        {
+            public long Max { set; get; }
+            public long Min { set; get; }
+            public long Default { set; get; }
+            public long Value { set; get; }
+            public tagCameraControlFlags Flags { set; get; }
+            public void Set(long value)
+            {
+
+            }
+        }
+
+        public class CaptureControl
+        {
+
+        }
+
+        public CaptureControl Brigtness {private set; get; }
+        public class CameraSetting
+        {
+            public CameraSetting(IMFCaptureSource source)
+            {
+                IMFMediaSource mediasource;
+                var hr = source.GetCaptureDeviceSource(MF_CAPTURE_ENGINE_DEVICE_TYPE.MF_CAPTURE_ENGINE_DEVICE_TYPE_VIDEO, out mediasource);
+
+                Marshal.ReleaseComObject(source);
+            }
+            public CameraProperty Brightness { set; get; }
+        }
+
+        enum tagCameraControlProperty
+        {
+            CameraControl_Pan = 0,
+            CameraControl_Tilt,
+            CameraControl_Roll,
+            CameraControl_Zoom,
+            CameraControl_Exposure,
+            CameraControl_Iris,
+            CameraControl_Focus
+        };
+
+        public enum tagCameraControlFlags
+        {
+            CameraControl_Flags_Auto = 0x1,
+            CameraControl_Flags_Manual = 0x2
+        };
 
         void DestroyCaptureEngine()
         {
@@ -443,6 +508,8 @@ namespace QSoft.MediaCapture
             //source.AddEffect()
             IMFMediaType pMediaType;
             source.GetCurrentDeviceMediaType(streamindex, out pMediaType);
+
+            //CLSID_CColorControlDmo
             var vp = Activator.CreateInstance(Type.GetTypeFromCLSID(DirectN.MFConstants.CLSID_VideoProcessorMFT)) as IMFVideoProcessorControl;
             var hr = vp.SetMirror(_MF_VIDEO_PROCESSOR_MIRROR.MIRROR_HORIZONTAL);
             IMFTransform mft = vp as IMFTransform;

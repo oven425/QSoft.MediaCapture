@@ -13,14 +13,31 @@
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
+            
             <UniformGrid Columns="2">
                 <WindowsFormsHost >
                     <wf:Button x:Name="mtbDate"/>
                 </WindowsFormsHost>
                 <Image x:Name="image_preview"></Image>
             </UniformGrid>
-            <StackPanel Grid.Row="1" Orientation="Horizontal">
+            <Expander IsExpanded="True" Header="setting" Grid.Row="1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Brightness"/>
+                    <Slider Grid.Column="1"/>
+                </Grid>
+            </Expander>
+            <StackPanel Grid.Row="2" Orientation="Horizontal">
                 <StackPanel>
                     <TextBlock Text="WebCam: " VerticalAlignment="Center"/>
                     <CheckBox IsChecked="{Binding IsMirror}">Mirror</CheckBox>
