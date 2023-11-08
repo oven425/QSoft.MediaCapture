@@ -23,19 +23,18 @@
                 <Image x:Name="image_preview"></Image>
             </UniformGrid>
             <Expander IsExpanded="True" Header="setting" Grid.Row="1">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="Brightness"/>
-                    <Slider Grid.Column="1"/>
-                </Grid>
+                <UniformGrid Columns="2">
+                    <Grid Margin="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Brightness"/>
+                        <Slider x:Name="slider_brightness" Grid.Column="1"/>
+                        <CheckBox Grid.Column="2">Auto</CheckBox>
+                    </Grid>
+                </UniformGrid>
             </Expander>
             <StackPanel Grid.Row="2" Orientation="Horizontal">
                 <StackPanel>

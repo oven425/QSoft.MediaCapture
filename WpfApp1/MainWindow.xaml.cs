@@ -102,6 +102,9 @@ namespace WpfApp1
             {
                 this.m_MainUI.PhotoFormats.Add(new VideoFormat() { Format = oo.format_str, Width = oo.width, Height = oo.height, FPS = oo.fps, Bitrate = oo.bitrate });
             }
+            slider_brightness.Maximum = mf.Brigtness.Max;
+            slider_brightness.Minimum = mf.Brigtness.Min;
+            slider_brightness.Value = mf.Brigtness.Value;
         }
 
         async private void button_startpreview_Click(object sender, RoutedEventArgs e)

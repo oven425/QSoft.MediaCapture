@@ -202,11 +202,10 @@ namespace QSoft.MediaCapture
                     System.Diagnostics.Trace.WriteLine($"w:{o1.width} h:{o1.height}");
                 }
             }
-            //IMFVideoProcessor
-
+            
             IMFMediaSource source;
             hr = pSource.GetCaptureDeviceSource(MF_CAPTURE_ENGINE_DEVICE_TYPE.MF_CAPTURE_ENGINE_DEVICE_TYPE_VIDEO, out source);
-            var brightness = source as IAMCameraControl;
+            var brightness = source as IAMVideoProcAmp;
             if (brightness == null)
             {
                 System.Diagnostics.Trace.WriteLine($"brightness == null");
@@ -216,7 +215,16 @@ namespace QSoft.MediaCapture
             long defaultt;
             long step;
             long flag;
-            hr = brightness.GetRange((int)tagCameraControlProperty.CameraControl_Exposure, out min, out max, out step, out defaultt, out flag);
+            hr = brightness.GetRange((int)VideoProcAmpProperty.VideoProcAmp_Brightness, out min, out max, out step, out defaultt, out flag);
+            this.Brigtness = new CaptureControl();
+            this.Brigtness.Default = defaultt;
+            this.Brigtness.Max = max;
+            this.Brigtness.Min = min;
+            this.Brigtness.Step = step;
+            long value;
+            hr = brightness.Get((int)VideoProcAmpProperty.VideoProcAmp_Brightness, out value, out flag);
+            this.Brigtness.Value = value;
+
             System.Diagnostics.Trace.WriteLine($"CameraControl_Exposure:{hr}");
             SafeRelease(pSource);
         Exit:
@@ -235,36 +243,34 @@ namespace QSoft.MediaCapture
             return hr;
         }
 
-        public class CameraProperty
+        //public class CameraProperty
+        //{
+        //    public long Max { set; get; }
+        //    public long Min { set; get; }
+        //    public long Default { set; get; }
+        //    public long Value { set; get; }
+        //    public tagCameraControlFlags Flags { set; get; }
+        //    public void Set(long value)
+        //    {
+
+        //    }
+        //}
+
+        public class CaptureControl
         {
             public long Max { set; get; }
             public long Min { set; get; }
             public long Default { set; get; }
             public long Value { set; get; }
-            public tagCameraControlFlags Flags { set; get; }
+            public long Step { set; get; }
             public void Set(long value)
             {
 
             }
         }
 
-        public class CaptureControl
-        {
-
-        }
-
         public CaptureControl Brigtness {private set; get; }
-        public class CameraSetting
-        {
-            public CameraSetting(IMFCaptureSource source)
-            {
-                IMFMediaSource mediasource;
-                var hr = source.GetCaptureDeviceSource(MF_CAPTURE_ENGINE_DEVICE_TYPE.MF_CAPTURE_ENGINE_DEVICE_TYPE_VIDEO, out mediasource);
 
-                Marshal.ReleaseComObject(source);
-            }
-            public CameraProperty Brightness { set; get; }
-        }
 
         enum tagCameraControlProperty
         {
@@ -275,6 +281,26 @@ namespace QSoft.MediaCapture
             CameraControl_Exposure,
             CameraControl_Iris,
             CameraControl_Focus
+        };
+
+        enum VideoProcAmpProperty
+        {
+            VideoProcAmp_Brightness = 0,
+            VideoProcAmp_Contrast,
+            VideoProcAmp_Hue,
+            VideoProcAmp_Saturation,
+            VideoProcAmp_Sharpness,
+            VideoProcAmp_Gamma,
+            VideoProcAmp_ColorEnable,
+            VideoProcAmp_WhiteBalance,
+            VideoProcAmp_BacklightCompensation,
+            VideoProcAmp_Gain
+        };
+
+        enum VideoProcAmpFlags
+        {
+            VideoProcAmp_Flags_Auto = 0x1,
+            VideoProcAmp_Flags_Manual = 0x2
         };
 
         public enum tagCameraControlFlags
