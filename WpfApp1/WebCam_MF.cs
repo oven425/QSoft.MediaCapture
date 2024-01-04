@@ -243,18 +243,6 @@ namespace QSoft.MediaCapture
             return hr;
         }
 
-        //public class CameraProperty
-        //{
-        //    public long Max { set; get; }
-        //    public long Min { set; get; }
-        //    public long Default { set; get; }
-        //    public long Value { set; get; }
-        //    public tagCameraControlFlags Flags { set; get; }
-        //    public void Set(long value)
-        //    {
-
-        //    }
-        //}
 
         public class CaptureControl
         {
@@ -537,7 +525,20 @@ namespace QSoft.MediaCapture
 
             //CLSID_CColorControlDmo
             var vp = Activator.CreateInstance(Type.GetTypeFromCLSID(DirectN.MFConstants.CLSID_VideoProcessorMFT)) as IMFVideoProcessorControl;
-            var hr = vp.SetMirror(_MF_VIDEO_PROCESSOR_MIRROR.MIRROR_HORIZONTAL);
+            //var hr = vp.SetMirror(_MF_VIDEO_PROCESSOR_MIRROR.MIRROR_HORIZONTAL);
+            IntPtr prc = Marshal.AllocHGlobal(Marshal.SizeOf<RECT>());
+            RECT rc;
+            rc.left = 10;
+            rc.top = 10;
+            rc.right = 310;
+            rc.bottom = 310;
+            
+            Marshal.StructureToPtr(rc, prc, true);
+            var hr = vp.SetSourceRectangle(prc);
+            Marshal.FreeHGlobal(prc);
+
+
+
             IMFTransform mft = vp as IMFTransform;
             hr = mft.SetInputType(0, pMediaType, 0);
             //if (COMBase.Failed(hr))
@@ -1298,6 +1299,14 @@ namespace QSoft.MediaCapture
             return "Unkknow";
         }
     }
+
+    struct RECT
+    {
+        public int left;
+        public int top;
+        public int right;
+        public int bottom;
+    };
 
     public class MFCaptureEngineOnSampleCallback : IMFCaptureEngineOnSampleCallback
     {

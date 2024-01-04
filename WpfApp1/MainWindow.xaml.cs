@@ -109,10 +109,11 @@ namespace WpfApp1
 
         async private void button_startpreview_Click(object sender, RoutedEventArgs e)
         {
-            await mf?.StartPreview(x =>
-            {
-                this.image_preview.Source = x;
-            });
+            //await mf?.StartPreview(x =>
+            //{
+            //    this.image_preview.Source = x;
+            //});
+            await mf?.StartPreview(mtbDate.Handle);
         }
 
         private void button_stoppreview_Click(object sender, RoutedEventArgs e)
