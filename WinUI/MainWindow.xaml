@@ -9,5 +9,5 @@
     Activated="Window_Activated"
     mc:Ignorable="d">
 
-    <MediaPlayerElement x:Name="mediaPlayerElement" Stretch="UniformToFill" AutoPlay="True" />
+    <MediaPlayerElement x:Name="mediaPlayerElement" Stretch="UniformToFill" />
 </Window>
