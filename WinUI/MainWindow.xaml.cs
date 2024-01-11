@@ -19,6 +19,7 @@ using Windows.Media;
 using Windows.Media.Capture;
 using Windows.Media.Capture.Frames;
 using Windows.Media.Core;
+using Windows.Media.MediaProperties;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -63,7 +64,14 @@ namespace WinUI
             mediaPlayerElement.Source = MediaSource.CreateFromMediaFrameSource(mediaCapture.FrameSources.FirstOrDefault().Value);
             try
             {
-                await mediaCapture.StartPreviewAsync();
+                var profile = new MediaEncodingProfile
+                {
+                    Audio = null,
+                    Video = VideoEncodingProperties.CreateUncompressed(MediaEncodingSubtypes.Rgb32, 640, 480),
+                    Container = null
+                };
+                IMediaExtension hh = new Sink();
+                await mediaCapture.StartPreviewToCustomSinkAsync(profile, hh);
             }
             catch(Exception e)
             {
@@ -88,6 +96,19 @@ namespace WinUI
             }
 
 
+        }
+
+        private void button_takephoto_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+    }
+
+    public class Sink : IMediaExtension
+    {
+        public void SetProperties(IPropertySet configuration)
+        {
+            throw new NotImplementedException();
         }
     }
 }

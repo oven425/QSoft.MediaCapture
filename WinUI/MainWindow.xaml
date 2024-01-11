@@ -8,6 +8,13 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Activated="Window_Activated"
     mc:Ignorable="d">
-
-    <MediaPlayerElement x:Name="mediaPlayerElement" Stretch="UniformToFill" />
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <MediaPlayerElement x:Name="mediaPlayerElement"/>
+        <Button x:Name="button_takephoto" Click="button_takephoto_Click">Take photo</Button>
+    </Grid>
+    
 </Window>
