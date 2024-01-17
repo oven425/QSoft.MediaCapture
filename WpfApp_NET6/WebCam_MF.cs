@@ -1311,7 +1311,7 @@ namespace QSoft.MediaCapture
 
     public class MFCaptureEngineOnSampleCallback : IMFCaptureEngineOnSampleCallback
     {
-        [DllImport("kernel32.dll", EntryPoint = "CopyMemory", SetLastError = false)]
+        [DllImport("kernel32.dll", EntryPoint = "RtlCopyMemory", SetLastError = false)]
         public static extern void CopyMemory(IntPtr dest, IntPtr src, uint count);
         WriteableBitmap m_Bmp;
         public MFCaptureEngineOnSampleCallback(WriteableBitmap data)
@@ -1339,14 +1339,26 @@ namespace QSoft.MediaCapture
                 var ptr = buf.Lock(out var max, out var cur);
                 //m_Buffer = new byte[cur];
                 //Marshal.Copy(ptr, m_Buffer, 0, m_Buffer.Length);
-                m_Bmp.Dispatcher.Invoke(() =>
+                try
                 {
-                    m_Bmp.Lock();
-                    CopyMemory(m_Bmp.BackBuffer, ptr, cur);
-                    //Marshal.Copy(this.m_Buffer, 0, m_Bmp.BackBuffer, this.m_Buffer.Length);
-                    m_Bmp.AddDirtyRect(new System.Windows.Int32Rect(0, 0, m_Bmp.PixelWidth, m_Bmp.PixelHeight));
-                    m_Bmp.Unlock();
-                }, System.Windows.Threading.DispatcherPriority.Background);
+                    m_Bmp.Dispatcher.Invoke(() =>
+                    {
+                        m_Bmp.Lock();
+                        CopyMemory(m_Bmp.BackBuffer, ptr, cur);
+                        //Marshal.Copy(this.m_Buffer, 0, m_Bmp.BackBuffer, this.m_Buffer.Length);
+                        
+                        m_Bmp.AddDirtyRect(new System.Windows.Int32Rect(0, 0, m_Bmp.PixelWidth, m_Bmp.PixelHeight));
+                        m_Bmp.Unlock();
+                    }, System.Windows.Threading.DispatcherPriority.Background);
+                }
+                catch(Exception ee)
+                {
+
+                }
+                finally
+                {
+                    
+                }
 
                 buf.Unlock();
                 Marshal.ReleaseComObject(buf);
