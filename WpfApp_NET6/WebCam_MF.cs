@@ -340,6 +340,13 @@ namespace QSoft.MediaCapture
         {
             return await this.StartPreview(hwnd, null);
         }
+
+         
+
+        public void StartPreviewToCustomSinkAsync(IMFCaptureEngineOnSampleCallback sink)
+        {
+
+        }
         
         MFCaptureEngineOnSampleCallback m_PreviewCallback;
         uint dwSinkStreamIndex = 0;
@@ -382,7 +389,7 @@ namespace QSoft.MediaCapture
                 }
                 m_pPreview = pSink as IMFCapturePreviewSink;
 
-                if(hwnd != IntPtr.Zero)
+                if(hwnd != IntPtr.Zero && m_pPreview !=null)
                 {
                     hr = m_pPreview.SetRenderHandle(hwnd);
                     if (hr != HRESULTS.S_OK)
@@ -844,6 +851,8 @@ namespace QSoft.MediaCapture
             return HRESULTS.S_OK;
         }
 
+        
+
         TaskCompletionSource<HRESULT> m_TaskStopRecord;
         public Task<HRESULT> StopRecord()
         {
@@ -1167,6 +1176,8 @@ namespace QSoft.MediaCapture
         //}
 
     }
+
+    
 
     public static class IMFCaptureSourceEx
     {
