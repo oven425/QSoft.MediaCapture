@@ -340,7 +340,12 @@ namespace QSoft.MediaCapture
         {
             return await this.StartPreview(hwnd, null);
         }
-        
+
+        public void StartPreviewToCustomSinkAsync(IMFCaptureEngineOnSampleCallback sink)
+        {
+
+        }
+
         MFCaptureEngineOnSampleCallback m_PreviewCallback;
         uint dwSinkStreamIndex = 0;
         public async Task<HRESULT> StartPreview(Action<WriteableBitmap> action)

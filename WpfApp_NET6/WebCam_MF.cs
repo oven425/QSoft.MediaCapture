@@ -341,7 +341,19 @@ namespace QSoft.MediaCapture
             return await this.StartPreview(hwnd, null);
         }
 
-         
+        public (int width, int height) PreviewSize { private set; get; }
+
+        //(int width, int height) GetPreviewSize()
+        //{
+        //    var hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_PREVIEW, out var pSink);
+        //    if (hr != HRESULTS.S_OK)
+        //    {
+        //        //goto done;
+        //    }
+        //    m_pPreview = pSink as IMFCapturePreviewSink;
+        //    m_pPreview.GetOutputMediaType()
+        //    return (0, 0);
+        //}
 
         public void StartPreviewToCustomSinkAsync(IMFCaptureEngineOnSampleCallback sink)
         {
@@ -451,9 +463,7 @@ namespace QSoft.MediaCapture
                 }
                 if(action != null)
                 {
-                    uint w = 0;
-                    uint h = 0;
-                    MFFunctions1.MFGetAttributeSize(pMediaType2, MFConstants.MF_MT_FRAME_SIZE, out w, out h);
+                    MFFunctions1.MFGetAttributeSize(pMediaType2, MFConstants.MF_MT_FRAME_SIZE, out var w, out var h);
                     m_PreviewBmp = new WriteableBitmap((int)w, (int)h, 96, 96, PixelFormats.Bgr24, null);
                     m_PreviewCallback = new MFCaptureEngineOnSampleCallback(m_PreviewBmp);
                     hr = m_pPreview.SetSampleCallback(dwSinkStreamIndex, m_PreviewCallback);
