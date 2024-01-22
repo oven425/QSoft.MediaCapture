@@ -12,8 +12,11 @@ namespace QSoft.MediaCapture
         public static void StartPreview(this WebCam_MF src, Action<WriteableBitmap> action)
         {
             WriteableBitmap bmp = null;
+            
             src.StartPreviewToCustomSinkAsync(new MFCaptureEngineOnSampleCallback(bmp));
             action(bmp);
         }
     }
+
+    
 }

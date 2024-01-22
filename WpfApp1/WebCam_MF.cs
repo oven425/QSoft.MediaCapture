@@ -119,7 +119,7 @@ namespace QSoft.MediaCapture
         TaskCompletionSource<HRESULT> m_Tasknitialize;
         //bool m_IsMirror = false;
         Setting m_Setting;
-        async public Task<HRESULT> InitializeCaptureManager(object videosource, Setting setting)
+        async public Task<HRESULT> InitializeCaptureManager(Setting setting)
         {
             this.m_Setting = setting;
             m_Tasknitialize = new TaskCompletionSource<HRESULT>();
@@ -150,7 +150,7 @@ namespace QSoft.MediaCapture
             object o;
             pFactory.CreateInstance(DirectN.MFConstants.CLSID_MFCaptureEngine, typeof(IMFCaptureEngine).GUID, out o);
             m_pEngine = o as IMFCaptureEngine;
-            hr = m_pEngine.Initialize(this, pAttributes, null, videosource);
+            hr = m_pEngine.Initialize(this, pAttributes, null, this.VideoDevice.Object);
             if (hr != HRESULTS.S_OK)
             {
                 goto Exit;
@@ -243,6 +243,15 @@ namespace QSoft.MediaCapture
             return hr;
         }
 
+        public (int width, int height)GetPreviewSize()
+        {
+            this.m_pEngine.GetSource(out var pSource);
+            pSource.GetCurrentDeviceMediaType(0, out var pMediaType);
+
+            Marshal.ReleaseComObject(pMediaType);
+            Marshal.ReleaseComObject(pSource);
+            return (0,0);
+        }
 
         public class CaptureControl
         {

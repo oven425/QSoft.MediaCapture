@@ -93,7 +93,7 @@ namespace WpfApp1
             this.m_MainUI.PhotoFormats.Clear();
             var combobox = sender as ComboBox;
             this.mf = combobox.SelectedItem as WebCam_MF;
-            await this.mf.InitializeCaptureManager(this.mf.VideoDevice.Object, new Setting() { Mirror = this.m_MainUI.IsMirror});
+            await this.mf.InitializeCaptureManager(new Setting() { Mirror = this.m_MainUI.IsMirror});
             foreach (var oo in mf.RecordForamts)
             {
                 this.m_MainUI.RecordFormats.Add(new VideoFormat() { Format = oo.format_str, Width = oo.width, Height = oo.height, FPS = oo.fps, Bitrate = oo.bitrate });
@@ -102,18 +102,15 @@ namespace WpfApp1
             {
                 this.m_MainUI.PhotoFormats.Add(new VideoFormat() { Format = oo.format_str, Width = oo.width, Height = oo.height, FPS = oo.fps, Bitrate = oo.bitrate });
             }
-            slider_brightness.Maximum = mf.Brigtness.Max;
-            slider_brightness.Minimum = mf.Brigtness.Min;
-            slider_brightness.Value = mf.Brigtness.Value;
+            //slider_brightness.Maximum = mf.Brigtness.Max;
+            //slider_brightness.Minimum = mf.Brigtness.Min;
+            //slider_brightness.Value = mf.Brigtness.Value;
         }
 
         async private void button_startpreview_Click(object sender, RoutedEventArgs e)
         {
-            //await mf?.StartPreview(x =>
-            //{
-            //    this.image_preview.Source = x;
-            //});
-            await mf?.StartPreview(mtbDate.Handle);
+            await mf?.StartPreview(x => this.image_preview.Source = x);
+            //await mf?.StartPreview(mtbDate.Handle);
         }
 
         private void button_stoppreview_Click(object sender, RoutedEventArgs e)
