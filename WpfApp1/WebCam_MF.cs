@@ -69,7 +69,7 @@ namespace QSoft.MediaCapture
         }
 
         ID3D11Device g_pDX11Device;
-        ID3D11DeviceContext m_pDeviceContext;
+        //ID3D11DeviceContext m_pDeviceContext;
         HRESULT CreateDX11Device(out ID3D11Device ppDevice, out ID3D11DeviceContext ppDeviceContext, out D3D_FEATURE_LEVEL pFeatureLevel)
         {
             HRESULT hr = HRESULTS.S_OK;
@@ -337,9 +337,9 @@ namespace QSoft.MediaCapture
 
         bool m_bPreviewing;
         bool m_bRecording;
-        bool m_bPhotoPending;
+        //bool m_bPhotoPending;
 
-        uint m_errorID;
+        //uint m_errorID;
         //HANDLE m_hEvent;
         //HANDLE m_hpwrRequest;
         bool m_fPowerRequestSet;
@@ -665,7 +665,7 @@ namespace QSoft.MediaCapture
                 goto done;
             }
 
-            m_bPhotoPending = true;
+            //m_bPhotoPending = true;
             hr = await m_TakeTakephoto.Task;
         done:
             SafeRelease(pSink);
