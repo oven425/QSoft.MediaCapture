@@ -32,7 +32,7 @@ namespace WpfApp1
             InitializeComponent();
         }
         MainUI m_MainUI;
-        WebCam_MF mf;
+        WebCam_MF mf = null;
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             if(this.m_MainUI == null)
@@ -109,13 +109,15 @@ namespace WpfApp1
 
         async private void button_startpreview_Click(object sender, RoutedEventArgs e)
         {
-            await mf?.StartPreview(x => this.image_preview.Source = x);
-            //await mf?.StartPreview(mtbDate.Handle);
+            //await mf?.StartPreview(x => this.image_preview.Source = x);
+            await mf?.StartPreview(mtbDate.Handle);
+            await Task.Delay(5000);
+            mf.Mirror();
         }
 
-        private void button_stoppreview_Click(object sender, RoutedEventArgs e)
+        private async void button_stoppreview_Click(object sender, RoutedEventArgs e)
         {
-            mf?.StopPreview();
+            await mf?.StopPreview();
         }
 
         private async void button_startrecord_Click(object sender, RoutedEventArgs e)

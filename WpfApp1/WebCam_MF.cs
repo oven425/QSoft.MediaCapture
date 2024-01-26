@@ -499,7 +499,7 @@ namespace QSoft.MediaCapture
 
             return hr;
         }
-
+        IMFVideoProcessorControl vp;
         TaskCompletionSource<HRESULT> m_TaskStopPreview;
         async public Task<HRESULT> StopPreview()
         {
@@ -530,6 +530,11 @@ namespace QSoft.MediaCapture
             return await this.m_TaskStopPreview.Task;
         }
 
+        public void Mirror()
+        {
+            var hr = vp.SetMirror(_MF_VIDEO_PROCESSOR_MIRROR.MIRROR_HORIZONTAL);
+        }
+
         void Mirror(IMFCaptureSource source, uint streamindex)
         {
             //IMFVideoProcessorControl
@@ -538,7 +543,7 @@ namespace QSoft.MediaCapture
             source.GetCurrentDeviceMediaType(streamindex, out pMediaType);
 
             //CLSID_CColorControlDmo
-            var vp = Activator.CreateInstance(Type.GetTypeFromCLSID(DirectN.MFConstants.CLSID_VideoProcessorMFT)) as IMFVideoProcessorControl;
+            vp = Activator.CreateInstance(Type.GetTypeFromCLSID(DirectN.MFConstants.CLSID_VideoProcessorMFT)) as IMFVideoProcessorControl;
             //var hr = vp.SetMirror(_MF_VIDEO_PROCESSOR_MIRROR.MIRROR_HORIZONTAL);
             IntPtr prc = Marshal.AllocHGlobal(Marshal.SizeOf<RECT>());
             RECT rc;
@@ -547,14 +552,14 @@ namespace QSoft.MediaCapture
             rc.right = 310;
             rc.bottom = 310;
             
-            Marshal.StructureToPtr(rc, prc, true);
-            var hr = vp.SetSourceRectangle(prc);
-            Marshal.FreeHGlobal(prc);
+            //Marshal.StructureToPtr(rc, prc, true);
+            //var hr = vp.SetSourceRectangle(prc);
+            //Marshal.FreeHGlobal(prc);
 
 
 
             IMFTransform mft = vp as IMFTransform;
-            hr = mft.SetInputType(0, pMediaType, 0);
+            var hr = mft.SetInputType(0, pMediaType, 0);
             //if (COMBase.Failed(hr))
             //{
             //    System.Diagnostics.Trace.WriteLine($"SetInputType  {hr}");

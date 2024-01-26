@@ -25,7 +25,7 @@ namespace WpfApp_NET6
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             var webcams = WebCam_MF.EnumDeviceSources();
-            var aa = await webcams[0].InitializeCaptureManager(webcams[0].VideoDevice.Object, new Setting() {  });
+            await webcams[0].InitializeCaptureManager(webcams[0].VideoDevice.Object, new Setting() {  });
             await webcams[0].StartPreview(x => { this.image.Source = x; });
         }
     }

@@ -243,12 +243,6 @@ namespace QSoft.MediaCapture
             VideoProcAmp_Gain
         };
 
-        enum VideoProcAmpFlags
-        {
-            VideoProcAmp_Flags_Auto = 0x1,
-            VideoProcAmp_Flags_Manual = 0x2
-        };
-
         public enum tagCameraControlFlags
         {
             CameraControl_Flags_Auto = 0x1,
@@ -326,11 +320,11 @@ namespace QSoft.MediaCapture
                 //return HRESULTS.MF_E_NOT_INITIALIZED;
             }
 
-            if (m_bPreviewing == true)
+            if (m_bPreviewing)
             {
                 return HRESULTS.S_OK;
             }
-            if (this.m_TaskStartPreview.Task.IsCompleted == true)
+            if (m_TaskStartPreview.Task.IsCompleted)
             {
                 return HRESULTS.S_OK;
             }
@@ -582,7 +576,7 @@ namespace QSoft.MediaCapture
             }
 
 
-            hr = m_pEngine.StartPreview();
+            m_pEngine.StartPreview();
             hr = await this.m_TaskStartPreview.Task;
         //if (!m_fPowerRequestSet && m_hpwrRequest != INVALID_HANDLE_VALUE)
         //{
@@ -1315,8 +1309,7 @@ namespace QSoft.MediaCapture
             uint index = 0;
             while (true)
             {
-                IMFMediaType mediaType;
-                var hr = src.GetAvailableDeviceMediaType(streamindex, index, out mediaType);
+                var hr = src.GetAvailableDeviceMediaType(streamindex, index, out var mediaType);
                 if (hr == HRESULTS.MF_E_NO_MORE_TYPES)
                 {
                     break;
@@ -1440,14 +1433,6 @@ namespace QSoft.MediaCapture
         }
     }
 
-    //struct RECT
-    //{
-    //    public int left;
-    //    public int top;
-    //    public int right;
-    //    public int bottom;
-    //};
-
     public class MFCaptureEngineOnSampleCallback : IMFCaptureEngineOnSampleCallback
     {
         [DllImport("kernel32.dll", EntryPoint = "RtlCopyMemory", SetLastError = false)]
@@ -1459,11 +1444,10 @@ namespace QSoft.MediaCapture
         }
         int samplecount = 0;
         DateTime time = DateTime.Now;
-        //byte[] m_Buffer;
         readonly object m_Lock = new();
         public HRESULT OnSample(IMFSample pSample)
         {
-            if (System.Threading.Monitor.TryEnter(this.m_Lock) == true)
+            if (System.Threading.Monitor.TryEnter(this.m_Lock))
             {
                 samplecount++;
                 if(samplecount > 100)
@@ -1476,8 +1460,6 @@ namespace QSoft.MediaCapture
                 }
                 pSample.GetBufferByIndex(0, out var buf);
                 var ptr = buf.Lock(out var max, out var cur);
-                //m_Buffer = new byte[cur];
-                //Marshal.Copy(ptr, m_Buffer, 0, m_Buffer.Length);
                 try
                 {
                     m_Bmp?.Dispatcher.Invoke(() =>
@@ -1496,10 +1478,10 @@ namespace QSoft.MediaCapture
                 }
                 finally
                 {
-                    
+                    buf.Unlock();
                 }
 
-                buf.Unlock();
+                
                 Marshal.ReleaseComObject(buf);
                 Marshal.ReleaseComObject(pSample);
                 System.Threading.Monitor.Exit(this.m_Lock);
