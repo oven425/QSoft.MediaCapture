@@ -14,15 +14,22 @@
                 <RowDefinition/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             
             <UniformGrid Columns="2">
-                <WindowsFormsHost >
-                    <wf:Button x:Name="mtbDate"/>
-                </WindowsFormsHost>
+                <DockPanel>
+                    <Button Content="A" DockPanel.Dock="Left"></Button>
+                    <Button Content="B" DockPanel.Dock="Top"></Button>
+                    <Button Content="C" DockPanel.Dock="Right"></Button>
+                    <Button Content="D" DockPanel.Dock="Bottom"></Button>
+                    <WindowsFormsHost SizeChanged="WindowsFormsHost_SizeChanged" >
+                        <wf:Button x:Name="mtbDate" SizeChanged="mtbDate_SizeChanged"/>
+                    </WindowsFormsHost>
+                </DockPanel>
                 <Image x:Name="image_preview"></Image>
             </UniformGrid>
-            <Expander IsExpanded="True" Header="setting" Grid.Row="1">
+            <!--<Expander IsExpanded="True" Header="setting" Grid.Row="1">
                 <UniformGrid Columns="2">
                     <Grid Margin="2">
                         <Grid.ColumnDefinitions>
@@ -35,7 +42,8 @@
                         <CheckBox Grid.Column="2">Auto</CheckBox>
                     </Grid>
                 </UniformGrid>
-            </Expander>
+            </Expander>-->
+            
             <StackPanel Grid.Row="2" Orientation="Horizontal">
                 <StackPanel>
                     <TextBlock Text="WebCam: " VerticalAlignment="Center"/>
@@ -96,6 +104,10 @@
                         </ComboBox>
                     </StackPanel>
                 </GroupBox>
+            </StackPanel>
+            <StackPanel Grid.Row="3" Orientation="Horizontal">
+                <TextBlock Text="Destination:"/>
+                <Slider Width="200" Minimum="1" Maximum="10" ValueChanged="Slider_ValueChanged"/>
             </StackPanel>
         </Grid>
 

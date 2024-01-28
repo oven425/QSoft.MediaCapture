@@ -111,8 +111,11 @@ namespace WpfApp1
         {
             //await mf?.StartPreview(x => this.image_preview.Source = x);
             await mf?.StartPreview(mtbDate.Handle);
-            await Task.Delay(5000);
             mf.Mirror();
+            await Task.Delay(5000);
+            
+            //mf.SetSource(0, 0, 2560, 1440);
+            
         }
 
         private async void button_stoppreview_Click(object sender, RoutedEventArgs e)
@@ -130,6 +133,28 @@ namespace WpfApp1
         {
             await mf?.StopRecord();
         }
+
+        private void WindowsFormsHost_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            //mf?.UpdateVideo((int)e.NewSize.Width, (int)e.NewSize.Height);
+        }
+
+        private void mtbDate_SizeChanged(object sender, EventArgs e)
+        {
+            System.Windows.Forms.Control aa = sender as System.Windows.Forms.Control;
+            mf?.UpdateVideo((int)aa.Width, (int)aa.Height);
+        }
+
+        private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            double w = 1280;
+            double h = 720;
+            var dw = w / e.NewValue;
+            var dh = h / e.NewValue;
+            var dx = (w - dw) / 2;
+            var dy = (h - dh) / 2;
+            mf?.SetDestination((int)dx, (int)dy, (int)dw, (int)dh);
+        }
     }
 
     public enum Modes
@@ -145,7 +170,8 @@ namespace WpfApp1
         public ObservableCollection<WebCam_MF> WebCams { set; get; } = new ObservableCollection<WebCam_MF>();
         public ObservableCollection<VideoFormat> PhotoFormats { set; get; } = new ObservableCollection<VideoFormat>();
         public ObservableCollection<VideoFormat> RecordFormats { set; get; } = new ObservableCollection<VideoFormat>();
-        public bool IsMirror { set; get; }
+        public bool IsMirror { set; get; } = true;
+        public RECT Source{set;get;} = new RECT() { left=0, top=0, right=100, bottom=100};
     }
 
 

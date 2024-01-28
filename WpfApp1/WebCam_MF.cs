@@ -362,6 +362,24 @@ namespace QSoft.MediaCapture
             return await this.StartPreview(IntPtr.Zero, action);
         }
 
+        public void UpdateVideo(int width, int height)
+        {
+            var hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_PREVIEW, out var pSink);
+            m_pPreview = pSink as IMFCapturePreviewSink;
+            hr = m_pPreview.GetMirrorState(out var mirror);
+            IntPtr prc = Marshal.AllocHGlobal(Marshal.SizeOf<RECT>());
+            RECT rc;
+            rc.left = 0;
+            rc.top = 0;
+            rc.right = width;
+            rc.bottom = height;
+
+            Marshal.StructureToPtr(rc, prc, true);
+            this.m_pPreview.UpdateVideo(IntPtr.Zero, prc, IntPtr.Zero);
+            Marshal.FreeHGlobal(prc);
+            
+        }
+
         TaskCompletionSource<HRESULT> m_TaskSetMediaType;
         async Task<HRESULT> StartPreview(IntPtr hwnd, Action<WriteableBitmap> action)
         {
@@ -404,7 +422,6 @@ namespace QSoft.MediaCapture
                         goto done;
                     }
                 }
-
 
                 hr = m_pEngine.GetSource(out pSource);
                 if (hr != HRESULTS.S_OK)
@@ -530,6 +547,34 @@ namespace QSoft.MediaCapture
             return await this.m_TaskStopPreview.Task;
         }
 
+        public void SetSource(int x, int y, int width, int height)
+        {
+            IntPtr prc = Marshal.AllocHGlobal(Marshal.SizeOf<RECT>());
+            RECT rc;
+            rc.left = x;
+            rc.top = y;
+            rc.right = x + width;
+            rc.bottom = y + height;
+
+            Marshal.StructureToPtr(rc, prc, true);
+            var hr = vp.SetDestinationRectangle(prc);
+            Marshal.FreeHGlobal(prc);
+        }
+
+        public void SetDestination(int x, int y, int width, int height)
+        {
+            IntPtr prc = Marshal.AllocHGlobal(Marshal.SizeOf<RECT>());
+            RECT rc;
+            rc.left = x;
+            rc.top = y;
+            rc.right = x+width;
+            rc.bottom = y+height;
+
+            Marshal.StructureToPtr(rc, prc, true);
+            var hr = vp.SetSourceRectangle(prc);
+            Marshal.FreeHGlobal(prc);
+        }
+
         public void Mirror()
         {
             var hr = vp.SetMirror(_MF_VIDEO_PROCESSOR_MIRROR.MIRROR_HORIZONTAL);
@@ -545,7 +590,7 @@ namespace QSoft.MediaCapture
             //CLSID_CColorControlDmo
             vp = Activator.CreateInstance(Type.GetTypeFromCLSID(DirectN.MFConstants.CLSID_VideoProcessorMFT)) as IMFVideoProcessorControl;
             //var hr = vp.SetMirror(_MF_VIDEO_PROCESSOR_MIRROR.MIRROR_HORIZONTAL);
-            IntPtr prc = Marshal.AllocHGlobal(Marshal.SizeOf<RECT>());
+            //IntPtr prc = Marshal.AllocHGlobal(Marshal.SizeOf<RECT>());
             RECT rc;
             rc.left = 10;
             rc.top = 10;
@@ -1320,7 +1365,7 @@ namespace QSoft.MediaCapture
         }
     }
 
-    struct RECT
+    public struct RECT
     {
         public int left;
         public int top;
