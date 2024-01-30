@@ -557,7 +557,7 @@ namespace QSoft.MediaCapture
             rc.bottom = y + height;
 
             Marshal.StructureToPtr(rc, prc, true);
-            var hr = vp.SetDestinationRectangle(prc);
+            var hr = vp.SetSourceRectangle(prc);
             Marshal.FreeHGlobal(prc);
         }
 
@@ -571,7 +571,7 @@ namespace QSoft.MediaCapture
             rc.bottom = y+height;
 
             Marshal.StructureToPtr(rc, prc, true);
-            var hr = vp.SetSourceRectangle(prc);
+            var hr = vp.SetDestinationRectangle(prc);
             Marshal.FreeHGlobal(prc);
         }
 

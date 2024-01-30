@@ -23,7 +23,7 @@
                     <Button Content="B" DockPanel.Dock="Top"></Button>
                     <Button Content="C" DockPanel.Dock="Right"></Button>
                     <Button Content="D" DockPanel.Dock="Bottom"></Button>
-                    <WindowsFormsHost SizeChanged="WindowsFormsHost_SizeChanged" >
+                    <WindowsFormsHost>
                         <wf:Button x:Name="mtbDate" SizeChanged="mtbDate_SizeChanged"/>
                     </WindowsFormsHost>
                 </DockPanel>
@@ -107,7 +107,7 @@
             </StackPanel>
             <StackPanel Grid.Row="3" Orientation="Horizontal">
                 <TextBlock Text="Destination:"/>
-                <Slider Width="200" Minimum="1" Maximum="10" ValueChanged="Slider_ValueChanged"/>
+                <Slider Width="200" Minimum="1" Maximum="5" ValueChanged="Slider_ValueChanged"/>
             </StackPanel>
         </Grid>
 

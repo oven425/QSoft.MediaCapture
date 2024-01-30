@@ -114,7 +114,7 @@ namespace WpfApp1
             mf.Mirror();
             await Task.Delay(5000);
             
-            //mf.SetSource(0, 0, 2560, 1440);
+            //mf.SetDestination(-640, -360, 1280, 720);
             
         }
 
@@ -134,11 +134,6 @@ namespace WpfApp1
             await mf?.StopRecord();
         }
 
-        private void WindowsFormsHost_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            //mf?.UpdateVideo((int)e.NewSize.Width, (int)e.NewSize.Height);
-        }
-
         private void mtbDate_SizeChanged(object sender, EventArgs e)
         {
             System.Windows.Forms.Control aa = sender as System.Windows.Forms.Control;
@@ -147,13 +142,16 @@ namespace WpfApp1
 
         private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+            var org = new Rect() { X = 0, Y = 0, Width = 1280, Height = 720 };
             double w = 1280;
             double h = 720;
             var dw = w / e.NewValue;
             var dh = h / e.NewValue;
             var dx = (w - dw) / 2;
             var dy = (h - dh) / 2;
-            mf?.SetDestination((int)dx, (int)dy, (int)dw, (int)dh);
+            mf?.SetSource((int)dx, (int)dy, (int)dw, (int)dh);
+            //mf?.SetSource((int)dx, (int)dy, (int)dw, (int)dh);
+            mf?.SetDestination(0, 0, (int)w, (int)h);
         }
     }
 
