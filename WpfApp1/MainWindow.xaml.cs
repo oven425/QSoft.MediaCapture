@@ -109,13 +109,12 @@ namespace WpfApp1
 
         async private void button_startpreview_Click(object sender, RoutedEventArgs e)
         {
-            //await mf?.StartPreview(x => this.image_preview.Source = x);
-            await mf?.StartPreview(mtbDate.Handle);
+            await mf?.StartPreview(x => this.image_preview.Source = x);
+            //await mf?.StartPreview(mtbDate.Handle);
             mf.Mirror();
-            await Task.Delay(5000);
-            
-            //mf.SetDestination(-640, -360, 1280, 720);
-            
+            //await Task.Delay(5000);
+
+            //mf.SetDestination(0,0,1280,70);
         }
 
         private async void button_stoppreview_Click(object sender, RoutedEventArgs e)
@@ -151,7 +150,7 @@ namespace WpfApp1
             var dy = (h - dh) / 2;
             mf?.SetSource((int)dx, (int)dy, (int)dw, (int)dh);
             //mf?.SetSource((int)dx, (int)dy, (int)dw, (int)dh);
-            mf?.SetDestination(0, 0, (int)w, (int)h);
+            //mf?.SetDestination(0, 0, (int)w, (int)h);
         }
     }
 

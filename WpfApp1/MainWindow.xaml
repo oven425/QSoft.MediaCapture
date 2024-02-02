@@ -107,7 +107,7 @@
             </StackPanel>
             <StackPanel Grid.Row="3" Orientation="Horizontal">
                 <TextBlock Text="Destination:"/>
-                <Slider Width="200" Minimum="1" Maximum="5" ValueChanged="Slider_ValueChanged"/>
+                <Slider Width="200" Minimum="1" Maximum="3" ValueChanged="Slider_ValueChanged"/>
             </StackPanel>
         </Grid>
 

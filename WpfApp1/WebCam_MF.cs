@@ -35,6 +35,14 @@ namespace QSoft.MediaCapture
         public bool Mirror { set; get; }
     }
 
+    static public class IMediaTypeExtension
+    {
+        public static (int width, int height)GetFrameSize(this IMFMediaType src)
+        {
+            return (0, 0);
+        }
+    }
+
     public class WebCam_MF : IMFCaptureEngineOnEventCallback, IDisposable
     {
         public IComObject<IMFActivate> VideoDevice { get; protected set; }
@@ -117,7 +125,6 @@ namespace QSoft.MediaCapture
 
 
         TaskCompletionSource<HRESULT> m_Tasknitialize;
-        //bool m_IsMirror = false;
         Setting m_Setting;
         async public Task<HRESULT> InitializeCaptureManager(Setting setting)
         {
@@ -237,20 +244,36 @@ namespace QSoft.MediaCapture
             if (null != pFactory)
             {
                 SafeRelease(pFactory);
-                //pFactory->Release();
-                //pFactory = NULL;
             }
             return hr;
         }
 
-        public (int width, int height)GetPreviewSize()
+        public (int width, int height) PreviewSize 
+        {
+            set
+            {
+                SetPreviewSize(value.width, value.height);
+            }
+            get
+            {
+                return GetPreviewSize();
+            }
+        }
+
+        void SetPreviewSize(int width, int height)
+        {
+
+        }
+
+        (int width, int height)GetPreviewSize()
         {
             this.m_pEngine.GetSource(out var pSource);
-            pSource.GetCurrentDeviceMediaType(0, out var pMediaType);
+            pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, out var pMediaType);
+            MFFunctions1.MFGetAttributeSize(pMediaType, MFConstants.MF_MT_FRAME_SIZE, out var w, out var h);
 
             Marshal.ReleaseComObject(pMediaType);
             Marshal.ReleaseComObject(pSource);
-            return (0,0);
+            return ((int)w,(int)h);
         }
 
         public class CaptureControl
@@ -1221,15 +1244,6 @@ namespace QSoft.MediaCapture
             var sources = attribute.EnumDeviceSources().Select(x => new WebCam_MF(x.GetString(MFConstants.MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME), x)).ToList();
             return sources;
         }
-
-        //public static List<(string name, IComObject<IMFActivate> obj)> EnumDeviceSources()
-        //{
-        //    var attribute = MFFunctions.MFCreateAttributes();
-        //    attribute.Set(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
-        //    var sources = attribute.EnumDeviceSources().Select(x => (x.GetString(MFConstants.MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME), x)).ToList();
-        //    return sources;
-        //}
-
     }
 
     public static class IMFCaptureSourceEx
@@ -1350,7 +1364,7 @@ namespace QSoft.MediaCapture
 
         public static void Unpack2UINT32AsUINT64(ulong unPacked, out uint punHigh, out uint punLow)
         {
-            ulong ul = (ulong)unPacked;
+            ulong ul = unPacked;
             punHigh = (uint)(ul >> 32);
             punLow = (uint)(ul & 0xffffffff);
         }
@@ -1388,7 +1402,7 @@ namespace QSoft.MediaCapture
         object m_Lock = new object();
         public HRESULT OnSample(IMFSample pSample)
         {
-            if (System.Threading.Monitor.TryEnter(this.m_Lock) == true)
+            if (System.Threading.Monitor.TryEnter(this.m_Lock))
             {
                 samplecount++;
                 if(samplecount > 100)
