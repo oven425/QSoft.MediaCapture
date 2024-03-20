@@ -1,12 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net472;net8.0-windows7.0;net6.0-windows7.0</TargetFrameworks>
+    <TargetFrameworks>net460;net472;net8.0-windows7.0;net6.0-windows7.0</TargetFrameworks>
     <LangVersion>11.0</LangVersion>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <OutputType>Library</OutputType>
   </PropertyGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net460'">
+    <PackageReference Include="DirectN" Version="1.15.0.2" />
+  </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
     <PackageReference Include="DirectN" Version="1.15.0.2" />
   </ItemGroup>
