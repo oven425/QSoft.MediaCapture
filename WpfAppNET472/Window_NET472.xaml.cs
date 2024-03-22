@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using DirectN;
 using QSoft.MediaCapture;
 
 namespace WpfAppNET472
@@ -58,12 +59,13 @@ namespace WpfAppNET472
             }
         }
 
-        private void host_SizeChanged(object sender, SizeChangedEventArgs e)
+        private void picture_SizeChanged(object sender, EventArgs e)
         {
             if (this.m_MainUI == null) return;
-            foreach(var oo in this.m_MainUI.WebCams)
+            System.Windows.Forms.Control aa = sender as System.Windows.Forms.Control;
+            foreach (var oo in this.m_MainUI.WebCams)
             {
-                oo.UpdateVideo();
+                oo.UpdateVideo((int)aa.Width, (int)aa.Height);
             }
         }
     }

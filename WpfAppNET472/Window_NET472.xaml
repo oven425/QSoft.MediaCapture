@@ -13,8 +13,8 @@
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <WindowsFormsHost SizeChanged="host_SizeChanged" x:Name="host">
-            <winform:PictureBox x:Name="picture"/>
+        <WindowsFormsHost x:Name="host">
+            <winform:PictureBox SizeChanged="picture_SizeChanged" x:Name="picture"/>
         </WindowsFormsHost>
         <WrapPanel Grid.Row="1" ItemWidth="100">
             <Button x:Name="button_stratpreivew" Click="button_stratpreivew_Click">Start preview</Button>

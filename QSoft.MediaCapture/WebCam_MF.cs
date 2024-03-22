@@ -235,29 +235,63 @@ namespace QSoft.MediaCapture
         async public Task<HRESULT?> StopPreview()
         {
             HRESULT hr = HRESULTS.S_OK;
+            try
+            {
+                if (m_pEngine == null)
+                {
 
-            if (m_pEngine == null)
-            {
+                    return HRESULTS.MF_E_NOT_INITIALIZED;
+                }
+                if (!m_IsPreviewing)
+                {
+                    return HRESULTS.S_OK;
+                }
+                if (m_TaskStopPreview == null)
+                {
+                    this.m_TaskStopPreview = new TaskCompletionSource<HRESULT>(hr);
+                }
+
+                hr = m_pEngine.StopPreview();
+                if (hr.IsError)
+                {
+                }
+                else if (hr.IsSuccess)
+                {
+                    hr = await this.m_TaskStopPreview.Task;
+                    this.m_TaskStopPreview = null;
+                }
+
                 
-                return HRESULTS.MF_E_NOT_INITIALIZED;
+                m_IsPreviewing = false;
             }
-            if (!m_IsPreviewing)
+            finally
             {
-                return HRESULTS.S_OK;
+
             }
-            if(m_TaskStopPreview == null)
-            {
-                this.m_TaskStopPreview = new TaskCompletionSource<HRESULT>(hr);
-            }
+
+        //    if (m_pEngine == null)
+        //    {
+                
+        //        return HRESULTS.MF_E_NOT_INITIALIZED;
+        //    }
+        //    if (!m_IsPreviewing)
+        //    {
+        //        return HRESULTS.S_OK;
+        //    }
+        //    if(m_TaskStopPreview == null)
+        //    {
+        //        this.m_TaskStopPreview = new TaskCompletionSource<HRESULT>(hr);
+        //    }
             
-            hr = m_pEngine.StopPreview();
-            if (hr.IsError)
-            {
-                goto done;
-            }
-        done:
-            hr = await this.m_TaskStopPreview.Task;
-            m_IsPreviewing = false;
+        //    hr = m_pEngine.StopPreview();
+        //    if (hr.IsError)
+        //    {
+        //        goto done;
+        //    }
+        //done:
+        //    hr = await this.m_TaskStopPreview.Task;
+        //    this.m_TaskStopPreview = null;
+        //    m_IsPreviewing = false;
             return hr;
         }
 
@@ -346,6 +380,7 @@ namespace QSoft.MediaCapture
 
             hr = m_pEngine?.StartPreview();
             hr = await m_TaskStartPreview.Task;
+            m_TaskStartPreview = null;
             m_IsPreviewing = true;
 
         done:
@@ -424,16 +459,21 @@ namespace QSoft.MediaCapture
 
 
 
-        public HRESULT? UpdateVideo()
+        public void UpdateVideo(int width, int height)
         {
-            if (m_IsPreviewing)
-            {
-                return m_pPreview?.UpdateVideo(IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
-            }
-            else
-            {
-                return HRESULTS.S_OK;
-            }
+            var hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_PREVIEW, out var pSink);
+            m_pPreview = pSink as IMFCapturePreviewSink;
+            IntPtr prc = Marshal.AllocHGlobal(Marshal.SizeOf<RECT>());
+            RECT rc;
+            rc.left = 0;
+            rc.top = 0;
+            rc.right = width;
+            rc.bottom = height;
+
+            Marshal.StructureToPtr(rc, prc, true);
+            this.m_pPreview.UpdateVideo(IntPtr.Zero, prc, IntPtr.Zero);
+            Marshal.FreeHGlobal(prc);
+
         }
 
         public void Dispose()
@@ -441,6 +481,14 @@ namespace QSoft.MediaCapture
             this.DestroyCaptureEngine();
         }
     }
+
+    struct RECT
+    {
+        public int left;
+        public int top;
+        public int right;
+        public int bottom;
+    };
 
     public enum MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM : uint
     {
