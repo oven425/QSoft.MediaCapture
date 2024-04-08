@@ -6,6 +6,10 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <OutputType>Library</OutputType>
+    <PackageReadmeFile>readme.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/oven425/QSoft.MediaCapture.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/oven425/QSoft.MediaCapture</PackageProjectUrl>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net460'">
     <PackageReference Include="DirectN" Version="1.15.0.2" />
@@ -18,5 +22,11 @@
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net8.0-windows7.0'">
     <PackageReference Include="DirectNCore" Version="1.15.0.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\OneDrive\桌面\WebCam\readme.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 </Project>
