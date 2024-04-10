@@ -10,11 +10,25 @@
     <RepositoryUrl>https://github.com/oven425/QSoft.MediaCapture.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/oven425/QSoft.MediaCapture</PackageProjectUrl>
+    <Authors>BEN HSU</Authors>
+    <PackageTags>Media Foundation; webcam</PackageTags>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0-windows7.0'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-windows7.0'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <UseWPF>true</UseWPF>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net460'">
+    <Reference Include="PresentationCore" />
+    <Reference Include="WindowsBase" />
     <PackageReference Include="DirectN" Version="1.15.0.2" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
+    <Reference Include="PresentationCore" />
+    <Reference Include="WindowsBase" />
     <PackageReference Include="DirectN" Version="1.15.0.2" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net6.0-windows7.0'">
@@ -29,4 +43,5 @@
       <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
+
 </Project>

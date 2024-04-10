@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using DirectN;
 using QSoft.MediaCapture;
+using QSoft.MediaCapture.WPF;
 
 namespace WpfAppNET472
 {
@@ -36,7 +37,8 @@ namespace WpfAppNET472
                 foreach(var oo in QSoft.MediaCapture.WebCam_MF.GetAllWebCams())
                 {
                     await oo.InitCaptureEngine();
-                    await oo.StartPreview(host.Child.Handle);
+                    //await oo.StartPreview(host.Child.Handle);
+                    await oo.StartPreview(x => this.image.Source = x);
                     this.m_MainUI.WebCams.Add(oo);
                 }
             }
