@@ -6,12 +6,18 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <OutputType>Library</OutputType>
-    <PackageReadmeFile>readme.md</PackageReadmeFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/oven425/QSoft.MediaCapture.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/oven425/QSoft.MediaCapture</PackageProjectUrl>
     <Authors>BEN HSU</Authors>
     <PackageTags>Media Foundation; webcam</PackageTags>
+    <Copyright>Copyright © Ben Hsu 2024</Copyright>
+    <Description>Easy use webcam or video capture card</Description>
+    <PackageIcon>48720503562_c9ae7998dc_o.jpg</PackageIcon>
+    <PackageReleaseNotes>1. support search video capture
+2. support preivew</PackageReleaseNotes>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0-windows7.0'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -38,7 +44,25 @@
     <PackageReference Include="DirectNCore" Version="1.15.0.2" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\OneDrive\桌面\WebCam\readme.md">
+    <None Include="..\48720503562_c9ae7998dc_o.jpg">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="48720503562_c9ae7998dc_o.jpg">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Update="LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
