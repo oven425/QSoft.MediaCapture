@@ -5,6 +5,8 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
+//https://learn.microsoft.com/zh-tw/windows/win32/api/mfidl/nn-mfidl-imfcameraconfigurationmanager
+
 namespace QSoft.MediaCapture
 {
     public sealed class WebCam_MF: IMFCaptureEngineOnEventCallback,IDisposable

@@ -31,15 +31,24 @@ namespace WpfAppNET472
         MainUI m_MainUI;
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if(m_MainUI == null)
+            if (m_MainUI == null)
             {
                 this.DataContext = this.m_MainUI = new MainUI();
-                foreach(var oo in QSoft.MediaCapture.WebCam_MF.GetAllWebCams())
+                //foreach(var oo in QSoft.MediaCapture.WebCam_MF.GetAllWebCams())
+                //{
+                //    System.Diagnostics.Trace.WriteLine(oo.FriendName);
+                //    System.Diagnostics.Trace.WriteLine(oo.SymbolLinkName);
+                //    //await oo.InitCaptureEngine();
+                //    ////await oo.StartPreview(host.Child.Handle);
+                //    //await oo.StartPreview(x => this.image.Source = x);
+                //    //this.m_MainUI.WebCams.Add(oo);
+                //}
+
+                var camera = QSoft.MediaCapture.WebCam_MF.GetAllWebCams().Find(x => x.FriendName == "USB2.0 HD UVC WebCam");
+                if(camera != null)
                 {
-                    await oo.InitCaptureEngine();
-                    //await oo.StartPreview(host.Child.Handle);
-                    await oo.StartPreview(x => this.image.Source = x);
-                    this.m_MainUI.WebCams.Add(oo);
+                    await camera.InitCaptureEngine();
+                    await camera.StartPreview(host.Child.Handle);
                 }
             }
             
