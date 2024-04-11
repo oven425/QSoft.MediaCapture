@@ -43,7 +43,6 @@ namespace WpfAppNET472
                 //    //await oo.StartPreview(x => this.image.Source = x);
                 //    //this.m_MainUI.WebCams.Add(oo);
                 //}
-
                 var camera = QSoft.MediaCapture.WebCam_MF.GetAllWebCams().Find(x => x.FriendName == "USB2.0 HD UVC WebCam");
                 if(camera != null)
                 {

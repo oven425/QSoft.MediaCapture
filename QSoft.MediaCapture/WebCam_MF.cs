@@ -443,7 +443,7 @@ namespace QSoft.MediaCapture
 
         HRESULT CopyAttribute(IMFAttributes pSrc, IMFAttributes pDest, Guid key)
         {
-            PropVariant var = new();
+            PROPVARIANT var = new();
             HRESULT hr = pSrc.GetItem(key, var);
             if (hr == HRESULTS.S_OK)
             {

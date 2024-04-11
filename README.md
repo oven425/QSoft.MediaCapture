@@ -1,3 +1,6 @@
+# Important hint
+if submodule Direct or Direct Core show new version, please don't update
+
 # Quick start
 ## Search all video capture
 ```c#
