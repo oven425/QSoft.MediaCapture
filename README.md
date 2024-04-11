@@ -1,5 +1,5 @@
 # Important hint
-if submodule Direct or Direct Core show new version, please don't update
+if submodule Direct or DirectCore show new version, please don't update
 
 # Quick start
 ## Search all video capture
