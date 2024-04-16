@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <VersionPrefix>1.0.0.1</VersionPrefix>
-    <TargetFrameworks>net460;net472;net8.0-windows7.0;net6.0-windows7.0</TargetFrameworks>
+    <TargetFrameworks>net460;net462;net472;net8.0-windows7.0;net6.0-windows7.0</TargetFrameworks>
     <LangVersion>11.0</LangVersion>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -16,8 +16,8 @@
     <Copyright>Copyright © Ben Hsu 2024</Copyright>
     <Description>Easy use webcam or video capture card</Description>
     <PackageIcon>48720503562_c9ae7998dc_o.jpg</PackageIcon>
-    <PackageReleaseNotes>1. support search video capture
-2. support preivew</PackageReleaseNotes>
+    <PackageReleaseNotes>1. Remove calculate fps
+2. Update DirectN DirectNCore package</PackageReleaseNotes>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0-windows7.0'">
@@ -26,9 +26,15 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-windows7.0'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IsAotCompatible>true</IsAotCompatible>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net460'">
+    <Reference Include="PresentationCore" />
+    <Reference Include="WindowsBase" />
+    <PackageReference Include="DirectN" Version="1.16.0" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
     <Reference Include="PresentationCore" />
     <Reference Include="WindowsBase" />
     <PackageReference Include="DirectN" Version="1.16.0" />

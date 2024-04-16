@@ -33,18 +33,22 @@ namespace QSoft.MediaCapture.WPF
         internal static extern void CopyMemory(IntPtr dest, IntPtr src, uint count);
 #endif
 
-        WriteableBitmap? m_Bmp;
+        readonly WriteableBitmap? m_Bmp;
         public MFCaptureEngineOnSampleCallback(WriteableBitmap data)
         {
             this.m_Bmp = data;
         }
+#if DEBUG
         int samplecount = 0;
-        object m_Lock = new object();
         System.Diagnostics.Stopwatch? m_StopWatch;
+#endif
+        readonly object m_Lock = new object();
+        
         public HRESULT OnSample(IMFSample pSample)
         {
             if (System.Threading.Monitor.TryEnter(this.m_Lock))
             {
+#if DEBUG
                 if (samplecount == 0)
                 {
                     m_StopWatch = System.Diagnostics.Stopwatch.StartNew();
@@ -57,6 +61,7 @@ namespace QSoft.MediaCapture.WPF
                     System.Diagnostics.Trace.WriteLine($"fps:{fps}");
                     samplecount = 0;
                 }
+#endif
                 pSample.GetBufferByIndex(0, out var buf);
                 var ptr = buf.Lock(out var max, out var cur);
                 
