@@ -280,16 +280,20 @@ namespace QSoft.MediaCapture
             m_TaskSetMediaType = new TaskCompletionSource<HRESULT>();
             var ff = func(m_PreviewTypes.Keys);
             if (ff == null) return HRESULTS.S_OK;
-            var mediatype = m_PreviewTypes[ff].FirstOrDefault();
+            if(m_PreviewTypes.ContainsKey(ff))
+            {
+                var mediatype = m_PreviewTypes[ff].FirstOrDefault();
 
-            if (m_pEngine == null) return HRESULTS.MF_E_NOT_INITIALIZED;
-            IMFCaptureSource? pSource;
-            var hr = m_pEngine.GetSource(out pSource);
-            if (hr != HRESULTS.S_OK) return hr;
+                if (m_pEngine == null) return HRESULTS.MF_E_NOT_INITIALIZED;
+                IMFCaptureSource? pSource;
+                var hr = m_pEngine.GetSource(out pSource);
+                if (hr != HRESULTS.S_OK) return hr;
 
-            hr = pSource.SetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, mediatype);
-            if (hr != HRESULTS.S_OK) return hr;
-            return await m_TaskSetMediaType.Task;
+                hr = pSource.SetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, mediatype);
+                if (hr != HRESULTS.S_OK) return hr;
+                return await m_TaskSetMediaType.Task;
+            }
+            return HRESULTS.S_OK;
         }
 
         public HRESULT GetPreviewSize(out uint width, out uint height)
