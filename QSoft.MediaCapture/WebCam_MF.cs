@@ -54,7 +54,7 @@ namespace QSoft.MediaCapture
                 }
                 else if (guidType == MFConstants.MF_CAPTURE_SOURCE_CURRENT_DEVICE_MEDIA_TYPE_SET)
                 {
-                    //this.m_TaskSetMediaType?.SetResult(hrStatus);
+                    m_TaskSetMediaType?.SetResult(hrStatus);
                 }
                 else if (guidType == MFConstants.MF_CAPTURE_ENGINE_ERROR)
                 {
@@ -171,7 +171,7 @@ namespace QSoft.MediaCapture
 
         IMFCaptureEngine? m_pEngine;
         IMFCapturePreviewSink? m_pPreview;
-
+        Dictionary<PreviewMediaType, List<IMFMediaType>> m_PreviewTypes = new();
         TaskCompletionSource<HRESULT>? m_TaskInitialize;
         async public Task<HRESULT?> InitCaptureEngine()
         {
@@ -200,6 +200,26 @@ namespace QSoft.MediaCapture
                 if (hr != HRESULTS.S_OK) return hr;
 
                 hr = await m_TaskInitialize.Task;
+
+                IMFCaptureSource? source = null;
+                hr = m_pEngine?.GetSource(out source);
+                if (hr != HRESULTS.S_OK) return hr;
+                var all = source.GetAllMediaType();
+                if(all.ContainsKey(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE))
+                {
+                    var pps = all[MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE]
+                        .GetVideoData()
+                        .GroupBy(x => new PreviewMediaType() { Fps=x.fps, Width = x.width, Height=x.height, SubType = x.format});
+                    foreach (var item in pps)
+                    {
+                        m_PreviewTypes[item.Key] = new List<IMFMediaType>(item.Select(x=>x.mediatype));
+                    }
+                }
+
+
+
+
+
             }
             finally
             {
@@ -209,6 +229,8 @@ namespace QSoft.MediaCapture
             }
             return hr;
         }
+
+        
 
         void SafeRelease<T>(T? obj) where T : class
         {
@@ -251,7 +273,26 @@ namespace QSoft.MediaCapture
         }
 
 
-        public HRESULT GetPreviewSize(out int width, out int height)
+        TaskCompletionSource<HRESULT>? m_TaskSetMediaType;
+        public async Task<HRESULT> SetPreviewSize(Func<IEnumerable<PreviewMediaType>, PreviewMediaType?>? func)
+        {
+            if (func == null) return HRESULTS.S_FALSE;
+            m_TaskSetMediaType = new TaskCompletionSource<HRESULT>();
+            var ff = func(m_PreviewTypes.Keys);
+            if (ff == null) return HRESULTS.S_OK;
+            var mediatype = m_PreviewTypes[ff].FirstOrDefault();
+
+            if (m_pEngine == null) return HRESULTS.MF_E_NOT_INITIALIZED;
+            IMFCaptureSource? pSource;
+            var hr = m_pEngine.GetSource(out pSource);
+            if (hr != HRESULTS.S_OK) return hr;
+
+            hr = pSource.SetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, mediatype);
+            if (hr != HRESULTS.S_OK) return hr;
+            return await m_TaskSetMediaType.Task;
+        }
+
+        public HRESULT GetPreviewSize(out uint width, out uint height)
         {
             width = 0; height = 0;
             if (m_pEngine == null) return HRESULTS.MF_E_NOT_INITIALIZED;
@@ -264,9 +305,12 @@ namespace QSoft.MediaCapture
             //// Configure the video format for the preview sink.
             hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, out pMediaType);
             if (hr != HRESULTS.S_OK) return hr;
-            pMediaType.GetUINT64(MFConstants.MF_MT_FRAME_SIZE, out var wh);
-            width = (int)(wh >> 32);
-            height = (int)(wh & 0xffffffff);
+            pMediaType.MFGetAttributeSize(MFConstants.MF_MT_FRAME_SIZE, out var w, out var h);
+            //pMediaType.GetUINT64(MFConstants.MF_MT_FRAME_SIZE, out var wh);
+            //width = (int)(wh >> 32);
+            //height = (int)(wh & 0xffffffff);
+            width = w;
+            height = h;
             return HRESULTS.S_OK;
         }
 
@@ -339,7 +383,7 @@ namespace QSoft.MediaCapture
             return hr;
         }
 
-        async public Task<HRESULT> StartPreview(IMFCaptureEngineOnSampleCallback samplecallback)
+        async public Task<HRESULT> StartPreview(IMFCaptureEngineOnSampleCallback samplecallback, Func<IEnumerable<PreviewMediaType>, PreviewMediaType>? func)
         {
             if (m_pEngine == null) return HRESULTS.MF_E_NOT_INITIALIZED;
 

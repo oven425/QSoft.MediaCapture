@@ -389,14 +389,6 @@ namespace QSoft.MediaCapture
             
         }
 
-        async public Task<HRESULT> StartPreviewToCustomSinkAsync(IMFCaptureEngineOnSampleCallback mf)
-        {
-            
-            return await Task.FromResult(HRESULTS.S_OK);
-        }
-
-
-
         TaskCompletionSource<HRESULT> m_TaskSetMediaType;
         async Task<HRESULT> StartPreview(IntPtr hwnd, Action<WriteableBitmap> action)
         {

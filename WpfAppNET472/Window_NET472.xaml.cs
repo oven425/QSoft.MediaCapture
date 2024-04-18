@@ -48,7 +48,8 @@ namespace WpfAppNET472
                 {
                     await camera.InitCaptureEngine();
                     //await camera.StartPreview(host.Child.Handle);
-                    await camera.StartPreview(x => this.image.Source = x);
+                    await camera.SetPreviewSize(x => x.FirstOrDefault(xy => xy.Width == 640));
+                    await camera.StartPreview(x => this.image.Source = x,null);
                 }
             }
             
