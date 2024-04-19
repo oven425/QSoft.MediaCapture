@@ -30,18 +30,9 @@
     <IsAotCompatible>true</IsAotCompatible>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net460'">
-    <Reference Include="PresentationCore" />
-    <Reference Include="WindowsBase" />
-    <PackageReference Include="DirectN" Version="1.16.0" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
-    <Reference Include="PresentationCore" />
-    <Reference Include="WindowsBase" />
-    <PackageReference Include="DirectN" Version="1.16.0" />
-  </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
     <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework"/>
     <Reference Include="WindowsBase" />
     <PackageReference Include="DirectN" Version="1.16.0" />
   </ItemGroup>

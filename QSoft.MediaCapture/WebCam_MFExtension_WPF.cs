@@ -15,7 +15,13 @@ namespace QSoft.MediaCapture.WPF
         public static async Task<HRESULT> StartPreview(this QSoft.MediaCapture.WebCam_MF src, Action<WriteableBitmap> action)
         {
             src.GetPreviewSize(out var width, out var height);
-            WriteableBitmap bmp = new WriteableBitmap((int)width, (int)height,96,96, PixelFormats.Bgr24, null);
+            WriteableBitmap? bmp = null;
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                bmp = new WriteableBitmap((int)width, (int)height, 96, 96, PixelFormats.Bgr24, null);
+            });
+
+            //WriteableBitmap bmp = new WriteableBitmap((int)width, (int)height,96,96, PixelFormats.Bgr24, null);
             var hr = await src.StartPreview(new MFCaptureEngineOnSampleCallback(bmp));
             action?.Invoke(bmp);
             return hr;

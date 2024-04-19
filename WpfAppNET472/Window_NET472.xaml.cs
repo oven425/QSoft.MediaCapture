@@ -11,6 +11,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
 using DirectN;
 using QSoft.MediaCapture;
@@ -52,19 +53,60 @@ namespace WpfAppNET472
                 //    await camera.StartPreview(x => this.image.Source = x,null);
                 //}
 
-                var tasks = QSoft.MediaCapture.WebCam_MF.GetAllWebCams()
-                    .Select((camera, i) => Task.Run(async() =>
-                    {
-                        await camera.InitCaptureEngine();
-                        //await camera.SetPreviewSize(x => x.ElementAt(1));
-                        await camera.StartPreview(x =>
-                        {
+                //var tasks = QSoft.MediaCapture.WebCam_MF.GetAllWebCams()
+                //    .Select((camera, i) => Task.Run(async() =>
+                //    {
+                //        await camera.InitCaptureEngine();
+                //        //await camera.SetPreviewSize(x => x.ElementAt(1));
+                //        await camera.StartPreview(x =>
+                //        {
 
+                //        });
+                //    })).ToArray();
+                //await Task.WhenAll(tasks);
+
+                //var aa = QSoft.MediaCapture.WebCam_MF.GetAllWebCams()
+                //    .Select(async (camera, i) =>
+                //    {
+                //        await camera.InitCaptureEngine();
+                //        //await camera.SetPreviewSize(x => x.ElementAt(1));
+                //        await camera.StartPreview(x =>
+                //        {
+                //            this.image.Source = x;
+                //        });
+                //    }).ToArray();
+
+
+                try
+                {
+                    var aa = QSoft.MediaCapture.WebCam_MF.GetAllWebCams()
+                    .Select(async (camera, i) =>
+                    {
+                        await Task.Run(async () =>
+                        {
+                            await camera.InitCaptureEngine();
+                            //await camera.SetPreviewSize(x => x.ElementAt(1));
+                            await camera.StartPreview(x =>
+                            {
+                                this.Dispatcher.Invoke(() =>
+                                {
+                                    this.image.Source = x;
+                                });
+
+                            });
                         });
-                    })).ToArray();
-                await Task.WhenAll(tasks);
+
+                    }).ToArray();
+
+                    await Task.WhenAll(aa);
+                }
+                catch(Exception ee)
+                {
+
+                }
+                
+
             }
-            
         }
 
         private void button_stoppreview_Click(object sender, RoutedEventArgs e)
