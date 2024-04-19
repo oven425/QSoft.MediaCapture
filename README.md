@@ -18,6 +18,7 @@ var camera = QSoft.MediaCapture.WebCam_MF.GetAllWebCams().Find(x => x.FriendName
 if(camera != null)
 {
     await camera.InitCaptureEngine();
+    await camera.SetPreviewSize(x => x.FirstOrDefault(y=>y.Width>=640));
     await camera.StartPreview(host.Child.Handle);
 }
 ```
@@ -27,7 +28,33 @@ var camera = QSoft.MediaCapture.WebCam_MF.GetAllWebCams().Find(x => x.FriendName
 if(camera != null)
 {
     await camera.InitCaptureEngine();
+    await camera.SetPreviewSize(x => x.FirstOrDefault(y=>y.Width>=640));
     await camera.StartPreview(x => this.image.Source = x);
 }
+
+```
+
+open multi camera same time in WPF
+```c#
+var aa = QSoft.MediaCapture.WebCam_MF.GetAllWebCams()
+    .Select(async (camera, i) =>
+    {
+        await Task.Run(async () =>
+        {
+            await camera.InitCaptureEngine();
+            //await camera.SetPreviewSize(x => x.ElementAt(1));
+            await camera.StartPreview(x =>
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    this.image.Source = x;
+                });
+
+            });
+        });
+
+    }).ToArray();
+
+await Task.WhenAll(aa);
 
 ```
