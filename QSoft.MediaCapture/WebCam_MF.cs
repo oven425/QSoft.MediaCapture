@@ -24,6 +24,7 @@ namespace QSoft.MediaCapture
             {
                 if (guidType == MFConstants.MF_CAPTURE_ENGINE_INITIALIZED)
                 {
+                    System.Diagnostics.Trace.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")}");
                     m_TaskInitialize?.SetResult(hrStatus);
                 }
                 else if (guidType == MFConstants.MF_CAPTURE_ENGINE_PREVIEW_STARTED)
@@ -196,14 +197,18 @@ namespace QSoft.MediaCapture
                 hr = pFactory?.CreateInstance(DirectN.MFConstants.CLSID_MFCaptureEngine, typeof(IMFCaptureEngine).GUID, out o);
                 if (hr != HRESULTS.S_OK) return hr;
                 m_pEngine = o as IMFCaptureEngine;
+                System.Diagnostics.Trace.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")}");
+                var sw = System.Diagnostics.Stopwatch.StartNew();
                 hr = m_pEngine?.Initialize(this, pAttributes, null, this.CaptureObj?.Object);
                 if (hr != HRESULTS.S_OK) return hr;
 
                 hr = await m_TaskInitialize.Task;
-
+                sw.Stop();
+                System.Diagnostics.Trace.WriteLine($"{sw.ElapsedMilliseconds}");
                 IMFCaptureSource? source = null;
                 hr = m_pEngine?.GetSource(out source);
                 if (hr != HRESULTS.S_OK) return hr;
+                
                 var all = source.GetAllMediaType();
                 if(all.ContainsKey(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE))
                 {
@@ -215,7 +220,7 @@ namespace QSoft.MediaCapture
                         m_PreviewTypes[item.Key] = new List<IMFMediaType>(item.Select(x=>x.mediatype));
                     }
                 }
-
+                
 
 
 
@@ -387,7 +392,7 @@ namespace QSoft.MediaCapture
             return hr;
         }
 
-        async public Task<HRESULT> StartPreview(IMFCaptureEngineOnSampleCallback samplecallback, Func<IEnumerable<PreviewMediaType>, PreviewMediaType>? func)
+        async public Task<HRESULT> StartPreview(IMFCaptureEngineOnSampleCallback samplecallback)
         {
             if (m_pEngine == null) return HRESULTS.MF_E_NOT_INITIALIZED;
 

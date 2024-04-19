@@ -12,11 +12,11 @@ namespace QSoft.MediaCapture.WPF
 {
     public static class WebCam_MFExtension_WPF
     {
-        public static async Task<HRESULT> StartPreview(this QSoft.MediaCapture.WebCam_MF src, Action<WriteableBitmap> action, Func<IEnumerable<PreviewMediaType>, PreviewMediaType?>? func)
+        public static async Task<HRESULT> StartPreview(this QSoft.MediaCapture.WebCam_MF src, Action<WriteableBitmap> action)
         {
             src.GetPreviewSize(out var width, out var height);
             WriteableBitmap bmp = new WriteableBitmap((int)width, (int)height,96,96, PixelFormats.Bgr24, null);
-            var hr = await src.StartPreview(new MFCaptureEngineOnSampleCallback(bmp), null);
+            var hr = await src.StartPreview(new MFCaptureEngineOnSampleCallback(bmp));
             action?.Invoke(bmp);
             return hr;
         }

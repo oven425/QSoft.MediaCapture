@@ -43,14 +43,26 @@ namespace WpfAppNET472
                 //    //await oo.StartPreview(x => this.image.Source = x);
                 //    //this.m_MainUI.WebCams.Add(oo);
                 //}
-                var camera = QSoft.MediaCapture.WebCam_MF.GetAllWebCams().Find(x => x.FriendName == "USB2.0 HD UVC WebCam");
-                if(camera != null)
-                {
-                    await camera.InitCaptureEngine();
-                    //await camera.StartPreview(host.Child.Handle);
-                    await camera.SetPreviewSize(x => x.ElementAt(1));
-                    await camera.StartPreview(x => this.image.Source = x,null);
-                }
+                //var camera = QSoft.MediaCapture.WebCam_MF.GetAllWebCams().Find(x => x.FriendName == "USB2.0 HD UVC WebCam");
+                //if(camera != null)
+                //{
+                //    await camera.InitCaptureEngine();
+                //    //await camera.StartPreview(host.Child.Handle);
+                //    await camera.SetPreviewSize(x => x.ElementAt(1));
+                //    await camera.StartPreview(x => this.image.Source = x,null);
+                //}
+
+                var tasks = QSoft.MediaCapture.WebCam_MF.GetAllWebCams()
+                    .Select((camera, i) => Task.Run(async() =>
+                    {
+                        await camera.InitCaptureEngine();
+                        //await camera.SetPreviewSize(x => x.ElementAt(1));
+                        await camera.StartPreview(x =>
+                        {
+
+                        });
+                    })).ToArray();
+                await Task.WhenAll(tasks);
             }
             
         }
