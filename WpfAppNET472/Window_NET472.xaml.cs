@@ -69,7 +69,7 @@ namespace WpfAppNET472
                 //    .Select(async (camera, i) =>
                 //    {
                 //        await camera.InitCaptureEngine();
-                //        await camera.SetPreviewSize(x => x.FirstOrDefault(y=>y.Width>=640));
+                //        await camera.SetPreviewSize(x => x.FirstOrDefault(y => y.Width >= 640));
                 //        await camera.StartPreview(x =>
                 //        {
                 //            this.image.Source = x;
@@ -79,13 +79,13 @@ namespace WpfAppNET472
 
                 try
                 {
-                    var aa = QSoft.MediaCapture.WebCam_MF.GetAllWebCams()
+                    var aa1 = QSoft.MediaCapture.WebCam_MF.GetAllWebCams()
                         .Select(async (camera, i) =>
                         {
                             await Task.Run(async () =>
                             {
                                 await camera.InitCaptureEngine();
-                                //await camera.SetPreviewSize(x => x.ElementAt(1));
+                                await camera.SetPreviewSize(x => x.ElementAt(1));
                                 await camera.StartPreview(x =>
                                 {
                                     this.Dispatcher.Invoke(() =>
@@ -98,7 +98,7 @@ namespace WpfAppNET472
 
                         }).ToArray();
 
-                    await Task.WhenAll(aa);
+                    await Task.WhenAll(aa1);
                 }
                 catch (Exception ee)
                 {

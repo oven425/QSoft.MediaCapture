@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <VersionPrefix>1.0.0.1</VersionPrefix>
+    <VersionPrefix>1.0.0.3</VersionPrefix>
     <TargetFrameworks>net472;net8.0-windows7.0;net6.0-windows7.0</TargetFrameworks>
     <LangVersion>11.0</LangVersion>
     <ImplicitUsings>disable</ImplicitUsings>
@@ -16,8 +16,7 @@
     <Copyright>Copyright © Ben Hsu 2024</Copyright>
     <Description>Easy use webcam or video capture card</Description>
     <PackageIcon>48720503562_c9ae7998dc_o.jpg</PackageIcon>
-    <PackageReleaseNotes>1. Remove calculate fps
-2. Update DirectN DirectNCore package</PackageReleaseNotes>
+    <PackageReleaseNotes>1. fix startpreview in task issue </PackageReleaseNotes>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <Title>MediaCapture.NET</Title>
   </PropertyGroup>
@@ -32,7 +31,7 @@
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
     <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework"/>
+    <Reference Include="PresentationFramework" />
     <Reference Include="WindowsBase" />
     <PackageReference Include="DirectN" Version="1.16.0" />
   </ItemGroup>

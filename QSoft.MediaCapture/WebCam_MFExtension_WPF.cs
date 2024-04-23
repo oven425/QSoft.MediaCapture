@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace QSoft.MediaCapture.WPF
 {
@@ -16,10 +17,20 @@ namespace QSoft.MediaCapture.WPF
         {
             src.GetPreviewSize(out var width, out var height);
             WriteableBitmap? bmp = null;
-            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            var dispatcher = Dispatcher.FromThread(System.Threading.Thread.CurrentThread);
+            if(dispatcher != null)
             {
                 bmp = new WriteableBitmap((int)width, (int)height, 96, 96, PixelFormats.Bgr24, null);
-            });
+            }
+            else
+            {
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    bmp = new WriteableBitmap((int)width, (int)height, 96, 96, PixelFormats.Bgr24, null);
+
+                });
+            }
+            
 
             //WriteableBitmap bmp = new WriteableBitmap((int)width, (int)height,96,96, PixelFormats.Bgr24, null);
             var hr = await src.StartPreview(new MFCaptureEngineOnSampleCallback(bmp));
