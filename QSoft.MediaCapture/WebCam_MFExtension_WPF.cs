@@ -13,7 +13,7 @@ namespace QSoft.MediaCapture.WPF
 {
     public static class WebCam_MFExtension_WPF
     {
-        public static async Task<HRESULT> StartPreview(this QSoft.MediaCapture.WebCam_MF src, Action<WriteableBitmap> action)
+        public static async Task<HRESULT> StartPreview(this QSoft.MediaCapture.WebCam_MF src, Action<WriteableBitmap?> action)
         {
             src.GetPreviewSize(out var width, out var height);
             WriteableBitmap? bmp = null;
@@ -31,8 +31,6 @@ namespace QSoft.MediaCapture.WPF
                 });
             }
             
-
-            //WriteableBitmap bmp = new WriteableBitmap((int)width, (int)height,96,96, PixelFormats.Bgr24, null);
             var hr = await src.StartPreview(new MFCaptureEngineOnSampleCallback(bmp));
             action?.Invoke(bmp);
             return hr;
@@ -51,7 +49,7 @@ namespace QSoft.MediaCapture.WPF
 #endif
 
         readonly WriteableBitmap? m_Bmp;
-        public MFCaptureEngineOnSampleCallback(WriteableBitmap data)
+        public MFCaptureEngineOnSampleCallback(WriteableBitmap? data)
         {
             this.m_Bmp = data;
         }
@@ -63,7 +61,7 @@ namespace QSoft.MediaCapture.WPF
         
         public HRESULT OnSample(IMFSample pSample)
         {
-            if (System.Threading.Monitor.TryEnter(this.m_Lock))
+            if (this.m_Bmp != null && System.Threading.Monitor.TryEnter(this.m_Lock))
             {
 #if DEBUG
                 if (samplecount == 0)
@@ -82,7 +80,7 @@ namespace QSoft.MediaCapture.WPF
                 pSample.GetBufferByIndex(0, out var buf);
                 var ptr = buf.Lock(out var max, out var cur);
                 
-                m_Bmp?.Dispatcher.Invoke(() =>
+                m_Bmp.Dispatcher.Invoke(() =>
                 {
                     m_Bmp.Lock();
                     CopyMemory(m_Bmp.BackBuffer, ptr, cur);
