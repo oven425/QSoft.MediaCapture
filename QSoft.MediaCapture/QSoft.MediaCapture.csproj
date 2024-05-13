@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <VersionPrefix>1.0.0.3</VersionPrefix>
-    <TargetFrameworks>net472;net8.0-windows7.0;net6.0-windows7.0</TargetFrameworks>
+    <VersionPrefix>1.0.0.4</VersionPrefix>
+    <TargetFrameworks>net460;net462;net472;net8.0-windows7.0;net6.0-windows7.0</TargetFrameworks>
     <LangVersion>11.0</LangVersion>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -29,6 +29,20 @@
     <IsAotCompatible>true</IsAotCompatible>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net460'">
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsBase" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+    <PackageReference Include="DirectN" Version="1.16.0" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsBase" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+    <PackageReference Include="DirectN" Version="1.16.0" />
+  </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
