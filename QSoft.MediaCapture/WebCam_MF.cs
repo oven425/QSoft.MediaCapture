@@ -285,12 +285,12 @@ namespace QSoft.MediaCapture
 
 
 
-            ////Configure the photo format
-            //hr = CreatePhotoMediaType(pMediaType, out pMediaType2);
-            //if (hr.IsError)
-            //{
-            //    goto done;
-            //}
+            //Configure the photo format
+            hr = CreatePhotoMediaType(pMediaType, out pMediaType2);
+            if (hr.IsError)
+            {
+                goto done;
+            }
 
             hr = pPhoto.RemoveAllStreams();
             if (hr.IsError)
@@ -299,7 +299,7 @@ namespace QSoft.MediaCapture
             }
 
             //DWORD dwSinkStreamIndex;
-            IntPtr pp = Marshal.AllocHGlobal(4);
+            //IntPtr pp = Marshal.AllocHGlobal(4);
             // Try to connect the first still image stream to the photo sink
             uint dwSinkStreamIndex = 0;
             if (bHasPhotoStream)
@@ -336,6 +336,48 @@ namespace QSoft.MediaCapture
             SafeRelease(pSource);
             SafeRelease(pMediaType);
             SafeRelease(pMediaType2);
+            return hr;
+        }
+
+        HRESULT CreatePhotoMediaType(IMFMediaType pSrcMediaType, out IMFMediaType? ppPhotoMediaType)
+        {
+            //*ppPhotoMediaType = NULL;
+            ppPhotoMediaType = null;
+            //const UINT32 uiFrameRateNumerator = 30;
+            //const UINT32 uiFrameRateDenominator = 1;
+
+            IMFMediaType? pPhotoMediaType = null;
+
+            HRESULT hr = MFFunctions.MFCreateMediaType(out pPhotoMediaType);
+            if (hr.IsError)
+            {
+                goto done;
+            }
+
+            hr = pPhotoMediaType.SetGUID(MFConstants.MF_MT_MAJOR_TYPE, MFConstants.MFMediaType_Image);
+            if (hr.IsError)
+            {
+                goto done;
+            }
+
+
+            hr = pPhotoMediaType.SetGUID(MFConstants.MF_MT_SUBTYPE, WICConstants.GUID_ContainerFormatBmp);
+            if (hr.IsError)
+            {
+                goto done;
+            }
+
+            hr = CopyAttribute(pSrcMediaType, pPhotoMediaType, MFConstants.MF_MT_FRAME_SIZE);
+            if (hr.IsError)
+            {
+                goto done;
+            }
+
+            ppPhotoMediaType = pPhotoMediaType;
+        //(*ppPhotoMediaType)->AddRef();
+
+        done:
+            //SafeRelease(&pPhotoMediaType);
             return hr;
         }
 

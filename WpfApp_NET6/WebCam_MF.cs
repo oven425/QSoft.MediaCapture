@@ -806,7 +806,7 @@ namespace QSoft.MediaCapture
             }
 
 
-            hr = pPhotoMediaType.SetGUID(MFConstants.MF_MT_SUBTYPE, WICConstants.GUID_ContainerFormatJpeg);
+            hr = pPhotoMediaType.SetGUID(MFConstants.MF_MT_SUBTYPE, WICConstants.GUID_ContainerFormatAdng);
             if (hr.IsError)
             {
                 goto done;

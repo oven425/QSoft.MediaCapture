@@ -35,15 +35,15 @@ namespace WpfAppNET472
             if (m_MainUI == null)
             {
                 this.DataContext = this.m_MainUI = new MainUI();
-                //foreach(var oo in QSoft.MediaCapture.WebCam_MF.GetAllWebCams())
-                //{
-                //    System.Diagnostics.Trace.WriteLine(oo.FriendName);
-                //    System.Diagnostics.Trace.WriteLine(oo.SymbolLinkName);
-                //    //await oo.InitCaptureEngine();
-                //    ////await oo.StartPreview(host.Child.Handle);
-                //    //await oo.StartPreview(x => this.image.Source = x);
-                //    //this.m_MainUI.WebCams.Add(oo);
-                //}
+                foreach (var oo in QSoft.MediaCapture.WebCam_MF.GetAllWebCams())
+                {
+                    System.Diagnostics.Trace.WriteLine(oo.FriendName);
+                    System.Diagnostics.Trace.WriteLine(oo.SymbolLinkName);
+                    await oo.InitCaptureEngine();
+                    //await oo.StartPreview(host.Child.Handle);
+                    await oo.StartPreview(x => this.image.Source = x);
+                    this.m_MainUI.WebCams.Add(oo);
+                }
                 //var camera = QSoft.MediaCapture.WebCam_MF.GetAllWebCams().Find(x => x.FriendName == "USB2.0 HD UVC WebCam");
                 //if(camera != null)
                 //{
@@ -79,26 +79,29 @@ namespace WpfAppNET472
 
                 try
                 {
-                    var aa1 = QSoft.MediaCapture.WebCam_MF.GetAllWebCams()
-                        .Select(async (camera, i) =>
-                        {
-                            await Task.Run(async () =>
-                            {
-                                await camera.InitCaptureEngine();
-                                await camera.SetPreviewSize(x => x.ElementAt(1));
-                                await camera.StartPreview(x =>
-                                {
-                                    this.Dispatcher.Invoke(() =>
-                                    {
-                                        this.image.Source = x;
-                                    });
+                    //var aa1 = QSoft.MediaCapture.WebCam_MF.GetAllWebCams()
+                    //    .Select(async (camera, i) =>
+                    //    {
+                    //        await Task.Run(async () =>
+                    //        {
+                    //            await camera.InitCaptureEngine();
+                    //            await camera.SetPreviewSize(x => x.ElementAt(1));
+                    //            await camera.StartPreview(x =>
+                    //            {
+                    //                this.Dispatcher.Invoke(() =>
+                    //                {
+                    //                    this.image.Source = x;
+                    //                });
 
-                                });
-                            });
+                    //            });
+                                
+                    //        });
+                    //        return camera;
+                    //        //this.m_MainUI.WebCams.Add(camera);
+                    //    }).ToArray();
 
-                        }).ToArray();
-
-                    await Task.WhenAll(aa1);
+                    //var io = await Task.WhenAll(aa1);
+                    //this.m_MainUI.WebCams.AddRange(io);
                 }
                 catch (Exception ee)
                 {
@@ -132,6 +135,14 @@ namespace WpfAppNET472
             foreach (var oo in this.m_MainUI.WebCams)
             {
                 oo.UpdateVideo((int)aa.Width, (int)aa.Height);
+            }
+        }
+
+        async private void button_takephoto_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var oo in this.m_MainUI.WebCams)
+            {
+                await oo?.TakePhoto("123.bmp");
             }
         }
     }
