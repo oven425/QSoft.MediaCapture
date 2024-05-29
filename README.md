@@ -14,7 +14,8 @@ and filter FriendName, SymbolLinkName get it
 
 # Init and start preview
 ```c#
-var camera = QSoft.MediaCapture.WebCam_MF.GetAllWebCams().Find(x => x.FriendName == "USB2.0 HD UVC WebCam");
+var camera = QSoft.MediaCapture.WebCam_MF.GetAllWebCams()
+    .Find(x => x.FriendName == "USB2.0 HD UVC WebCam");
 if(camera != null)
 {
     await camera.InitCaptureEngine();
@@ -24,7 +25,8 @@ if(camera != null)
 ```
 try below code when use WPF
 ```c#
-var camera = QSoft.MediaCapture.WebCam_MF.GetAllWebCams().Find(x => x.FriendName == "USB2.0 HD UVC WebCam");
+var camera = QSoft.MediaCapture.WebCam_MF.GetAllWebCams()
+    .Find(x => x.FriendName == "USB2.0 HD UVC WebCam");
 if(camera != null)
 {
     await camera.InitCaptureEngine();
