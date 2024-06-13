@@ -41,7 +41,10 @@ namespace WpfAppNET472
                     System.Diagnostics.Trace.WriteLine(oo.SymbolLinkName);
                     await oo.InitCaptureEngine();
                     //await oo.StartPreview(host.Child.Handle);
-                    await oo.StartPreview(x => this.image.Source = x);
+                    await oo.StartPreview(x => 
+                    {
+                        this.image.Source = x;
+                    }, System.Windows.Threading.DispatcherPriority.Render);
                     this.m_MainUI.WebCams.Add(oo);
                 }
                 //var camera = QSoft.MediaCapture.WebCam_MF.GetAllWebCams().Find(x => x.FriendName == "USB2.0 HD UVC WebCam");
@@ -140,10 +143,10 @@ namespace WpfAppNET472
 
         async private void button_takephoto_Click(object sender, RoutedEventArgs e)
         {
-            foreach (var oo in this.m_MainUI.WebCams)
-            {
-                await oo?.TakePhoto("123.bmp");
-            }
+            //foreach (var oo in this.m_MainUI.WebCams)
+            //{
+            //    await oo?.TakePhoto("123.bmp");
+            //}
         }
     }
 

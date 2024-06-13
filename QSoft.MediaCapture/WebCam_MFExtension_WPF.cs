@@ -13,7 +13,7 @@ namespace QSoft.MediaCapture.WPF
 {
     public static class WebCam_MFExtension_WPF
     {
-        public static async Task<HRESULT> StartPreview(this QSoft.MediaCapture.WebCam_MF src, Action<WriteableBitmap?> action)
+        public static async Task<HRESULT> StartPreview(this QSoft.MediaCapture.WebCam_MF src, Action<WriteableBitmap?> action, System.Windows.Threading.DispatcherPriority dispatcherpriority = DispatcherPriority.Background)
         {
             src.GetPreviewSize(out var width, out var height);
             WriteableBitmap? bmp = null;
@@ -24,14 +24,13 @@ namespace QSoft.MediaCapture.WPF
             }
             else
             {
-                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
                 {
                     bmp = new WriteableBitmap((int)width, (int)height, 96, 96, PixelFormats.Bgr24, null);
-
                 });
             }
             
-            var hr = await src.StartPreview(new MFCaptureEngineOnSampleCallback(bmp));
+            var hr = await src.StartPreview(new MFCaptureEngineOnSampleCallback(bmp, dispatcherpriority));
             action?.Invoke(bmp);
             return hr;
         }
@@ -48,9 +47,11 @@ namespace QSoft.MediaCapture.WPF
         internal static extern void CopyMemory(IntPtr dest, IntPtr src, uint count);
 #endif
 
-        readonly WriteableBitmap? m_Bmp;
-        public MFCaptureEngineOnSampleCallback(WriteableBitmap? data)
+        readonly WriteableBitmap? m_Bmp; 
+        readonly System.Windows.Threading.DispatcherPriority m_DispatcherPriority;
+        public MFCaptureEngineOnSampleCallback(WriteableBitmap? data, System.Windows.Threading.DispatcherPriority dispatcherpriority)
         {
+            m_DispatcherPriority = dispatcherpriority;
             this.m_Bmp = data;
         }
 #if DEBUG
@@ -86,7 +87,7 @@ namespace QSoft.MediaCapture.WPF
                     CopyMemory(m_Bmp.BackBuffer, ptr, cur);
                     m_Bmp.AddDirtyRect(new System.Windows.Int32Rect(0, 0, m_Bmp.PixelWidth, m_Bmp.PixelHeight));
                     m_Bmp.Unlock();
-                }, System.Windows.Threading.DispatcherPriority.Background);
+                }, m_DispatcherPriority);
 
                 buf.Unlock();
                 Marshal.ReleaseComObject(buf);
