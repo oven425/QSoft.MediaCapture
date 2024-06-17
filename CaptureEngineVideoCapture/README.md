@@ -1,3 +1,7 @@
+test yuv and dxva2
+https://blog.csdn.net/u013113678/article/details/124223161
+
+
 CaptureEngine video capture sample
 ==================================
 
