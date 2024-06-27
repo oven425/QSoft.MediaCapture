@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,13 +21,7 @@ namespace QSoft.MediaCapture
         internal static extern void CopyMemory(IntPtr dest, IntPtr src, uint count);
 #endif
 
-        readonly WriteableBitmap? m_Bmp;
-        readonly System.Windows.Threading.DispatcherPriority m_DispatcherPriority;
-        public MFCaptureEngineOnSampleCallback(WriteableBitmap? data, System.Windows.Threading.DispatcherPriority dispatcherpriority)
-        {
-            m_DispatcherPriority = dispatcherpriority;
-            this.m_Bmp = data;
-        }
+        
 #if DEBUG
         int samplecount = 0;
         System.Diagnostics.Stopwatch? m_StopWatch;
@@ -35,7 +30,7 @@ namespace QSoft.MediaCapture
 
         public HRESULT OnSample(IMFSample pSample)
         {
-            if (this.m_Bmp != null && System.Threading.Monitor.TryEnter(this.m_Lock))
+            if (System.Threading.Monitor.TryEnter(this.m_Lock))
             {
 #if DEBUG
                 if (samplecount == 0)
@@ -54,13 +49,7 @@ namespace QSoft.MediaCapture
                 pSample.GetBufferByIndex(0, out var buf);
                 var ptr = buf.Lock(out var max, out var cur);
 
-                m_Bmp.Dispatcher.Invoke(() =>
-                {
-                    m_Bmp.Lock();
-                    CopyMemory(m_Bmp.BackBuffer, ptr, cur);
-                    m_Bmp.AddDirtyRect(new System.Windows.Int32Rect(0, 0, m_Bmp.PixelWidth, m_Bmp.PixelHeight));
-                    m_Bmp.Unlock();
-                }, m_DispatcherPriority);
+                OnSample(ptr, cur);
 
                 buf.Unlock();
                 Marshal.ReleaseComObject(buf);
@@ -75,7 +64,31 @@ namespace QSoft.MediaCapture
             return HRESULTS.S_OK;
         }
 
-        virtual protected void OnSample(IntPtr data, int len) { }
+        virtual protected void OnSample(IntPtr data, uint len) { }
 
     }
+
+    public class MFCaptureEngineOnSampleCallback_WriteableBitmap : MFCaptureEngineOnSampleCallback
+    {
+        readonly WriteableBitmap? m_Bmp;
+        readonly System.Windows.Threading.DispatcherPriority m_DispatcherPriority;
+        public MFCaptureEngineOnSampleCallback_WriteableBitmap(WriteableBitmap? data, System.Windows.Threading.DispatcherPriority dispatcherpriority)
+        {
+            m_DispatcherPriority = dispatcherpriority;
+            this.m_Bmp = data;
+        }
+
+        protected override void OnSample(nint data, uint len)
+        {
+            m_Bmp?.Dispatcher.Invoke(() =>
+            {
+                m_Bmp.Lock();
+                CopyMemory(m_Bmp.BackBuffer, data, len);
+                m_Bmp.AddDirtyRect(new System.Windows.Int32Rect(0, 0, m_Bmp.PixelWidth, m_Bmp.PixelHeight));
+                m_Bmp.Unlock();
+            }, m_DispatcherPriority);
+        }
+    }
 }
+
+
