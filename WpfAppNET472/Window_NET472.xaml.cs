@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
@@ -41,10 +42,18 @@ namespace WpfAppNET472
                     System.Diagnostics.Trace.WriteLine(oo.SymbolLinkName);
                     await oo.InitCaptureEngine();
                     //await oo.StartPreview(host.Child.Handle);
-                    await oo.StartPreview(x => 
+                    //await oo.StartPreview(new Action<System.Windows.Interop.D3DImage>((x) => 
+                    //{
+                    //    //this.image.Source = x;
+                    //}), System.Windows.Threading.DispatcherPriority.Render);
+                    await oo.StartPreview(new Action<WriteableBitmap>((x) =>
                     {
                         this.image.Source = x;
-                    }, System.Windows.Threading.DispatcherPriority.Render);
+                    }));
+                    oo.StartPreview(new Action<D3DImage>((x) =>
+                    {
+                        this.image.Source = x;
+                    }));
                     this.m_MainUI.WebCams.Add(oo);
                 }
                 //var camera = QSoft.MediaCapture.WebCam_MF.GetAllWebCams().Find(x => x.FriendName == "USB2.0 HD UVC WebCam");
