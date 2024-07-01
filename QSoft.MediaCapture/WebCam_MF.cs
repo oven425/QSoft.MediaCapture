@@ -58,7 +58,7 @@ namespace QSoft.MediaCapture
                 }
                 else if (guidType == MFConstants.MF_CAPTURE_ENGINE_ERROR)
                 {
-                    //var aa = Marshal.GetExceptionForHR(hrStatus.Value).Message;
+                    var aa = Marshal.GetExceptionForHR(hrStatus.Value).Message;
                     //if (OnFail != null)
                     //{
 
@@ -422,6 +422,11 @@ namespace QSoft.MediaCapture
             return hr;
         }
 
+        public void SetPreview(Func<int, int, Guid, bool> func)
+        {
+
+        }
+
 
         TaskCompletionSource<HRESULT>? m_TaskSetMediaType;
         public async Task<HRESULT> SetPreviewSize(Func<IEnumerable<PreviewMediaType>, PreviewMediaType?>? func)
@@ -460,6 +465,7 @@ namespace QSoft.MediaCapture
             hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, out pMediaType);
             if (hr != HRESULTS.S_OK) return hr;
             pMediaType.MFGetAttributeSize(MFConstants.MF_MT_FRAME_SIZE, out var w, out var h);
+            var subtype = pMediaType.GetGuid(MFConstants.MF_MT_SUBTYPE);
             //pMediaType.GetUINT64(MFConstants.MF_MT_FRAME_SIZE, out var wh);
             //width = (int)(wh >> 32);
             //height = (int)(wh & 0xffffffff);
@@ -578,7 +584,7 @@ namespace QSoft.MediaCapture
 
                     // Connect the video stream to the preview sink.
                     using var cm = new ComMemory(Marshal.SizeOf<uint>());
-                    hr = m_pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, pMediaType2, null, cm.Pointer);
+                    hr = m_pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, pMediaType, null, cm.Pointer);
                     if (hr != HRESULTS.S_OK) return hr;
                     dwSinkStreamIndex = Marshal.ReadInt32(cm.Pointer);
                 }

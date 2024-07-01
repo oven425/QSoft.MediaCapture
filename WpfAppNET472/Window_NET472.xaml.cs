@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -33,6 +34,25 @@ namespace WpfAppNET472
         MainUI m_MainUI;
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            //var yuv = new YUVRender();
+            //yuv.Init(720, 404);
+            //D3DImage d3dimg = new D3DImage();
+            //this.image.Source = d3dimg;
+            //d3dimg.Lock();
+            //var ptr = Marshal.GetIUnknownForObject(yuv.BackBuffer);
+            //d3dimg.SetBackBuffer(D3DResourceType.IDirect3DSurface9, ptr);
+            //d3dimg.Unlock();
+
+            //var buf = System.IO.File.ReadAllBytes("720-404-nv12.yuv");
+            //var src = Marshal.AllocHGlobal(buf.Length);
+            //Marshal.Copy(buf, 0, src, buf.Length);
+            //yuv.WriteFrame(src, YUVRender.D3DFMT_NV12);
+            ////yuv.NV12(src);
+            //d3dimg.Lock();
+            //d3dimg.AddDirtyRect(new Int32Rect(0, 0, 720, 404));
+            //d3dimg.Unlock();
+
+            //return;
             if (m_MainUI == null)
             {
                 this.DataContext = this.m_MainUI = new MainUI();
@@ -46,15 +66,15 @@ namespace WpfAppNET472
                     //{
                     //    //this.image.Source = x;
                     //}), System.Windows.Threading.DispatcherPriority.Render);
-                    await oo.StartPreview(new Action<WriteableBitmap>((x) =>
+                    //await oo.StartPreview(new Action<WriteableBitmap>((x) =>
+                    //{
+                    //    this.image.Source = x;
+                    //}));
+                    await oo.StartPreview(new Action<D3DImage>((x) =>
                     {
                         this.image.Source = x;
                     }));
-                    oo.StartPreview(new Action<D3DImage>((x) =>
-                    {
-                        this.image.Source = x;
-                    }));
-                    this.m_MainUI.WebCams.Add(oo);
+                    //this.m_MainUI.WebCams.Add(oo);
                 }
                 //var camera = QSoft.MediaCapture.WebCam_MF.GetAllWebCams().Find(x => x.FriendName == "USB2.0 HD UVC WebCam");
                 //if(camera != null)

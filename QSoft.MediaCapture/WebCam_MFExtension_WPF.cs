@@ -14,9 +14,44 @@ namespace QSoft.MediaCapture.WPF
 {
     public static class WebCam_MFExtension_WPF
     {
-        public static HRESULT StartPreview(this QSoft.MediaCapture.WebCam_MF src, Action<D3DImage> action, System.Windows.Threading.DispatcherPriority dispatcherpriority = DispatcherPriority.Background)
+        public static async Task<HRESULT> StartPreivew(this QSoft.MediaCapture.WebCam_MF src, Action<ImageSource> action)
         {
             return HRESULTS.S_OK;
+        }
+
+        static void CreateD3DImage(int width, int height, DispatcherPriority dispatcherpriority, out D3DImage d3dimage, out MFCaptureEngineOnSampleCallback_D3DImage callback)
+        {
+            d3dimage = new D3DImage();
+            callback = new MFCaptureEngineOnSampleCallback_D3DImage(d3dimage, dispatcherpriority);
+            callback.Init(width, height);
+            d3dimage.Lock();
+            var ptr = Marshal.GetIUnknownForObject(callback.BackBuffer);
+            d3dimage.SetBackBuffer(D3DResourceType.IDirect3DSurface9, ptr);
+            d3dimage.Unlock();
+        }
+
+        public static async Task<HRESULT> StartPreview(this QSoft.MediaCapture.WebCam_MF src, Action<D3DImage?> action, DispatcherPriority dispatcherpriority = DispatcherPriority.Background)
+        {
+            src.GetPreviewSize(out var width, out var height);
+            var dispatcher = Dispatcher.FromThread(System.Threading.Thread.CurrentThread);
+            D3DImage? d3dimage = null;
+            MFCaptureEngineOnSampleCallback_D3DImage? callback = null;
+            if (dispatcher != null)
+            {
+                CreateD3DImage((int)width, (int)height, dispatcherpriority, out d3dimage, out callback);
+            }
+            else
+            {
+                await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    CreateD3DImage((int)width, (int)height, dispatcherpriority, out d3dimage, out callback);
+                });
+            }
+
+            var hr = await src.StartPreview(callback);
+            action?.Invoke(d3dimage);
+
+            return hr;
         }
         public static async Task<HRESULT> StartPreview(this QSoft.MediaCapture.WebCam_MF src, Action<WriteableBitmap?> action, System.Windows.Threading.DispatcherPriority dispatcherpriority = DispatcherPriority.Background)
         {
@@ -40,71 +75,4 @@ namespace QSoft.MediaCapture.WPF
             return hr;
         }
     }
-
-//    public partial class MFCaptureEngineOnSampleCallback : IMFCaptureEngineOnSampleCallback
-//    {
-//#if NET8_0_OR_GREATER
-//        [LibraryImport("kernel32.dll", EntryPoint = "RtlCopyMemory", SetLastError = false)]
-//        internal static partial void CopyMemory(IntPtr dest, IntPtr src, uint count);
-
-//#else
-//        [DllImport("kernel32.dll", EntryPoint = "CopyMemory", SetLastError = false)]
-//        internal static extern void CopyMemory(IntPtr dest, IntPtr src, uint count);
-//#endif
-
-//        readonly WriteableBitmap? m_Bmp; 
-//        readonly System.Windows.Threading.DispatcherPriority m_DispatcherPriority;
-//        public MFCaptureEngineOnSampleCallback(WriteableBitmap? data, System.Windows.Threading.DispatcherPriority dispatcherpriority)
-//        {
-//            m_DispatcherPriority = dispatcherpriority;
-//            this.m_Bmp = data;
-//        }
-//#if DEBUG
-//        int samplecount = 0;
-//        System.Diagnostics.Stopwatch? m_StopWatch;
-//#endif
-//        readonly object m_Lock = new object();
-        
-//        public HRESULT OnSample(IMFSample pSample)
-//        {
-//            if (this.m_Bmp != null && System.Threading.Monitor.TryEnter(this.m_Lock))
-//            {
-//#if DEBUG
-//                if (samplecount == 0)
-//                {
-//                    m_StopWatch = System.Diagnostics.Stopwatch.StartNew();
-//                }
-//                samplecount++;
-//                if (samplecount > 100 && m_StopWatch != null)
-//                {
-//                    m_StopWatch.Stop();
-//                    var fps = samplecount / m_StopWatch.Elapsed.TotalSeconds;
-//                    System.Diagnostics.Trace.WriteLine($"fps:{fps}");
-//                    samplecount = 0;
-//                }
-//#endif
-//                pSample.GetBufferByIndex(0, out var buf);
-//                var ptr = buf.Lock(out var max, out var cur);
-                
-//                m_Bmp.Dispatcher.Invoke(() =>
-//                {
-//                    m_Bmp.Lock();
-//                    CopyMemory(m_Bmp.BackBuffer, ptr, cur);
-//                    m_Bmp.AddDirtyRect(new System.Windows.Int32Rect(0, 0, m_Bmp.PixelWidth, m_Bmp.PixelHeight));
-//                    m_Bmp.Unlock();
-//                }, m_DispatcherPriority);
-
-//                buf.Unlock();
-//                Marshal.ReleaseComObject(buf);
-//                Marshal.ReleaseComObject(pSample);
-//                System.Threading.Monitor.Exit(this.m_Lock);
-//            }
-//            else
-//            {
-//                Marshal.ReleaseComObject(pSample);
-//            }
-
-//            return HRESULTS.S_OK;
-//        }
-//    }
 }

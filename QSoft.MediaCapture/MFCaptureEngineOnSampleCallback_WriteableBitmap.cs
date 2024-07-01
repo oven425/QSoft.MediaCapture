@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 
-namespace QSoft.MediaCapture
+namespace QSoft.MediaCapture.WPF
 {
     internal class MFCaptureEngineOnSampleCallback_WriteableBitmap : MFCaptureEngineOnSampleCallback
     {
