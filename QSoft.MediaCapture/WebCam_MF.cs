@@ -543,7 +543,7 @@ namespace QSoft.MediaCapture
             return hr;
         }
 
-        async public Task<HRESULT> StartPreview(IMFCaptureEngineOnSampleCallback samplecallback)
+        async public Task<HRESULT> StartPreview(Func<IMFMediaType, IMFMediaType?>? transform,  IMFCaptureEngineOnSampleCallback samplecallback)
         {
             if (m_pEngine == null) return HRESULTS.MF_E_NOT_INITIALIZED;
 
@@ -576,15 +576,20 @@ namespace QSoft.MediaCapture
                     hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, out pMediaType);
                     if (hr != HRESULTS.S_OK) return hr;
 
-                    hr = CloneVideoMediaType(pMediaType, MFConstants.MFVideoFormat_RGB24, out pMediaType2);
-                    if (hr != HRESULTS.S_OK || pMediaType2 == null) return hr;
+                    var dst = transform?.Invoke(pMediaType);
+                    if (dst==null)
+                    {
+                        dst = pMediaType;
+                    }
+                    //hr = CloneVideoMediaType(pMediaType, MFConstants.MFVideoFormat_RGB24, out pMediaType2);
+                    //if (hr != HRESULTS.S_OK || pMediaType2 == null) return hr;
 
-                    hr = pMediaType2.SetUINT32(MFConstants.MF_MT_ALL_SAMPLES_INDEPENDENT, 1);
-                    if (hr != HRESULTS.S_OK) return hr;
+                    //hr = pMediaType2.SetUINT32(MFConstants.MF_MT_ALL_SAMPLES_INDEPENDENT, 1);
+                    //if (hr != HRESULTS.S_OK) return hr;
 
                     // Connect the video stream to the preview sink.
                     using var cm = new ComMemory(Marshal.SizeOf<uint>());
-                    hr = m_pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, pMediaType, null, cm.Pointer);
+                    hr = m_pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, dst, null, cm.Pointer);
                     if (hr != HRESULTS.S_OK) return hr;
                     dwSinkStreamIndex = Marshal.ReadInt32(cm.Pointer);
                 }
@@ -614,83 +619,157 @@ namespace QSoft.MediaCapture
 
 
             return hr;
+
         }
 
-        async public Task<HRESULT> StartPreview1(IMFCaptureEngineOnSampleCallback samplecallback)
-        {
-            if (m_pEngine == null) return HRESULTS.MF_E_NOT_INITIALIZED;
+        ////async public Task<HRESULT> StartPreview(IMFCaptureEngineOnSampleCallback samplecallback)
+        ////{
+        ////    if (m_pEngine == null) return HRESULTS.MF_E_NOT_INITIALIZED;
 
-            m_TaskStartPreview = new TaskCompletionSource<HRESULT>();
+        ////    m_TaskStartPreview = new TaskCompletionSource<HRESULT>();
 
-            if (m_IsPreviewing) return HRESULTS.S_OK;
+        ////    if (m_IsPreviewing) return HRESULTS.S_OK;
 
-            IMFCaptureSink? pSink = null;
-            IMFMediaType? pMediaType = null;
-            IMFMediaType? pMediaType2 = null;
-            IMFCaptureSource? pSource = null;
-            int dwSinkStreamIndex = 0;
-            HRESULT hr = HRESULTS.S_OK;
-            try
-            {
-                // Get a pointer to the preview sink.
-                if (m_pPreview == null)
-                {
-                    hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_PREVIEW, out pSink);
-                    if (hr != HRESULTS.S_OK) return hr;
-                    m_pPreview = pSink as IMFCapturePreviewSink;
-                    if (m_pPreview == null) return HRESULTS.E_NOTIMPL;
-
-
-                    hr = m_pEngine.GetSource(out pSource);
-                    if (hr != HRESULTS.S_OK) return hr;
+        ////    IMFCaptureSink? pSink = null;
+        ////    IMFMediaType? pMediaType = null;
+        ////    IMFMediaType? pMediaType2 = null;
+        ////    IMFCaptureSource? pSource = null;
+        ////    int dwSinkStreamIndex = 0;
+        ////    HRESULT hr = HRESULTS.S_OK;
+        ////    try
+        ////    {
+        ////        // Get a pointer to the preview sink.
+        ////        if (m_pPreview == null)
+        ////        {
+        ////            hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_PREVIEW, out pSink);
+        ////            if (hr != HRESULTS.S_OK) return hr;
+        ////            m_pPreview = pSink as IMFCapturePreviewSink;
+        ////            if (m_pPreview == null) return HRESULTS.E_NOTIMPL;
 
 
-                    //// Configure the video format for the preview sink.
-                    hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, out pMediaType);
-                    if (hr != HRESULTS.S_OK) return hr;
-
-                    hr = CloneVideoMediaType(pMediaType, MFConstants.MFVideoFormat_RGB24, out pMediaType2);
-                    if (hr != HRESULTS.S_OK || pMediaType2 == null) return hr;
-
-                    hr = pMediaType2.SetUINT32(MFConstants.MF_MT_ALL_SAMPLES_INDEPENDENT, 1);
-                    if (hr != HRESULTS.S_OK) return hr;
-
-                    // Connect the video stream to the preview sink.
-                    using var cm = new ComMemory(Marshal.SizeOf<uint>());
-                    hr = m_pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, pMediaType2, null, cm.Pointer);
-                    if (hr != HRESULTS.S_OK) return hr;
-                    dwSinkStreamIndex = Marshal.ReadInt32(cm.Pointer);
-                }
-                if (samplecallback != null)
-                {
-                    //uint w = 0;
-                    //uint h = 0;
-                    //MFFunctions1.MFGetAttributeSize(pMediaType2, MFConstants.MF_MT_FRAME_SIZE, out w, out h);
-                    //m_PreviewBmp = new WriteableBitmap((int)w, (int)h, 96, 96, PixelFormats.Bgr24, null);
-                    //m_PreviewCallback = new MFCaptureEngineOnSampleCallback(m_PreviewBmp);
-                    hr = m_pPreview.SetSampleCallback((uint)dwSinkStreamIndex, samplecallback);
-                    if (hr != HRESULTS.S_OK) return hr;
-                }
-
-                hr = m_pEngine.StartPreview();
-                hr = await m_TaskStartPreview.Task;
-                m_TaskStartPreview = null;
-                m_IsPreviewing = true;
-            }
-            finally
-            {
-                SafeRelease(pSink);
-                SafeRelease(pMediaType);
-                SafeRelease(pMediaType2);
-                SafeRelease(pSource);
-            }
+        ////            hr = m_pEngine.GetSource(out pSource);
+        ////            if (hr != HRESULTS.S_OK) return hr;
 
 
-            return hr;
-        }
+        ////            //// Configure the video format for the preview sink.
+        ////            hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, out pMediaType);
+        ////            if (hr != HRESULTS.S_OK) return hr;
+
+        ////            hr = CloneVideoMediaType(pMediaType, MFConstants.MFVideoFormat_RGB24, out pMediaType2);
+        ////            if (hr != HRESULTS.S_OK || pMediaType2 == null) return hr;
+
+        ////            hr = pMediaType2.SetUINT32(MFConstants.MF_MT_ALL_SAMPLES_INDEPENDENT, 1);
+        ////            if (hr != HRESULTS.S_OK) return hr;
+
+        ////            // Connect the video stream to the preview sink.
+        ////            using var cm = new ComMemory(Marshal.SizeOf<uint>());
+        ////            hr = m_pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, pMediaType, null, cm.Pointer);
+        ////            if (hr != HRESULTS.S_OK) return hr;
+        ////            dwSinkStreamIndex = Marshal.ReadInt32(cm.Pointer);
+        ////        }
+        ////        if (samplecallback != null)
+        ////        {
+        ////            //uint w = 0;
+        ////            //uint h = 0;
+        ////            //MFFunctions1.MFGetAttributeSize(pMediaType2, MFConstants.MF_MT_FRAME_SIZE, out w, out h);
+        ////            //m_PreviewBmp = new WriteableBitmap((int)w, (int)h, 96, 96, PixelFormats.Bgr24, null);
+        ////            //m_PreviewCallback = new MFCaptureEngineOnSampleCallback(m_PreviewBmp);
+        ////            hr = m_pPreview.SetSampleCallback((uint)dwSinkStreamIndex, samplecallback);
+        ////            if (hr != HRESULTS.S_OK) return hr;
+        ////        }
+
+        ////        hr = m_pEngine.StartPreview();
+        ////        hr = await m_TaskStartPreview.Task;
+        ////        m_TaskStartPreview = null;
+        ////        m_IsPreviewing = true;
+        ////    }
+        ////    finally
+        ////    {
+        ////        SafeRelease(pSink);
+        ////        SafeRelease(pMediaType);
+        ////        SafeRelease(pMediaType2);
+        ////        SafeRelease(pSource);
+        ////    }
 
 
-        HRESULT CloneVideoMediaType(IMFMediaType pSrcMediaType, Guid guidSubType, out IMFMediaType? ppNewMediaType)
+        ////    return hr;
+        ////}
+
+        //async public Task<HRESULT> StartPreview1(IMFCaptureEngineOnSampleCallback samplecallback)
+        //{
+        //    if (m_pEngine == null) return HRESULTS.MF_E_NOT_INITIALIZED;
+
+        //    m_TaskStartPreview = new TaskCompletionSource<HRESULT>();
+
+        //    if (m_IsPreviewing) return HRESULTS.S_OK;
+
+        //    IMFCaptureSink? pSink = null;
+        //    IMFMediaType? pMediaType = null;
+        //    IMFMediaType? pMediaType2 = null;
+        //    IMFCaptureSource? pSource = null;
+        //    int dwSinkStreamIndex = 0;
+        //    HRESULT hr = HRESULTS.S_OK;
+        //    try
+        //    {
+        //        // Get a pointer to the preview sink.
+        //        if (m_pPreview == null)
+        //        {
+        //            hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_PREVIEW, out pSink);
+        //            if (hr != HRESULTS.S_OK) return hr;
+        //            m_pPreview = pSink as IMFCapturePreviewSink;
+        //            if (m_pPreview == null) return HRESULTS.E_NOTIMPL;
+
+
+        //            hr = m_pEngine.GetSource(out pSource);
+        //            if (hr != HRESULTS.S_OK) return hr;
+
+
+        //            //// Configure the video format for the preview sink.
+        //            hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, out pMediaType);
+        //            if (hr != HRESULTS.S_OK) return hr;
+
+        //            hr = CloneVideoMediaType(pMediaType, MFConstants.MFVideoFormat_RGB24, out pMediaType2);
+        //            if (hr != HRESULTS.S_OK || pMediaType2 == null) return hr;
+
+        //            hr = pMediaType2.SetUINT32(MFConstants.MF_MT_ALL_SAMPLES_INDEPENDENT, 1);
+        //            if (hr != HRESULTS.S_OK) return hr;
+
+        //            // Connect the video stream to the preview sink.
+        //            using var cm = new ComMemory(Marshal.SizeOf<uint>());
+        //            hr = m_pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, pMediaType2, null, cm.Pointer);
+        //            if (hr != HRESULTS.S_OK) return hr;
+        //            dwSinkStreamIndex = Marshal.ReadInt32(cm.Pointer);
+        //        }
+        //        if (samplecallback != null)
+        //        {
+        //            //uint w = 0;
+        //            //uint h = 0;
+        //            //MFFunctions1.MFGetAttributeSize(pMediaType2, MFConstants.MF_MT_FRAME_SIZE, out w, out h);
+        //            //m_PreviewBmp = new WriteableBitmap((int)w, (int)h, 96, 96, PixelFormats.Bgr24, null);
+        //            //m_PreviewCallback = new MFCaptureEngineOnSampleCallback(m_PreviewBmp);
+        //            hr = m_pPreview.SetSampleCallback((uint)dwSinkStreamIndex, samplecallback);
+        //            if (hr != HRESULTS.S_OK) return hr;
+        //        }
+
+        //        hr = m_pEngine.StartPreview();
+        //        hr = await m_TaskStartPreview.Task;
+        //        m_TaskStartPreview = null;
+        //        m_IsPreviewing = true;
+        //    }
+        //    finally
+        //    {
+        //        SafeRelease(pSink);
+        //        SafeRelease(pMediaType);
+        //        SafeRelease(pMediaType2);
+        //        SafeRelease(pSource);
+        //    }
+
+
+        //    return hr;
+        //}
+
+
+        internal HRESULT CloneVideoMediaType(IMFMediaType pSrcMediaType, Guid guidSubType, out IMFMediaType? ppNewMediaType)
         {
             ppNewMediaType = null;
             var hr = MFFunctions.MFCreateMediaType(out var pNewMediaType);

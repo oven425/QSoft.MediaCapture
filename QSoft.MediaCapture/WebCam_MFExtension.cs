@@ -111,6 +111,15 @@ namespace QSoft.MediaCapture
             return result;
         }
 
+        internal static (uint width, uint height, Guid subtype, double fps)GetVideoTypeInfo(this IMFMediaType src)
+        {
+            src.GetGUID(MFConstants.MF_MT_SUBTYPE, out var subtype);
+            MFGetAttributeSize(src, MFConstants.MF_MT_FRAME_SIZE, out var w, out var h);
+            MFGetAttributeRatio(src, MFConstants.MF_MT_FRAME_RATE, out var numerator, out var denominator);
+            var fps = (double)numerator / (double)denominator;
+            return (w,h,subtype, fps);
+        }
+
         public static string FormatToString(this Guid src)
         {
             if (src == MFConstants.MFVideoFormat_MJPG) return "MJPG";

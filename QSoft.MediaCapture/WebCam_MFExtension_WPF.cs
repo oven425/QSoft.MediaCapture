@@ -14,10 +14,10 @@ namespace QSoft.MediaCapture.WPF
 {
     public static class WebCam_MFExtension_WPF
     {
-        public static async Task<HRESULT> StartPreivew(this QSoft.MediaCapture.WebCam_MF src, Action<ImageSource> action)
-        {
-            return HRESULTS.S_OK;
-        }
+        //public static async Task<HRESULT> StartPreivew(this QSoft.MediaCapture.WebCam_MF src, Action<ImageSource> action)
+        //{
+        //    return HRESULTS.S_OK;
+        //}
 
         static void CreateD3DImage(int width, int height, DispatcherPriority dispatcherpriority, out D3DImage d3dimage, out MFCaptureEngineOnSampleCallback_D3DImage callback)
         {
@@ -48,7 +48,7 @@ namespace QSoft.MediaCapture.WPF
                 });
             }
 
-            var hr = await src.StartPreview(callback);
+            var hr = await src.StartPreview(null, callback);
             action?.Invoke(d3dimage);
 
             return hr;
@@ -70,7 +70,16 @@ namespace QSoft.MediaCapture.WPF
                 });
             }
             
-            var hr = await src.StartPreview(new MFCaptureEngineOnSampleCallback_WriteableBitmap(bmp, dispatcherpriority));
+            var hr = await src.StartPreview(type =>
+            {
+                var info =  type.GetVideoTypeInfo();
+                if(info.subtype != MFConstants.MFVideoFormat_RGB24)
+                {
+                    src.CloneVideoMediaType(type, MFConstants.MFVideoFormat_RGB24, out var dst);
+                    return dst;
+                }
+                return null;
+            }, new MFCaptureEngineOnSampleCallback_WriteableBitmap(bmp, dispatcherpriority));
             action?.Invoke(bmp);
             return hr;
         }

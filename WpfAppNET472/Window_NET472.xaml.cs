@@ -66,14 +66,16 @@ namespace WpfAppNET472
                     //{
                     //    //this.image.Source = x;
                     //}), System.Windows.Threading.DispatcherPriority.Render);
-                    //await oo.StartPreview(new Action<WriteableBitmap>((x) =>
-                    //{
-                    //    this.image.Source = x;
-                    //}));
-                    await oo.StartPreview(new Action<D3DImage>((x) =>
+                    await oo.StartPreview(new Action<WriteableBitmap>((x) =>
                     {
                         this.image.Source = x;
                     }));
+
+
+                    //await oo.StartPreview(new Action<D3DImage>((x) =>
+                    //{
+                    //    this.image.Source = x;
+                    //}));
                     //this.m_MainUI.WebCams.Add(oo);
                 }
                 //var camera = QSoft.MediaCapture.WebCam_MF.GetAllWebCams().Find(x => x.FriendName == "USB2.0 HD UVC WebCam");
