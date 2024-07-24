@@ -26,14 +26,14 @@ namespace QSoft.MediaCapture.WPF
         protected override void OnSample(IntPtr data, uint len)
         {
             
-            this.m_D3dImage.Dispatcher.Invoke(() =>
-            {
-                this.WriteFrame(data, D3DFMT_NV12);
-                this.m_D3dImage.Lock();
+            //this.m_D3dImage.Dispatcher.Invoke(() =>
+            //{
+            //    this.WriteFrame(data, D3DFMT_NV12);
+            //    this.m_D3dImage.Lock();
 
-                this.m_D3dImage.AddDirtyRect(new Int32Rect(0,0, this.m_Width, this.m_Height));
-                this.m_D3dImage.Unlock();
-            }, m_DispatcherPriority);
+            //    this.m_D3dImage.AddDirtyRect(new Int32Rect(0,0, this.m_Width, this.m_Height));
+            //    this.m_D3dImage.Unlock();
+            //}, m_DispatcherPriority);
         }
     }
 
