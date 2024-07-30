@@ -46,7 +46,7 @@ namespace QSoft.MediaCapture
                     samplecount = 0;
                 }
 #endif
-                pSample.GetBufferByIndex(0, out var buf);
+                pSample.ConvertToContiguousBuffer(out var buf);
                 var ptr = buf.Lock(out var max, out var cur);
 
                 OnSample(ptr, cur);

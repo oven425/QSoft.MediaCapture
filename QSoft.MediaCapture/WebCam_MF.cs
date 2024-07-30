@@ -173,7 +173,7 @@ namespace QSoft.MediaCapture
         IMFCapturePreviewSink? m_pPreview;
         Dictionary<PreviewMediaType, List<IMFMediaType>> m_PreviewTypes = new();
         TaskCompletionSource<HRESULT>? m_TaskInitialize;
-        async public Task<HRESULT?> InitCaptureEngine()
+        async public Task<HRESULT?> InitCaptureEngine(bool used3d=false)
         {
             m_TaskInitialize = new TaskCompletionSource<HRESULT>();
             HRESULT? hr = HRESULTS.S_OK;
@@ -183,10 +183,15 @@ namespace QSoft.MediaCapture
             DestroyCaptureEngine();
             try
             {
-                hr = CreateD3DManager();
+                
                 if (hr != HRESULTS.S_OK) return hr;
                 hr = MFFunctions.MFCreateAttributes(out pAttributes, 1);
-                if (hr != HRESULTS.S_OK) return hr;
+                if(used3d)
+                {
+                    hr = CreateD3DManager();
+                    if (hr != HRESULTS.S_OK) return hr;
+                }
+                
                 hr = pAttributes.SetUnknown(MFConstants.MF_CAPTURE_ENGINE_D3D_MANAGER, g_pDXGIMan);
                 if (hr != HRESULTS.S_OK) return hr;
                 var tty = Type.GetTypeFromCLSID(DirectN.MFConstants.CLSID_MFCaptureEngineClassFactory, true);
