@@ -14,8 +14,10 @@
         </Grid.RowDefinitions>
         <MediaPlayerElement x:Name="mediaelement"/>
         <StackPanel Orientation="Horizontal">
-            <ToggleSwitch>Mirror</ToggleSwitch>
-            <Button></Button>
+            <ToggleSwitch x:Name="mirror" Toggled="mirror_Toggled">Mirror</ToggleSwitch>
+            <Button Click="myButton_Click">AAAA</Button>
+            <Button x:Name="button_startrecord" Click="button_startrecord_Click">Start record</Button>
+            <Button x:Name="button_stoprecord" Click="button_stoprecord_Click">Stop record</Button>
         </StackPanel>
     </Grid>
     
