@@ -33,7 +33,7 @@ public class CaptureElement(MediaPlayerElement mediaElement)
             
             frameSource = m_MediaCapture.FrameSources.FirstOrDefault(source => source.Value.Info.MediaStreamType == MediaStreamType.VideoRecord).Value;
             mediaElement.AutoPlay = true;
-            
+            mediaElement.FlowDirection = Microsoft.UI.Xaml.FlowDirection.RightToLeft;
             mediaElement.Source = MediaSource.CreateFromMediaFrameSource(frameSource);
         }
 
