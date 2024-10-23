@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace QSoft.MediaCapture
 {
-    public sealed class WebCam_MF: IMFCaptureEngineOnEventCallback,IDisposable
+    public sealed partial class WebCam_MF: IMFCaptureEngineOnEventCallback,IDisposable
     {
         public HRESULT OnEvent(IMFMediaEvent pEvent)
         {
@@ -80,21 +80,7 @@ namespace QSoft.MediaCapture
         public string SymbolLinkName { private set; get; } = "";
         public IComObject<IMFActivate>? CaptureObj { private set; get; }
 
-        public static List<WebCam_MF> GetAllWebCams()
-        {
-            var attr = MFFunctions.MFCreateAttributes();
-            attr.Set(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
-            return attr.EnumDeviceSources().Select(x =>
-            {
-                var mf = new WebCam_MF
-                {
-                    FriendName = x.GetString(MFConstants.MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME),
-                    SymbolLinkName = x.GetString(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK),
-                    CaptureObj = x
-                };
-                return mf;
-            }).ToList();
-        }
+        
 
         uint g_ResetToken = 0;
         IMFDXGIDeviceManager? g_pDXGIMan;
