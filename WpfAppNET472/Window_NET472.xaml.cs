@@ -174,10 +174,10 @@ namespace WpfAppNET472
 
         async private void button_takephoto_Click(object sender, RoutedEventArgs e)
         {
-            //foreach (var oo in this.m_MainUI.WebCams)
-            //{
-            //    await oo?.TakePhoto("123.bmp");
-            //}
+            foreach (var oo in this.m_MainUI.WebCams)
+            {
+                await oo?.TakePhoto("123.bmp");
+            }
         }
     }
 
