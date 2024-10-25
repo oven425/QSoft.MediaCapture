@@ -9,72 +9,10 @@ using System.Threading.Tasks;
 
 namespace QSoft.MediaCapture
 {
-    public sealed partial class WebCam_MF: IMFCaptureEngineOnEventCallback,IDisposable
+    
+    public sealed partial class WebCam_MF: IDisposable
     {
-        public HRESULT OnEvent(IMFMediaEvent pEvent)
-        {
-            HRESULT hr = pEvent.GetStatus(out HRESULT hrStatus);
-            if (hr != HRESULTS.S_OK)
-            {
-                hrStatus = hr;
-            }
-
-            hr = pEvent.GetExtendedType(out Guid guidType);
-            if (hr == HRESULTS.S_OK)
-            {
-                if (guidType == MFConstants.MF_CAPTURE_ENGINE_INITIALIZED)
-                {
-                    m_TaskInitialize?.SetResult(hrStatus);
-                }
-                else if (guidType == MFConstants.MF_CAPTURE_ENGINE_PREVIEW_STARTED)
-                {
-                    m_TaskStartPreview?.SetResult(hrStatus);
-                }
-                else if (guidType == MFConstants.MF_CAPTURE_ENGINE_PREVIEW_STOPPED)
-                {
-                    m_TaskStopPreview?.SetResult(hrStatus);
-                }
-                else if (guidType == MFConstants.MF_CAPTURE_ENGINE_RECORD_STARTED)
-                {
-                   // m_TaskStartRecord.SetResult(hrStatus);
-                    //m_pManager->OnRecordStopped(hrStatus);
-                    //SetEvent(m_pManager->m_hEvent);
-                }
-                else if (guidType == MFConstants.MF_CAPTURE_ENGINE_RECORD_STOPPED)
-                {
-                    //m_TaskStopRecord.SetResult(hrStatus);
-                }
-                else if (guidType == MFConstants.MF_CAPTURE_ENGINE_PHOTO_TAKEN)
-                {
-                    //this.m_TakeTakephoto?.SetResult(hrStatus);
-                }
-                else if (guidType == MFConstants.MF_CAPTURE_ENGINE_EFFECT_ADDED)
-                {
-
-                }
-                else if (guidType == MFConstants.MF_CAPTURE_SOURCE_CURRENT_DEVICE_MEDIA_TYPE_SET)
-                {
-                    m_TaskSetMediaType?.SetResult(hrStatus);
-                }
-                else if (guidType == MFConstants.MF_CAPTURE_ENGINE_ERROR)
-                {
-                    var aa = Marshal.GetExceptionForHR(hrStatus.Value).Message;
-                    //if (OnFail != null)
-                    //{
-
-                    //    OnFail(this, hrStatus.Value);
-                    //}
-                }
-                else
-                {
-                    System.Diagnostics.Trace.WriteLine(guidType);
-                    // This is an event we don't know about, we don't really care and there's
-                    // no clean way to report the error so just set the event and fall through.
-                    //SetEvent(m_pManager->m_hEvent);
-                }
-            }
-            return HRESULTS.S_OK;
-        }
+        
 
         public string FriendName { private set; get; } = "";
         public string SymbolLinkName { private set; get; } = "";
@@ -155,6 +93,12 @@ namespace QSoft.MediaCapture
             //m_errorID = 0;
         }
 
+        public class CaptureSetting
+        {
+            public bool IsMirror { set; get; } = false;
+            public bool IsUse3D { set; get; } = false;
+        }
+
         IMFCaptureEngine? m_pEngine;
         IMFCapturePreviewSink? m_pPreview;
         Dictionary<PreviewMediaType, List<IMFMediaType>> m_PreviewTypes = new();
@@ -224,153 +168,6 @@ namespace QSoft.MediaCapture
             }
             return hr;
         }
-        TaskCompletionSource<HRESULT>? m_TakeTakephoto;
-        public async Task<HRESULT> TakePhoto(string pszFileName, uint width = 0, uint height = 0)
-        {
-            var ext = System.IO.Path.GetExtension(pszFileName);
-
-            this.m_TakeTakephoto = new TaskCompletionSource<HRESULT>();
-            IMFCaptureSink? pSink = null;
-            IMFCapturePhotoSink? pPhoto = null;
-            IMFCaptureSource? pSource = null;
-            IMFMediaType? pMediaType = null;
-            IMFMediaType? pMediaType2 = null;
-            bool bHasPhotoStream = true;
-            HRESULT hr = HRESULTS.S_OK;
-            if (m_pEngine == null)
-            {
-                goto done;
-            }
-            // Get a pointer to the photo sink.
-            hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_PHOTO, out pSink);
-            if (hr.IsError)
-            {
-                goto done;
-            }
-            pPhoto = pSink as IMFCapturePhotoSink;
-            if (pPhoto == null)
-            {
-                goto done;
-            }
-            hr = m_pEngine.GetSource(out pSource);
-            if (hr.IsError)
-            {
-                goto done;
-            }
-
-            //if (this.VideoFormats.ContainsKey(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT))
-            //{
-            //    var type = this.PhotoForamts.FirstOrDefault(x => x.width == width && x.height == height);
-            //    if (type.mediatype != null)
-            //    {
-            //        hr = pSource.SetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_PHOTO, type.mediatype);
-            //    }
-            //}
-
-
-            hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_PHOTO, out pMediaType);
-            if (hr.IsError)
-            {
-                goto done;
-            }
-
-
-
-            //Configure the photo format
-            hr = CreatePhotoMediaType(pMediaType, out pMediaType2);
-            if (hr.IsError)
-            {
-                goto done;
-            }
-
-            hr = pPhoto.RemoveAllStreams();
-            if (hr.IsError)
-            {
-                goto done;
-            }
-
-            //DWORD dwSinkStreamIndex;
-            //IntPtr pp = Marshal.AllocHGlobal(4);
-            // Try to connect the first still image stream to the photo sink
-            uint dwSinkStreamIndex = 0;
-            if (bHasPhotoStream)
-            {
-                using (var cm = new ComMemory(Marshal.SizeOf<uint>()))
-                {
-                    hr = pPhoto.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_PHOTO, pMediaType2, null, cm.Pointer);
-                    dwSinkStreamIndex = (uint)Marshal.ReadInt32(cm.Pointer);
-                }
-            }
-
-            if (hr.IsError)
-            {
-                goto done;
-            }
-
-            hr = pPhoto.SetOutputFileName(pszFileName);
-            if (hr.IsError)
-            {
-                goto done;
-            }
-
-            hr = m_pEngine.TakePhoto();
-            if (hr.IsError)
-            {
-                goto done;
-            }
-
-            //m_bPhotoPending = true;
-            hr = await m_TakeTakephoto.Task;
-        done:
-            SafeRelease(pSink);
-            SafeRelease(pPhoto);
-            SafeRelease(pSource);
-            SafeRelease(pMediaType);
-            SafeRelease(pMediaType2);
-            return hr;
-        }
-
-        HRESULT CreatePhotoMediaType(IMFMediaType pSrcMediaType, out IMFMediaType? ppPhotoMediaType)
-        {
-            //*ppPhotoMediaType = NULL;
-            ppPhotoMediaType = null;
-            //const UINT32 uiFrameRateNumerator = 30;
-            //const UINT32 uiFrameRateDenominator = 1;
-
-            IMFMediaType? pPhotoMediaType = null;
-
-            HRESULT hr = MFFunctions.MFCreateMediaType(out pPhotoMediaType);
-            if (hr.IsError)
-            {
-                goto done;
-            }
-
-            hr = pPhotoMediaType.SetGUID(MFConstants.MF_MT_MAJOR_TYPE, MFConstants.MFMediaType_Image);
-            if (hr.IsError)
-            {
-                goto done;
-            }
-
-
-            hr = pPhotoMediaType.SetGUID(MFConstants.MF_MT_SUBTYPE, WICConstants.GUID_ContainerFormatBmp);
-            if (hr.IsError)
-            {
-                goto done;
-            }
-
-            hr = CopyAttribute(pSrcMediaType, pPhotoMediaType, MFConstants.MF_MT_FRAME_SIZE);
-            if (hr.IsError)
-            {
-                goto done;
-            }
-
-            ppPhotoMediaType = pPhotoMediaType;
-        //(*ppPhotoMediaType)->AddRef();
-
-        done:
-            //SafeRelease(&pPhotoMediaType);
-            return hr;
-        }
 
 
         void SafeRelease<T>(T? obj) where T : class
@@ -380,6 +177,8 @@ namespace QSoft.MediaCapture
                 Marshal.ReleaseComObject(obj);
             }
         }
+
+        
 
         TaskCompletionSource<HRESULT>? m_TaskStopPreview;
         async public Task<HRESULT?> StopPreview()
@@ -412,12 +211,6 @@ namespace QSoft.MediaCapture
             }
             return hr;
         }
-
-        public void SetPreview(Func<int, int, Guid, bool> func)
-        {
-
-        }
-
 
         TaskCompletionSource<HRESULT>? m_TaskSetMediaType;
         public async Task<HRESULT> SetPreviewSize(Func<IEnumerable<PreviewMediaType>, PreviewMediaType?>? func)
