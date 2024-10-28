@@ -45,7 +45,7 @@ namespace QSoft.MediaCapture
                 }
                 else if (guidType == MFConstants.MF_CAPTURE_ENGINE_PHOTO_TAKEN)
                 {
-                    //this.m_TakeTakephoto?.SetResult(hrStatus);
+                    this.m_TaskTakephoto?.SetResult(hrStatus);
                 }
                 else if (guidType == MFConstants.MF_CAPTURE_ENGINE_EFFECT_ADDED)
                 {

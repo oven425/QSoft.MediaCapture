@@ -19,40 +19,40 @@ namespace QSoft.MediaCapture.WPF
         //    return HRESULTS.S_OK;
         //}
 
-        static void CreateD3DImage(int width, int height, DispatcherPriority dispatcherpriority, out D3DImage d3dimage, out MFCaptureEngineOnSampleCallback_D3DImage callback)
-        {
-            d3dimage = new D3DImage();
-            callback = new MFCaptureEngineOnSampleCallback_D3DImage(d3dimage, dispatcherpriority);
-            callback.Init(width, height);
-            d3dimage.Lock();
-            var ptr = Marshal.GetIUnknownForObject(callback.BackBuffer);
-            d3dimage.SetBackBuffer(D3DResourceType.IDirect3DSurface9, ptr);
-            d3dimage.Unlock();
-        }
+        //static void CreateD3DImage(int width, int height, DispatcherPriority dispatcherpriority, out D3DImage d3dimage, out MFCaptureEngineOnSampleCallback_D3DImage callback)
+        //{
+        //    d3dimage = new D3DImage();
+        //    callback = new MFCaptureEngineOnSampleCallback_D3DImage(d3dimage, dispatcherpriority);
+        //    callback.Init(width, height);
+        //    d3dimage.Lock();
+        //    var ptr = Marshal.GetIUnknownForObject(callback.BackBuffer);
+        //    d3dimage.SetBackBuffer(D3DResourceType.IDirect3DSurface9, ptr);
+        //    d3dimage.Unlock();
+        //}
 
-        public static async Task<HRESULT> StartPreview(this QSoft.MediaCapture.WebCam_MF src, Action<D3DImage?> action, DispatcherPriority dispatcherpriority = DispatcherPriority.Background)
-        {
-            src.GetPreviewSize(out var width, out var height);
-            var dispatcher = Dispatcher.FromThread(System.Threading.Thread.CurrentThread);
-            D3DImage? d3dimage = null;
-            MFCaptureEngineOnSampleCallback_D3DImage? callback = null;
-            if (dispatcher != null)
-            {
-                CreateD3DImage((int)width, (int)height, dispatcherpriority, out d3dimage, out callback);
-            }
-            else
-            {
-                await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
-                {
-                    CreateD3DImage((int)width, (int)height, dispatcherpriority, out d3dimage, out callback);
-                });
-            }
+        //public static async Task<HRESULT> StartPreview(this QSoft.MediaCapture.WebCam_MF src, Action<D3DImage?> action, DispatcherPriority dispatcherpriority = DispatcherPriority.Background)
+        //{
+        //    src.GetPreviewSize(out var width, out var height);
+        //    var dispatcher = Dispatcher.FromThread(System.Threading.Thread.CurrentThread);
+        //    D3DImage? d3dimage = null;
+        //    MFCaptureEngineOnSampleCallback_D3DImage? callback = null;
+        //    if (dispatcher != null)
+        //    {
+        //        CreateD3DImage((int)width, (int)height, dispatcherpriority, out d3dimage, out callback);
+        //    }
+        //    else
+        //    {
+        //        await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+        //        {
+        //            CreateD3DImage((int)width, (int)height, dispatcherpriority, out d3dimage, out callback);
+        //        });
+        //    }
 
-            var hr = await src.StartPreview(null, callback);
-            action?.Invoke(d3dimage);
+        //    var hr = await src.StartPreview(null, callback);
+        //    action?.Invoke(d3dimage);
 
-            return hr;
-        }
+        //    return hr;
+        //}
         public static async Task<HRESULT> StartPreview(this QSoft.MediaCapture.WebCam_MF src, Action<WriteableBitmap?> action, System.Windows.Threading.DispatcherPriority dispatcherpriority = DispatcherPriority.Background)
         {
             src.GetPreviewSize(out var width, out var height);

@@ -139,22 +139,35 @@ namespace QSoft.MediaCapture
                 hr = await m_TaskInitialize.Task;
                 sw.Stop();
                 System.Diagnostics.Trace.WriteLine($"{sw.ElapsedMilliseconds}");
-                IMFCaptureSource? source = null;
-                hr = m_pEngine?.GetSource(out source);
-                if (hr != HRESULTS.S_OK) return hr;
+                var ssp = this.SupporCategory();
+
+                var imss = this.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_INDEPENDENT);
                 
-                var all = source.GetAllMediaType();
-                if(all.ContainsKey(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE))
+                Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, IReadOnlyCollection<ImageEncodingProperties>> dd = new Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, IReadOnlyCollection<ImageEncodingProperties>>();
+                foreach(var category in this.SupporCategory())
                 {
-                    var pps = all[MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE]
-                        .GetVideoData()
-                        .GroupBy(x => new PreviewMediaType() { Fps=x.fps, Width = x.width, Height=x.height, SubType = x.format});
-                    foreach (var item in pps)
-                    {
-                        m_PreviewTypes[item.Key] = new List<IMFMediaType>(item.Select(x=>x.mediatype));
-                    }
+                    var eels = GetAvailableMediaStreamProperties(category.Key);
+                    dd[category.Key] = eels;
                 }
-                
+                this.GetMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
+                dd.Clear();
+
+                //IMFCaptureSource? source = null;
+                //hr = m_pEngine?.GetSource(out source);
+                //if (hr != HRESULTS.S_OK) return hr;
+
+                //var all = source.GetAllMediaType();
+                //if(all.ContainsKey(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE))
+                //{
+                //    var pps = all[MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE]
+                //        .GetVideoData()
+                //        .GroupBy(x => new PreviewMediaType() { Fps=x.fps, Width = x.width, Height=x.height, SubType = x.format});
+                //    foreach (var item in pps)
+                //    {
+                //        m_PreviewTypes[item.Key] = new List<IMFMediaType>(item.Select(x=>x.mediatype));
+                //    }
+                //}
+
 
 
 
@@ -170,7 +183,9 @@ namespace QSoft.MediaCapture
         }
 
 
-        void SafeRelease<T>(T? obj) where T : class
+
+
+        public static void SafeRelease<T>(T? obj) where T : class
         {
             if (obj != null && Marshal.IsComObject(obj))
             {

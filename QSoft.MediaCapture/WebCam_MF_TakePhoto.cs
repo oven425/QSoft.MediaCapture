@@ -10,7 +10,7 @@ namespace QSoft.MediaCapture
 {
     public partial class WebCam_MF
     {
-        TaskCompletionSource<HRESULT>? m_TakeTakephoto;
+        TaskCompletionSource<HRESULT>? m_TaskTakephoto;
         public async Task<HRESULT> TakePhoto(string pszFileName, uint width = 0, uint height = 0)
         {
             var ext = System.IO.Path.GetExtension(pszFileName);
@@ -25,7 +25,7 @@ namespace QSoft.MediaCapture
             {
                 return HRESULTS.MF_E_UNSUPPORTED_FORMAT;
             }
-            this.m_TakeTakephoto = new TaskCompletionSource<HRESULT>();
+            this.m_TaskTakephoto = new TaskCompletionSource<HRESULT>();
             IMFCaptureSink? pSink = null;
             IMFCapturePhotoSink? pPhoto = null;
             IMFCaptureSource? pSource = null;
@@ -88,14 +88,12 @@ namespace QSoft.MediaCapture
             //DWORD dwSinkStreamIndex;
             //IntPtr pp = Marshal.AllocHGlobal(4);
             // Try to connect the first still image stream to the photo sink
-            uint dwSinkStreamIndex = 0;
+            //uint dwSinkStreamIndex = 0;
             if (bHasPhotoStream)
             {
-                using (var cm = new ComMemory(Marshal.SizeOf<uint>()))
-                {
-                    hr = pPhoto.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_PHOTO, pMediaType2, null, cm.Pointer);
-                    dwSinkStreamIndex = (uint)Marshal.ReadInt32(cm.Pointer);
-                }
+                using var cm = new ComMemory(Marshal.SizeOf<uint>());
+                hr = pPhoto.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_PHOTO, pMediaType2, null, cm.Pointer);
+                //dwSinkStreamIndex = (uint)Marshal.ReadInt32(cm.Pointer);
             }
 
             if (hr.IsError)
@@ -116,7 +114,7 @@ namespace QSoft.MediaCapture
             }
 
             //m_bPhotoPending = true;
-            hr = await m_TakeTakephoto.Task;
+            hr = await m_TaskTakephoto.Task;
         done:
             SafeRelease(pSink);
             SafeRelease(pPhoto);
