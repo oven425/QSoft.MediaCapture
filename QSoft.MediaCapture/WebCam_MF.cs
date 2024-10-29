@@ -139,12 +139,12 @@ namespace QSoft.MediaCapture
                 hr = await m_TaskInitialize.Task;
                 sw.Stop();
                 System.Diagnostics.Trace.WriteLine($"{sw.ElapsedMilliseconds}");
-                var ssp = this.SupporCategory();
+                this.SupporCategory();
 
-                var imss = this.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_INDEPENDENT);
-                
+                var imss = this.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
+                var bbbb = imss[0] == imss[1];
                 Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, IReadOnlyCollection<ImageEncodingProperties>> dd = new Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, IReadOnlyCollection<ImageEncodingProperties>>();
-                foreach(var category in this.SupporCategory())
+                foreach(var category in m_StreamGategory)
                 {
                     var eels = GetAvailableMediaStreamProperties(category.Key);
                     dd[category.Key] = eels;
