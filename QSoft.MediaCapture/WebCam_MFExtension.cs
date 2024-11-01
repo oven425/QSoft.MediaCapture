@@ -127,7 +127,7 @@ namespace QSoft.MediaCapture
             else if (src == MFConstants.MFVideoFormat_YV12) return "YV12";
             else if (src == MFConstants.MFVideoFormat_YUY2) return "YUY2";
             else if (src == MFConstants.MFAudioFormat_AAC) return "AAC";
-            return "Unkknow";
+            return src.ToString();
         }
     }
 

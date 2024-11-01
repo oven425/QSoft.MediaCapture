@@ -11,7 +11,7 @@ namespace QSoft.MediaCapture
     public partial class WebCam_MF
     {
         TaskCompletionSource<HRESULT>? m_TaskTakephoto;
-        public async Task<HRESULT> TakePhoto(string pszFileName, uint width = 0, uint height = 0)
+        public async Task<HRESULT> TakePhoto(string pszFileName)
         {
             var ext = System.IO.Path.GetExtension(pszFileName);
             var photoformat = ext switch
@@ -33,94 +33,70 @@ namespace QSoft.MediaCapture
             IMFMediaType? pMediaType2 = null;
             bool bHasPhotoStream = true;
             HRESULT hr = HRESULTS.S_OK;
-            if (m_pEngine == null)
+            if (m_pEngine == null) return HRESULTS.MF_E_NOT_INITIALIZED;
+            try
             {
-                goto done;
+                hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_PHOTO, out pSink);
+                if (hr.IsError) return hr;
+                pPhoto = pSink as IMFCapturePhotoSink;
+                if (pPhoto == null) return hr;
+                hr = m_pEngine.GetSource(out pSource);
+                if (hr.IsError) return hr;
+
+                //if (this.VideoFormats.ContainsKey(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT))
+                //{
+                //    var type = this.PhotoForamts.FirstOrDefault(x => x.width == width && x.height == height);
+                //    if (type.mediatype != null)
+                //    {
+                //        hr = pSource.SetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_PHOTO, type.mediatype);
+                //    }
+                //}
+
+
+                hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_PHOTO, out pMediaType);
+                if (hr.IsError) return hr;
+
+
+
+                //Configure the photo format
+                hr = CreatePhotoMediaType(pMediaType, photoformat, out pMediaType2);
+                if (hr.IsError)
+                {
+                }
+
+                hr = pPhoto.RemoveAllStreams();
+                if (hr.IsError) return hr;
+                //DWORD dwSinkStreamIndex;
+                //IntPtr pp = Marshal.AllocHGlobal(4);
+                // Try to connect the first still image stream to the photo sink
+                //uint dwSinkStreamIndex = 0;
+                if (bHasPhotoStream)
+                {
+                    using var cm = new ComMemory(Marshal.SizeOf<uint>());
+                    hr = pPhoto.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_PHOTO, pMediaType2, null, cm.Pointer);
+                    //dwSinkStreamIndex = (uint)Marshal.ReadInt32(cm.Pointer);
+                }
+
+                if (hr.IsError) return hr;
+
+                hr = pPhoto.SetOutputFileName(pszFileName);
+                if (hr.IsError) return hr;
+
+                hr = m_pEngine.TakePhoto();
+                if (hr.IsError) return hr;
+
+                //m_bPhotoPending = true;
+                hr = await m_TaskTakephoto.Task;
             }
-            // Get a pointer to the photo sink.
-            hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_PHOTO, out pSink);
-            if (hr.IsError)
+            finally
             {
-                goto done;
+                SafeRelease(pSink);
+                SafeRelease(pPhoto);
+                SafeRelease(pSource);
+                SafeRelease(pMediaType);
+                SafeRelease(pMediaType2);
             }
-            pPhoto = pSink as IMFCapturePhotoSink;
-            if (pPhoto == null)
-            {
-                goto done;
-            }
-            hr = m_pEngine.GetSource(out pSource);
-            if (hr.IsError)
-            {
-                goto done;
-            }
-
-            //if (this.VideoFormats.ContainsKey(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT))
-            //{
-            //    var type = this.PhotoForamts.FirstOrDefault(x => x.width == width && x.height == height);
-            //    if (type.mediatype != null)
-            //    {
-            //        hr = pSource.SetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_PHOTO, type.mediatype);
-            //    }
-            //}
-
-
-            hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_PHOTO, out pMediaType);
-            if (hr.IsError)
-            {
-                goto done;
-            }
-
-
-
-            //Configure the photo format
-            hr = CreatePhotoMediaType(pMediaType, photoformat, out pMediaType2);
-            if (hr.IsError)
-            {
-                goto done;
-            }
-
-            hr = pPhoto.RemoveAllStreams();
-            if (hr.IsError)
-            {
-                goto done;
-            }
-
-            //DWORD dwSinkStreamIndex;
-            //IntPtr pp = Marshal.AllocHGlobal(4);
-            // Try to connect the first still image stream to the photo sink
-            //uint dwSinkStreamIndex = 0;
-            if (bHasPhotoStream)
-            {
-                using var cm = new ComMemory(Marshal.SizeOf<uint>());
-                hr = pPhoto.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_PHOTO, pMediaType2, null, cm.Pointer);
-                //dwSinkStreamIndex = (uint)Marshal.ReadInt32(cm.Pointer);
-            }
-
-            if (hr.IsError)
-            {
-                goto done;
-            }
-
-            hr = pPhoto.SetOutputFileName(pszFileName);
-            if (hr.IsError)
-            {
-                goto done;
-            }
-
-            hr = m_pEngine.TakePhoto();
-            if (hr.IsError)
-            {
-                goto done;
-            }
-
-            //m_bPhotoPending = true;
-            hr = await m_TaskTakephoto.Task;
-        done:
-            SafeRelease(pSink);
-            SafeRelease(pPhoto);
-            SafeRelease(pSource);
-            SafeRelease(pMediaType);
-            SafeRelease(pMediaType2);
+            
             return hr;
         }
 

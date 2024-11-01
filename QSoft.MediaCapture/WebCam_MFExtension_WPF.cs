@@ -73,7 +73,7 @@ namespace QSoft.MediaCapture.WPF
             var hr = await src.StartPreview(type =>
             {
                 var info =  type.GetVideoTypeInfo();
-                if(info.subtype != MFConstants.MFVideoFormat_RGB24)
+                if (info.subtype != MFConstants.MFVideoFormat_RGB24)
                 {
                     src.CloneVideoMediaType(type, MFConstants.MFVideoFormat_RGB24, out var dst);
                     return dst;

@@ -140,17 +140,26 @@ namespace QSoft.MediaCapture
                 sw.Stop();
                 System.Diagnostics.Trace.WriteLine($"{sw.ElapsedMilliseconds}");
                 this.SupporCategory();
-
-                var imss = this.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
-                var bbbb = imss[0] == imss[1];
-                Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, IReadOnlyCollection<ImageEncodingProperties>> dd = new Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, IReadOnlyCollection<ImageEncodingProperties>>();
-                foreach(var category in m_StreamGategory)
-                {
-                    var eels = GetAvailableMediaStreamProperties(category.Key);
-                    dd[category.Key] = eels;
-                }
-                this.GetMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
-                dd.Clear();
+                //var mm = this.GetMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
+                //foreach (var oo in this.m_StreamGategory)
+                //{
+                //    System.Diagnostics.Trace.WriteLine($"{oo.Key}:{oo.Value}");
+                //}
+                //var imss = this.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT);
+                //System.Diagnostics.Trace.WriteLine($"imss:{imss.Count}");
+                //foreach(var oo in imss)
+                //{
+                //    System.Diagnostics.Trace.WriteLine($"{oo.Width}x{oo.Height} {oo.Fps} {WebCam_MFExtension.FormatToString(oo.SubType)}");
+                //}
+                ////var bbbb = imss[0] == imss[1];
+                //Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, IReadOnlyCollection<ImageEncodingProperties>> dd = new Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, IReadOnlyCollection<ImageEncodingProperties>>();
+                //foreach(var category in m_StreamGategory)
+                //{
+                //    var eels = GetAvailableMediaStreamProperties(category.Key);
+                //    dd[category.Key] = eels;
+                //}
+                //this.GetMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
+                //dd.Clear();
 
                 //IMFCaptureSource? source = null;
                 //hr = m_pEngine?.GetSource(out source);

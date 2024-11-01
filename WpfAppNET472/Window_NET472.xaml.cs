@@ -34,6 +34,7 @@ namespace WpfAppNET472
         MainUI m_MainUI;
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
+
             //var yuv = new YUVRender();
             //yuv.Init(720, 404);
             //D3DImage d3dimg = new D3DImage();
@@ -56,11 +57,29 @@ namespace WpfAppNET472
             if (m_MainUI == null)
             {
                 this.DataContext = this.m_MainUI = new MainUI();
-                foreach (var oo in QSoft.MediaCapture.WebCam_MF.GetAllWebCams())
+                var allcameras = QSoft.MediaCapture.WebCam_MF.GetAllWebCams();
+                foreach(var oo in allcameras)
                 {
                     System.Diagnostics.Trace.WriteLine(oo.FriendName);
                     System.Diagnostics.Trace.WriteLine(oo.SymbolLinkName);
+                }
+                
+                foreach (var oo in QSoft.MediaCapture.WebCam_MF.GetAllWebCams().Skip(1).Take(1))
+                {
+                    
                     await oo.InitCaptureEngine();
+                    //var currentmm = oo.GetMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
+                    var photos = oo.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT);
+                    foreach (var mm in photos)
+                    {
+                        System.Diagnostics.Trace.WriteLine($"{mm.Width}x{mm.Height} {mm.Fps} {WebCam_MFExtension.FormatToString(mm.SubType)}");
+                    }
+                    var mms = oo.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
+                    //foreach (var mm in mms)
+                    //{
+                    //    System.Diagnostics.Trace.WriteLine($"{mm.Width}x{mm.Height} {mm.Fps} {WebCam_MFExtension.FormatToString(mm.SubType)}");
+                    //}
+                    await oo.SetMediaStreamPropertiesAsync(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, mms[6]);
                     //await oo.StartPreview(host.Child.Handle);
                     //await oo.StartPreview(new Action<System.Windows.Interop.D3DImage>((x) => 
                     //{
@@ -176,10 +195,12 @@ namespace WpfAppNET472
         {
             foreach (var oo in this.m_MainUI.WebCams)
             {
-                await oo?.TakePhoto("123.bmp");
+                var hr = await oo.TakePhoto("123.bmp");
+                System.Diagnostics.Trace.WriteLine($"button_takephoto_Click {hr}");
             }
         }
     }
+
 
     public class MainUI
     {
