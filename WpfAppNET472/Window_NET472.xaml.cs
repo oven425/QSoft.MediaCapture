@@ -64,7 +64,7 @@ namespace WpfAppNET472
                     System.Diagnostics.Trace.WriteLine(oo.SymbolLinkName);
                 }
                 
-                foreach (var oo in QSoft.MediaCapture.WebCam_MF.GetAllWebCams().Skip(1).Take(1))
+                foreach (var oo in QSoft.MediaCapture.WebCam_MF.GetAllWebCams().Skip(0).Take(1))
                 {
                     
                     await oo.InitCaptureEngine();
@@ -79,7 +79,7 @@ namespace WpfAppNET472
                     //{
                     //    System.Diagnostics.Trace.WriteLine($"{mm.Width}x{mm.Height} {mm.Fps} {WebCam_MFExtension.FormatToString(mm.SubType)}");
                     //}
-                    await oo.SetMediaStreamPropertiesAsync(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, mms[6]);
+                    //await oo.SetMediaStreamPropertiesAsync(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, mms[6]);
                     //await oo.StartPreview(host.Child.Handle);
                     //await oo.StartPreview(new Action<System.Windows.Interop.D3DImage>((x) => 
                     //{
@@ -95,7 +95,7 @@ namespace WpfAppNET472
                     //{
                     //    this.image.Source = x;
                     //}));
-                    //this.m_MainUI.WebCams.Add(oo);
+                    this.m_MainUI.WebCams.Add(oo);
                 }
                 //var camera = QSoft.MediaCapture.WebCam_MF.GetAllWebCams().Find(x => x.FriendName == "USB2.0 HD UVC WebCam");
                 //if(camera != null)
@@ -197,6 +197,23 @@ namespace WpfAppNET472
             {
                 var hr = await oo.TakePhoto("123.bmp");
                 System.Diagnostics.Trace.WriteLine($"button_takephoto_Click {hr}");
+            }
+        }
+
+        private async void button_startrecord_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var oo in this.m_MainUI.WebCams)
+            {
+                var hr = await oo.StartRecord("123.mp4");
+                System.Diagnostics.Trace.WriteLine($"button_takephoto_Click {hr}");
+            }
+        }
+
+        private async void button_stoprecord_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var oo in this.m_MainUI.WebCams)
+            {
+                var hr = await oo.StopRecord();
             }
         }
     }

@@ -22,6 +22,8 @@
             <Button x:Name="button_stratpreivew" Click="button_stratpreivew_Click">Start preview</Button>
             <Button x:Name="button_stoppreview" Click="button_stoppreview_Click">Stop preview</Button>
             <Button x:Name="button_takephoto" Click="button_takephoto_Click">Task photo</Button>
+            <Button x:Name="button_startrecord" Click="button_startrecord_Click">Start Record</Button>
+            <Button x:Name="button_stoprecord" Click="button_stoprecord_Click">Stop Record</Button>
         </WrapPanel>
     </Grid>
 </Window>

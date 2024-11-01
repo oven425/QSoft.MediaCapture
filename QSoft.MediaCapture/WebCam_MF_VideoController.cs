@@ -13,6 +13,7 @@ namespace QSoft.MediaCapture
         readonly Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, IReadOnlyList<ImageEncodingProperties>> m_VideoList = [];
         public IReadOnlyList<ImageEncodingProperties> GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY mediastreamtype)
         {
+            
             System.Diagnostics.Trace.WriteLine("GetAvailableMediaStreamProperties 1");
             if (!m_VideoList.ContainsKey(mediastreamtype)) m_VideoList[mediastreamtype] = [];
             System.Diagnostics.Trace.WriteLine("GetAvailableMediaStreamProperties 2");
@@ -211,6 +212,6 @@ namespace QSoft.MediaCapture
     //    }
     //}
 
-
+    
 
 }
