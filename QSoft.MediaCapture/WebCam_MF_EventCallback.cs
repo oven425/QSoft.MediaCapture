@@ -5,11 +5,19 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace QSoft.MediaCapture
 {
+    
+    public class MediaCaptureFailedEventArgs:EventArgs
+    {
+        public uint Code { set; get; }
+        public string Message { set; get; } = "";
+    }
     public partial class WebCam_MF : IMFCaptureEngineOnEventCallback
     {
+        public event EventHandler<MediaCaptureFailedEventArgs>? MediaCaptureFailedEventHandler;
         public HRESULT OnEvent(IMFMediaEvent pEvent)
         {
             HRESULT hr = pEvent.GetStatus(out HRESULT hrStatus);
@@ -47,21 +55,23 @@ namespace QSoft.MediaCapture
                 }
                 else if (guidType == MFConstants.MF_CAPTURE_ENGINE_EFFECT_ADDED)
                 {
-
+                    m_TaskAddEffect?.SetResult(hrStatus);
+                }
+                else if (guidType == MFConstants.MF_CAPTURE_ENGINE_ALL_EFFECTS_REMOVED)
+                {
                 }
                 else if (guidType == MFConstants.MF_CAPTURE_SOURCE_CURRENT_DEVICE_MEDIA_TYPE_SET)
                 {
                     m_TaskSetCurrentType?.SetResult(hrStatus);
-                    m_TaskSetMediaType?.SetResult(hrStatus);
+                    //m_TaskSetMediaType?.SetResult(hrStatus);
                 }
                 else if (guidType == MFConstants.MF_CAPTURE_ENGINE_ERROR)
                 {
-                    var aa = Marshal.GetExceptionForHR(hrStatus.Value).Message;
-                    //if (OnFail != null)
-                    //{
-
-                    //    OnFail(this, hrStatus.Value);
-                    //}
+                    MediaCaptureFailedEventHandler?.Invoke(this, new MediaCaptureFailedEventArgs()
+                    {
+                        Code = (uint)hrStatus,
+                        Message = Marshal.GetExceptionForHR(hrStatus.Value)?.Message ?? string.Empty,
+                    });
                 }
                 else
                 {

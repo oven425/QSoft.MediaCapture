@@ -381,6 +381,33 @@ HRESULT CaptureManager::StartPreview()
             goto done;
         }
 
+        //IMFExtendedCameraController
+        ::OutputDebugStringA("");
+        IMFGetService* pGetService = NULL;
+        
+        IMFMediaSource* devicesource;
+        hr = pSource->GetCaptureDeviceSource(MF_CAPTURE_ENGINE_DEVICE_TYPE_VIDEO, &devicesource);
+        hr = devicesource->QueryInterface(
+            IID_IMFGetService,
+            (void**)&pGetService);
+        IMFExtendedCameraController* extended_camera_controller_;
+        //hr = MFGetService(
+        //    pSource,
+        //    GUID_NULL,
+        //    IID_IMFExtendedCameraController,
+        //    (void**)&extended_camera_controller_
+        //);
+        //auto dd = IID_IMFExtendedCameraController;
+        //hr = pGetService->GetService(GUID_NULL, IID_PPV_ARGS(&extended_camera_controller_));
+        //MF_CAPTURE_ENGINE_MEDIASOURCE
+        if (hr == S_OK)
+        {
+            ::OutputDebugStringA("get  servie ok");
+        }
+        else
+        {
+            ::OutputDebugStringA("get  servie fail");
+        }
         // Configure the video format for the preview sink.
         hr = pSource->GetCurrentDeviceMediaType((DWORD)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM_FOR_VIDEO_PREVIEW , &pMediaType);
         if (FAILED(hr))

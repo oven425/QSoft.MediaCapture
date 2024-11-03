@@ -29,11 +29,19 @@ namespace WpfAppNET472
         public Window_NET472()
         {
             InitializeComponent();
+            Microsoft.Win32.SystemEvents.DisplaySettingsChanged += SystemEvents_DisplaySettingsChanged;
+        }
+
+        private void SystemEvents_DisplaySettingsChanged(object sender, EventArgs e)
+        {
+
         }
 
         MainUI m_MainUI;
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            var orientation = System.Windows.Forms.SystemInformation.ScreenOrientation;
+            System.Diagnostics.Trace.WriteLine($"orientation:{orientation}");
 
             //var yuv = new YUVRender();
             //yuv.Init(720, 404);
@@ -58,43 +66,58 @@ namespace WpfAppNET472
             {
                 this.DataContext = this.m_MainUI = new MainUI();
                 var allcameras = QSoft.MediaCapture.WebCam_MF.GetAllWebCams();
-                foreach(var oo in allcameras)
+                foreach (var oo in allcameras)
                 {
                     System.Diagnostics.Trace.WriteLine(oo.FriendName);
                     System.Diagnostics.Trace.WriteLine(oo.SymbolLinkName);
                 }
-                
+
                 foreach (var oo in QSoft.MediaCapture.WebCam_MF.GetAllWebCams().Skip(0).Take(1))
                 {
-                    
-                    await oo.InitCaptureEngine();
+                    oo.MediaCaptureFailedEventHandler += Oo_MediaCaptureFailedEventHandler;
+                    await oo.InitCaptureEngine(new WebCam_MF_Setting()
+                    {
+                        IsMirror = true,
+                        Rotate = 90
+                    });
+                    if(oo.WhiteBalance.IsSupported)
+                    {
+                        this.slider_whitebalance.Maximum = oo.WhiteBalance.Max;
+                        this.slider_whitebalance.Minimum = oo.WhiteBalance.Min;
+                        this.slider_whitebalance.Value = oo.WhiteBalance.Value;
+                        this.slider_whitebalance.SmallChange = oo.WhiteBalance.Step;
+                        this.slider_whitebalance.LargeChange = oo.WhiteBalance.Step;
+                    }
                     //var currentmm = oo.GetMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
                     var photos = oo.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT);
-                    foreach (var mm in photos)
-                    {
-                        System.Diagnostics.Trace.WriteLine($"{mm.Width}x{mm.Height} {mm.Fps} {WebCam_MFExtension.FormatToString(mm.SubType)}");
-                    }
+                    //foreach (var mm in photos)
+                    //{
+                    //    System.Diagnostics.Trace.WriteLine($"{mm.Width}x{mm.Height} {mm.Fps} {WebCam_MFExtension.FormatToString(mm.SubType)}");
+                    //}
                     var mms = oo.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
                     //foreach (var mm in mms)
                     //{
                     //    System.Diagnostics.Trace.WriteLine($"{mm.Width}x{mm.Height} {mm.Fps} {WebCam_MFExtension.FormatToString(mm.SubType)}");
                     //}
                     //await oo.SetMediaStreamPropertiesAsync(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, mms[6]);
+                    host.Visibility = Visibility.Collapsed;
+                    //host.Visibility = Visibility.Visible;
                     //await oo.StartPreview(host.Child.Handle);
                     //await oo.StartPreview(new Action<System.Windows.Interop.D3DImage>((x) => 
                     //{
                     //    //this.image.Source = x;
                     //}), System.Windows.Threading.DispatcherPriority.Render);
-                    await oo.StartPreview(new Action<WriteableBitmap>((x) =>
+                    await oo.StartPreview(x =>
                     {
                         this.image.Source = x;
-                    }));
+                    });
 
 
                     //await oo.StartPreview(new Action<D3DImage>((x) =>
                     //{
                     //    this.image.Source = x;
                     //}));
+
                     this.m_MainUI.WebCams.Add(oo);
                 }
                 //var camera = QSoft.MediaCapture.WebCam_MF.GetAllWebCams().Find(x => x.FriendName == "USB2.0 HD UVC WebCam");
@@ -147,7 +170,7 @@ namespace WpfAppNET472
                     //                });
 
                     //            });
-                                
+
                     //        });
                     //        return camera;
                     //        //this.m_MainUI.WebCams.Add(camera);
@@ -165,9 +188,13 @@ namespace WpfAppNET472
             }
         }
 
+        private void Oo_MediaCaptureFailedEventHandler(object sender, MediaCaptureFailedEventArgs e)
+        {
+        }
+
         private void button_stoppreview_Click(object sender, RoutedEventArgs e)
         {
-            foreach(var oo in this.m_MainUI.WebCams)
+            foreach (var oo in this.m_MainUI.WebCams)
             {
                 oo?.StopPreview();
             }
@@ -215,6 +242,71 @@ namespace WpfAppNET472
             {
                 var hr = await oo.StopRecord();
             }
+        }
+
+        private void slider_whitebalance_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            foreach (var oo in this.m_MainUI.WebCams)
+            {
+                var hr = oo.WhiteBalance.SetValue((int)e.NewValue, false);
+            }
+        }
+
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var combobox = sender as ComboBox;
+            switch (combobox.SelectedIndex)
+            {
+                case 0:
+                    {
+                        foreach (var oo in this.m_MainUI.WebCams)
+                        {
+                            oo.FlashLight.Set(0);
+                        }
+                    }
+                    break;
+                case 1:
+                    {
+                        foreach (var oo in this.m_MainUI.WebCams)
+                        {
+                            oo.FlashLight.Set(1);
+                        }
+                    }
+                    break;
+                case 2:
+                    {
+                        foreach (var oo in this.m_MainUI.WebCams)
+                        {
+                            oo.FlashLight.Set(4);
+                        }
+                    }
+                    break;
+            }
+        }
+
+        private void combobox_torch_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var combobox = sender as ComboBox;
+            switch (combobox.SelectedIndex)
+            {
+                case 0:
+                    {
+                        foreach (var oo in this.m_MainUI.WebCams)
+                        {
+                            oo.TorchLight.Set(0);
+                        }
+                    }
+                    break;
+                case 1:
+                    {
+                        foreach (var oo in this.m_MainUI.WebCams)
+                        {
+                            oo.TorchLight.Set(1);
+                        }
+                    }
+                    break;
+            }
+
         }
     }
 

@@ -141,8 +141,18 @@ namespace QSoft.MediaCapture
 
             // Connect the video stream to the recording sink.
             //DWORD dwSinkStreamIndex;
-            IntPtr dwSinkStreamIndex = Marshal.AllocHGlobal(4);
-            hr = pRecord.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_RECORD, pMediaType2, null, dwSinkStreamIndex);
+            if (this.m_Setting.Rotate == 90 || this.m_Setting.Rotate == 270)
+            {
+                pMediaType2.TryGetSize(MFConstants.MF_MT_FRAME_SIZE, out var w, out var h);
+                pMediaType2.SetSize(MFConstants.MF_MT_FRAME_SIZE, h, w);
+            }
+            using (var cm = new ComMemory(Marshal.SizeOf<uint>()))
+            {
+                hr = pRecord.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_RECORD, pMediaType2, null, cm.Pointer);
+                var streamindex = (uint)Marshal.ReadInt32(cm.Pointer);
+                hr = pRecord.SetRotation(streamindex, this.m_Setting.Rotate);
+            }
+                
 
         done:
             //SafeRelease(&pMediaType);

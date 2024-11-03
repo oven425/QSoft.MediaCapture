@@ -9,18 +9,23 @@ namespace QSoft.MediaCapture
 {
     public partial class WebCam_MF
     {
+        TaskCompletionSource<HRESULT>? m_TaskAddEffect;
         IMFVideoProcessorControl? m_VideoProcessor;
-        void CreateVideoProcessorMFT(IMFCaptureSource source, uint streamindex)
+        Task<HRESULT> AddVideoProcessorMFT(IMFCaptureSource source, uint streamindex)
         {
-            //IMFVideoProcessorControl
-            //source.AddEffect()
             IMFMediaType pMediaType;
             source.GetCurrentDeviceMediaType(streamindex, out pMediaType);
 
             //CLSID_CColorControlDmo
             this.m_VideoProcessor = Activator.CreateInstance(Type.GetTypeFromCLSID(DirectN.MFConstants.CLSID_VideoProcessorMFT)!) as IMFVideoProcessorControl;
-            var hr = m_VideoProcessor?.SetMirror(_MF_VIDEO_PROCESSOR_MIRROR.MIRROR_HORIZONTAL);
-
+            HRESULT? hr = HRESULTS.S_OK;
+            if(this.m_Setting.IsMirror && m_VideoProcessor != null)
+            {
+                //m_VideoProcessor.SetRotation(_MF_VIDEO_PROCESSOR_ROTATION.ROTATION_NORMAL);
+                //hr = m_VideoProcessor?.SetRotationOverride(90);
+                hr = m_VideoProcessor?.SetMirror(_MF_VIDEO_PROCESSOR_MIRROR.MIRROR_HORIZONTAL);
+            }
+            
 
             //HRESULT hr;
             IMFTransform? mft = m_VideoProcessor as IMFTransform;
@@ -42,9 +47,10 @@ namespace QSoft.MediaCapture
                 //}
             }
 
-
+            m_TaskAddEffect = new TaskCompletionSource<HRESULT>();
 
             hr = source.AddEffect(streamindex, m_VideoProcessor);
+            return m_TaskAddEffect.Task;
             //object o;
             //pFactory.CreateInstance(DirectN.MFConstants.CLSID_MFCaptureEngine, typeof(IMFCaptureEngine).GUID, out o);
             //m_pEngine = o as IMFVideoProcessorControl;

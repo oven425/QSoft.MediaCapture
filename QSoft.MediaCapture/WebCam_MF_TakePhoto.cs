@@ -74,7 +74,8 @@ namespace QSoft.MediaCapture
                 {
                     using var cm = new ComMemory(Marshal.SizeOf<uint>());
                     hr = pPhoto.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_PHOTO, pMediaType2, null, cm.Pointer);
-                    //dwSinkStreamIndex = (uint)Marshal.ReadInt32(cm.Pointer);
+                    var dwSinkStreamIndex = (uint)Marshal.ReadInt32(cm.Pointer);
+                    //pPhoto.setr
                 }
 
                 if (hr.IsError) return hr;

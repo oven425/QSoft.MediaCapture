@@ -13,17 +13,30 @@
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <WindowsFormsHost x:Name="host" Visibility="Collapsed">
+        <WindowsFormsHost x:Name="host">
             <winform:PictureBox SizeChanged="picture_SizeChanged" x:Name="picture"/>
         </WindowsFormsHost>
         <Image x:Name="image"></Image>
-        
-        <WrapPanel Grid.Row="1" ItemWidth="100">
-            <Button x:Name="button_stratpreivew" Click="button_stratpreivew_Click">Start preview</Button>
-            <Button x:Name="button_stoppreview" Click="button_stoppreview_Click">Stop preview</Button>
-            <Button x:Name="button_takephoto" Click="button_takephoto_Click">Task photo</Button>
-            <Button x:Name="button_startrecord" Click="button_startrecord_Click">Start Record</Button>
-            <Button x:Name="button_stoprecord" Click="button_stoprecord_Click">Stop Record</Button>
-        </WrapPanel>
+        <StackPanel Grid.Row="1">
+            <WrapPanel  ItemWidth="100">
+                <Button x:Name="button_stratpreivew" Click="button_stratpreivew_Click">Start preview</Button>
+                <Button x:Name="button_stoppreview" Click="button_stoppreview_Click">Stop preview</Button>
+                <Button x:Name="button_takephoto" Click="button_takephoto_Click">Task photo</Button>
+                <Button x:Name="button_startrecord" Click="button_startrecord_Click">Start Record</Button>
+                <Button x:Name="button_stoprecord" Click="button_stoprecord_Click">Stop Record</Button>
+                <ComboBox SelectionChanged="ComboBox_SelectionChanged">
+                    <ComboBoxItem>Flash off</ComboBoxItem>
+                    <ComboBoxItem>Flash on</ComboBoxItem>
+                    <ComboBoxItem>Flash auto</ComboBoxItem>
+                </ComboBox>
+                <ComboBox x:Name="combobox_torch" SelectionChanged="combobox_torch_SelectionChanged">
+                    <ComboBoxItem>Torch off</ComboBoxItem>
+                    <ComboBoxItem>Torch on</ComboBoxItem>
+                </ComboBox>
+            </WrapPanel>
+            <Slider x:Name="slider_whitebalance" ValueChanged="slider_whitebalance_ValueChanged"  Width="300" IsMoveToPointEnabled="True"/>
+
+        </StackPanel>
+
     </Grid>
 </Window>

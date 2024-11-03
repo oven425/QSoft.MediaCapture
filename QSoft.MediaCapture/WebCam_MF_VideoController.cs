@@ -13,17 +13,12 @@ namespace QSoft.MediaCapture
         readonly Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, IReadOnlyList<ImageEncodingProperties>> m_VideoList = [];
         public IReadOnlyList<ImageEncodingProperties> GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY mediastreamtype)
         {
-            
-            System.Diagnostics.Trace.WriteLine("GetAvailableMediaStreamProperties 1");
             if (!m_VideoList.ContainsKey(mediastreamtype)) m_VideoList[mediastreamtype] = [];
-            System.Diagnostics.Trace.WriteLine("GetAvailableMediaStreamProperties 2");
             if (m_VideoList[mediastreamtype].Count > 0) return m_VideoList[mediastreamtype];
-            System.Diagnostics.Trace.WriteLine("GetAvailableMediaStreamProperties 3");
             if (this.m_pEngine == null) return [];
             IMFCaptureSource? source = null;
             try
             {
-                System.Diagnostics.Trace.WriteLine("GetAvailableMediaStreamProperties 4");
                 m_pEngine.GetSource(out source);
                 if (source == null) return [];
                 if (m_StreamGategory.TryGetValue(mediastreamtype, out var streamindex))
@@ -86,7 +81,7 @@ namespace QSoft.MediaCapture
             {
                 hr = source.GetCurrentDeviceMediaType(m_StreamGategory[mediastreamtype], out mediatype);
                 var mm = new ImageEncodingProperties(mediatype, mediastreamtype);
-                var ff = this.GetAvailableMediaStreamProperties(mediastreamtype).FirstOrDefault(x => x == mm);
+                var ff = this.GetAvailableMediaStreamProperties(mediastreamtype).FirstOrDefault(x => x.Equals(mm));
                 return ff;
             }
             finally
