@@ -72,7 +72,7 @@ namespace WpfAppNET472
                     System.Diagnostics.Trace.WriteLine(oo.SymbolLinkName);
                 }
 
-                foreach (var oo in QSoft.MediaCapture.WebCam_MF.GetAllWebCams().Skip(0).Take(1))
+                foreach (var oo in QSoft.MediaCapture.WebCam_MF.GetAllWebCams().Skip(1).Take(1))
                 {
                     oo.MediaCaptureFailedEventHandler += Oo_MediaCaptureFailedEventHandler;
                     await oo.InitCaptureEngine(new WebCam_MF_Setting()
@@ -88,6 +88,8 @@ namespace WpfAppNET472
                         this.slider_whitebalance.SmallChange = oo.WhiteBalance.Step;
                         this.slider_whitebalance.LargeChange = oo.WhiteBalance.Step;
                     }
+                    System.Diagnostics.Trace.WriteLine($"FlashLight IsSupported:{oo.FlashLight.IsSupported}");
+                    System.Diagnostics.Trace.WriteLine($"TorchLight IsSupported:{oo.TorchLight.IsSupported}");
                     //var currentmm = oo.GetMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
                     var photos = oo.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT);
                     //foreach (var mm in photos)

@@ -205,52 +205,31 @@ namespace QSoft.MediaCapture
 
         HRESULT ConfigureAudioEncoding(IMFCaptureSource pSource, IMFCaptureRecordSink pRecord, Guid guidEncodingType)
         {
-            //IMFCollection pAvailableTypes = null;
             IMFMediaType? pMediaType = null;
             IMFAttributes? pAttributes = null;
-
-            // Configure the audio format for the recording sink.
-
-            HRESULT hr = MFFunctions.MFCreateAttributes(out pAttributes, 1);
-            if (hr.IsError)
+            IMFCollection? pAvailableTypes = null;
+            try
             {
-                goto done;
-            }
+                HRESULT hr = MFFunctions.MFCreateAttributes(out pAttributes, 1);
+                if (hr.IsError) return hr;
 
-            // Enumerate low latency media types
-            hr = pAttributes.SetUINT32(MFConstants.MF_LOW_LATENCY, 1);
-            if (hr.IsError)
-            {
-                goto done;
-            }
+                // Enumerate low latency media types
+                hr = pAttributes.SetUINT32(MFConstants.MF_LOW_LATENCY, 1);
+                if (hr.IsError) return hr;
 
 
-            // Get a list of encoded output formats that are supported by the encoder.
-            //hr = MFTranscodeGetAudioOutputAvailableTypes(guidEncodingType, MFT_ENUM_FLAG_ALL | MFT_ENUM_FLAG_SORTANDFILTER,
-            //    pAttributes, out pAvailableTypes);
-            if (hr.IsError)
-            {
-                goto done;
-            }
-            //DirectN._MFT_ENUM_FLAG
+                uint flag = (uint)(DirectN._MFT_ENUM_FLAG.MFT_ENUM_FLAG_ALL | DirectN._MFT_ENUM_FLAG.MFT_ENUM_FLAG_SORTANDFILTER);
 
-            //MFT_ENUM_FLAG_SORTANDFILTER
-            uint flag = (uint)(DirectN._MFT_ENUM_FLAG.MFT_ENUM_FLAG_ALL | DirectN._MFT_ENUM_FLAG.MFT_ENUM_FLAG_SORTANDFILTER);
 
-            IMFCollection colptr;
-            
-            
-            hr = MFTranscodeGetAudioOutputAvailableTypes(guidEncodingType, flag, pAttributes, out colptr);
+                hr = MFTranscodeGetAudioOutputAvailableTypes(guidEncodingType, flag, pAttributes, out pAvailableTypes);
 
-            hr = colptr.GetElement(0, out var punk);
-            if (hr.IsSuccess)
-            {
+                //hr = DirectN.Functions.MFTranscodeGetAudioOutputAvailableTypes(guidEncodingType, flag, pAttributes, out pAvailableTypes);
+                if (hr.IsError) return hr;
+                hr = pAvailableTypes.GetElement(0, out var punk);
+                if (hr.IsError) return hr;
                 pMediaType = punk as IMFMediaType;
-            }
 
-            // Connect the audio stream to the recording sink.
-            using (ComMemory cm = new(Marshal.SizeOf<uint>()))
-            {
+                using ComMemory cm = new(Marshal.SizeOf<uint>());
                 hr = pRecord.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_AUDIO, pMediaType, null, cm.Pointer);
                 if (hr == HRESULTS.MF_E_INVALIDSTREAMNUMBER)
                 {
@@ -258,13 +237,13 @@ namespace QSoft.MediaCapture
                     hr = HRESULTS.S_OK;
                 }
             }
-        done:
-            //SafeRelease(&pAvailableTypes);
-            //SafeRelease(&pMediaType);
-            //SafeRelease(&pAttributes);
-            SafeRelease(pMediaType);
-            SafeRelease(pAttributes);
-            return hr;
+            finally
+            {
+                SafeRelease(pAvailableTypes);
+                SafeRelease(pMediaType);
+                SafeRelease(pAttributes);
+            }
+            return HRESULTS.S_OK;
         }
         [DllImport("mf", ExactSpelling = true)]
         public static extern HRESULT MFTranscodeGetAudioOutputAvailableTypes([MarshalAs(UnmanagedType.LPStruct)] Guid guidSubType, uint dwMFTFlags, IMFAttributes pCodecConfig, out IMFCollection ppAvailableTypes);

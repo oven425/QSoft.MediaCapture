@@ -27,93 +27,10 @@ namespace QSoft.MediaCapture
 //#define KSCAMERA_EXTENDEDPROP_FLASH_AUTO_ADJUSTABLEPOWER  0x0000000000000008
 //#define KSCAMERA_EXTENDEDPROP_FLASH_REDEYEREDUCTION  0x0000000000000010
 //#define KSCAMERA_EXTENDEDPROP_FLASH_SINGLEFLASH  0x0000000000000020
-        //public bool IsSupported { private set; get; } = false;
-        //readonly IMFCaptureEngine? m_pEngine;
         public FlashLight(IMFCaptureEngine? engine)
             : base(engine, KSPROPERTY_CAMERACONTROL_EXTENDED.KSPROPERTY_CAMERACONTROL_EXTENDED_FLASHMODE)
         {
-            //m_pEngine = engine;
-            //if(this.Get(out var mode) == HRESULTS.S_OK)
-            //{
-            //    IsSupported = true;
-            //}
         }
-
-        //public HRESULT Get(out ulong mode)
-        //{
-        //    mode = 0;
-        //    IMFCaptureSource? pSource = null;
-        //    IMFGetService? mfservice = null;
-        //    IMFExtendedCameraController? extendedcameracontroller = null;
-        //    IMFExtendedCameraControl? extendedcameracontrol = null;
-        //    if (m_pEngine is null) return HRESULTS.MF_E_NOT_INITIALIZED;
-        //    try
-        //    {
-        //        var hr = m_pEngine.GetSource(out pSource);
-        //        var sser = pSource.GetCaptureDeviceSource(MF_CAPTURE_ENGINE_DEVICE_TYPE.MF_CAPTURE_ENGINE_DEVICE_TYPE_VIDEO, out var ds);
-
-        //        mfservice = ds as IMFGetService;
-        //        hr = mfservice.GetService(Guid.Empty, new Guid("b91ebfee-ca03-4af4-8a82-a31752f4a0fc"), out var con);
-        //        extendedcameracontroller = con as IMFExtendedCameraController;
-        //        //https://github.com/smourier/DirectN/blob/af1d27a173291bf648d3262952e36629e9420cbc/DirectN/DirectN/Generated/KSPROPERTY_CAMERACONTROL_EXTENDED.cs#L15
-        //        hr = extendedcameracontroller.GetExtendedCameraControl(0xffffffff, (int)KSPROPERTY_CAMERACONTROL_EXTENDED.KSPROPERTY_CAMERACONTROL_EXTENDED_FLASHMODE, out extendedcameracontrol);
-        //        if (hr != HRESULTS.S_OK) return hr;
-        //        System.Diagnostics.Trace.WriteLine($"GetExtendedCameraControl {hr}");
-        //        var capabilities = extendedcameracontrol.GetCapabilities();
-        //        System.Diagnostics.Trace.WriteLine($"GetCapabilities {capabilities}");
-        //        mode = extendedcameracontrol.GetFlags();
-        //        System.Diagnostics.Trace.WriteLine($"GetFlags {mode}");
-        //        hr = extendedcameracontrol.CommitSettings();
-        //        System.Diagnostics.Trace.WriteLine($"CommitSettings {hr}");
-
-        //    }
-        //    finally
-        //    {
-        //        WebCam_MF.SafeRelease(extendedcameracontrol);
-        //        WebCam_MF.SafeRelease(extendedcameracontroller);
-        //        WebCam_MF.SafeRelease(mfservice);
-        //        WebCam_MF.SafeRelease(pSource);
-        //    }
-        //    return HRESULTS.S_OK;
-
-        //}
-
-        //public HRESULT Set(ulong mode)
-        //{
-        //    IMFCaptureSource? pSource = null;
-        //    IMFGetService? mfservice = null;
-        //    IMFExtendedCameraController? extendedcameracontroller = null;
-        //    IMFExtendedCameraControl? extendedcameracontrol = null;
-        //    if (m_pEngine is null) return HRESULTS.MF_E_NOT_INITIALIZED;
-        //    try
-        //    {
-        //        var hr = m_pEngine.GetSource(out pSource);
-        //        var sser = pSource.GetCaptureDeviceSource(MF_CAPTURE_ENGINE_DEVICE_TYPE.MF_CAPTURE_ENGINE_DEVICE_TYPE_VIDEO, out var ds);
-
-        //        mfservice = ds as IMFGetService;
-        //        hr = mfservice.GetService(Guid.Empty, new Guid("b91ebfee-ca03-4af4-8a82-a31752f4a0fc"), out var con);
-        //        extendedcameracontroller = con as IMFExtendedCameraController;
-        //        //https://github.com/smourier/DirectN/blob/af1d27a173291bf648d3262952e36629e9420cbc/DirectN/DirectN/Generated/KSPROPERTY_CAMERACONTROL_EXTENDED.cs#L15
-        //        hr = extendedcameracontroller.GetExtendedCameraControl(0xffffffff, (int)KSPROPERTY_CAMERACONTROL_EXTENDED.KSPROPERTY_CAMERACONTROL_EXTENDED_FLASHMODE, out extendedcameracontrol);
-        //        if (hr != HRESULTS.S_OK) return hr;
-        //        System.Diagnostics.Trace.WriteLine($"GetExtendedCameraControl {hr}");
-        //        var capabilities = extendedcameracontrol.GetCapabilities();
-        //        System.Diagnostics.Trace.WriteLine($"GetCapabilities {capabilities}");
-        //        hr = extendedcameracontrol.SetFlags(mode);
-        //        System.Diagnostics.Trace.WriteLine($"SetFlags {hr}");
-        //        hr = extendedcameracontrol.CommitSettings();
-        //        System.Diagnostics.Trace.WriteLine($"CommitSettings {hr}");
-
-        //    }
-        //    finally
-        //    {
-        //        WebCam_MF.SafeRelease(extendedcameracontrol);
-        //        WebCam_MF.SafeRelease(extendedcameracontroller);
-        //        WebCam_MF.SafeRelease(mfservice);
-        //        WebCam_MF.SafeRelease(pSource);
-        //    }
-        //    return HRESULTS.S_OK;
-        //}
     }
 
     public class ExtendedCameraControl
@@ -192,7 +109,7 @@ namespace QSoft.MediaCapture
                 hr = mfservice.GetService(Guid.Empty, new Guid("b91ebfee-ca03-4af4-8a82-a31752f4a0fc"), out var con);
                 extendedcameracontroller = con as IMFExtendedCameraController;
                 //https://github.com/smourier/DirectN/blob/af1d27a173291bf648d3262952e36629e9420cbc/DirectN/DirectN/Generated/KSPROPERTY_CAMERACONTROL_EXTENDED.cs#L15
-                hr = extendedcameracontroller.GetExtendedCameraControl(0xffffffff, (int)KSPROPERTY_CAMERACONTROL_EXTENDED.KSPROPERTY_CAMERACONTROL_EXTENDED_FLASHMODE, out extendedcameracontrol);
+                hr = extendedcameracontroller.GetExtendedCameraControl(0xffffffff, (uint)m_KsProperty, out extendedcameracontrol);
                 if (hr != HRESULTS.S_OK) return hr;
                 System.Diagnostics.Trace.WriteLine($"GetExtendedCameraControl {hr}");
                 var capabilities = extendedcameracontrol.GetCapabilities();

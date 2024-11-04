@@ -60,7 +60,7 @@ namespace QSoft.MediaCapture
                     hr = m_pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, pMediaType2, null, cm.Pointer);
                     if (hr != HRESULTS.S_OK) return hr;
                     var streamindex = (uint)Marshal.ReadInt32(cm.Pointer);
-                    this.AddVideoProcessorMFT(pSource, streamindex);
+                    await this.AddVideoProcessorMFT(pSource, streamindex);
                     m_pPreview.SetRotation(streamindex, m_Setting.Rotate);
                 }
 
@@ -112,11 +112,11 @@ namespace QSoft.MediaCapture
 
                     hr = pMediaType2.SetUINT32(MFConstants.MF_MT_ALL_SAMPLES_INDEPENDENT, 1);
                     if (hr != HRESULTS.S_OK) return hr;
-                    if (this.m_Setting.Rotate == 90 || this.m_Setting.Rotate == 270)
-                    {
-                        pMediaType2.TryGetSize(MFConstants.MF_MT_FRAME_SIZE, out var w, out var h);
-                        pMediaType2.SetSize(MFConstants.MF_MT_FRAME_SIZE, h, w);
-                    }
+                    //if (this.m_Setting.Rotate == 90 || this.m_Setting.Rotate == 270)
+                    //{
+                    //    pMediaType2.TryGetSize(MFConstants.MF_MT_FRAME_SIZE, out var w, out var h);
+                    //    pMediaType2.SetSize(MFConstants.MF_MT_FRAME_SIZE, h, w);
+                    //}
                     // Connect the video stream to the preview sink.
                     using var cm = new ComMemory(Marshal.SizeOf<uint>());
                     hr = m_pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, pMediaType2, null, cm.Pointer);
@@ -124,16 +124,10 @@ namespace QSoft.MediaCapture
                     var streamindex = (uint)Marshal.ReadInt32(cm.Pointer);
 
 
-                    //uint w = 0;
-                    //uint h = 0;
-                    //MFFunctions1.MFGetAttributeSize(pMediaType2, MFConstants.MF_MT_FRAME_SIZE, out w, out h);
-                    //m_PreviewBmp = new WriteableBitmap((int)w, (int)h, 96, 96, PixelFormats.Bgr24, null);
-                    //m_PreviewCallback = new MFCaptureEngineOnSampleCallback(m_PreviewBmp);
                     hr = m_pPreview.SetSampleCallback(streamindex, samplecallback);
                     if (hr != HRESULTS.S_OK) return hr;
 
-                    this.AddVideoProcessorMFT(pSource, streamindex);
-                    m_pPreview.SetRotation(streamindex, m_Setting.Rotate);
+                    await this.AddVideoProcessorMFT(pSource, streamindex);
 
                 }
 
