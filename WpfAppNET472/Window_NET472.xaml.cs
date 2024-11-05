@@ -62,6 +62,20 @@ namespace WpfAppNET472
             //d3dimg.Unlock();
 
             //return;
+
+            _=Task.Run(async() =>
+            {
+                while (true)
+                {
+                    var webcam = WebCam_MF.GetAllWebCams().ElementAt(0);
+                    await webcam.InitCaptureEngine(new WebCam_MF_Setting());
+                    webcam.Dispose();
+                    await Task.Delay(1000);
+                }
+            });
+
+            return;
+
             if (m_MainUI == null)
             {
                 this.DataContext = this.m_MainUI = new MainUI();

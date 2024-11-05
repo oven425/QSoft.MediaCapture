@@ -45,7 +45,7 @@ namespace QSoft.MediaCapture
 
 
 
-                    //// Configure the video format for the preview sink.
+                    // Configure the video format for the preview sink.
                     hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, out pMediaType);
                     if (hr != HRESULTS.S_OK) return hr;
 
@@ -66,6 +66,7 @@ namespace QSoft.MediaCapture
 
 
                 hr = m_pEngine.StartPreview();
+                if (hr != HRESULTS.S_OK) return hr;
                 hr = await m_TaskStartPreview.Task;
                 m_TaskStartPreview = null;
                 m_IsPreviewing = true;
@@ -112,11 +113,7 @@ namespace QSoft.MediaCapture
 
                     hr = pMediaType2.SetUINT32(MFConstants.MF_MT_ALL_SAMPLES_INDEPENDENT, 1);
                     if (hr != HRESULTS.S_OK) return hr;
-                    //if (this.m_Setting.Rotate == 90 || this.m_Setting.Rotate == 270)
-                    //{
-                    //    pMediaType2.TryGetSize(MFConstants.MF_MT_FRAME_SIZE, out var w, out var h);
-                    //    pMediaType2.SetSize(MFConstants.MF_MT_FRAME_SIZE, h, w);
-                    //}
+
                     // Connect the video stream to the preview sink.
                     using var cm = new ComMemory(Marshal.SizeOf<uint>());
                     hr = m_pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, pMediaType2, null, cm.Pointer);
@@ -133,7 +130,7 @@ namespace QSoft.MediaCapture
 
 
                 hr = m_pEngine.StartPreview();
-                
+                if (hr != HRESULTS.S_OK) return hr;
                 hr = await m_TaskStartPreview.Task;
                 m_TaskStartPreview = null;
                 m_IsPreviewing = true;

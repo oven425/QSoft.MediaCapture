@@ -98,9 +98,7 @@ namespace QSoft.MediaCapture
             SafeRelease(g_pDX11Device);
             SafeRelease(g_pDXGIMan);
             m_IsPreviewing = false;
-            //m_bRecording = false;
-            //m_bPhotoPending = false;
-            //m_errorID = 0;
+            
         }
 
         IMFCaptureEngine? m_pEngine;
@@ -122,12 +120,13 @@ namespace QSoft.MediaCapture
                 
                 if (hr != HRESULTS.S_OK) return hr;
                 hr = MFFunctions.MFCreateAttributes(out pAttributes, 1);
+                if (hr != HRESULTS.S_OK) return hr;
                 //if(used3d)
                 //{
                 //    hr = CreateD3DManager();
                 //    if (hr != HRESULTS.S_OK) return hr;
                 //}
-                
+
                 hr = pAttributes.SetUnknown(MFConstants.MF_CAPTURE_ENGINE_D3D_MANAGER, g_pDXGIMan);
                 if (hr != HRESULTS.S_OK) return hr;
                 var tty = Type.GetTypeFromCLSID(DirectN.MFConstants.CLSID_MFCaptureEngineClassFactory, true);
