@@ -94,26 +94,20 @@ namespace QSoft.MediaCapture
         TaskCompletionSource<HRESULT> m_TaskSetCurrentType;
         public async Task SetMediaStreamPropertiesAsync(MF_CAPTURE_ENGINE_STREAM_CATEGORY mediastreamtype, ImageEncodingProperties type)
         {
-            System.Diagnostics.Trace.WriteLine($"SetMediaStreamPropertiesAsync 1");
             IMFCaptureSource? source = null;
             if (m_pEngine == null) return;
             var hr = m_pEngine.GetSource(out source);
             if (hr != HRESULTS.S_OK || source == null) return;
             try
             {
-                System.Diagnostics.Trace.WriteLine($"SetMediaStreamPropertiesAsync 2");
                 m_TaskSetCurrentType = new TaskCompletionSource<HRESULT>();
                 var list = this.GetAvailableMediaStreamProperties(mediastreamtype);
-                System.Diagnostics.Trace.WriteLine($"SetMediaStreamPropertiesAsync 3");
                 var sss = list.FirstOrDefault(x => x.Equals(type));
-                System.Diagnostics.Trace.WriteLine($"SetMediaStreamPropertiesAsync 4");
                 if (sss != null)
                 {
-                    System.Diagnostics.Trace.WriteLine($"SetMediaStreamPropertiesAsync 5");
                     hr = source.SetCurrentDeviceMediaType(m_StreamGategory[mediastreamtype], sss.MediaType);
-                    System.Diagnostics.Trace.WriteLine($"SetMediaStreamPropertiesAsync 6");
+                    if (hr != HRESULTS.S_OK) return;
                     await m_TaskSetCurrentType.Task;
-                    System.Diagnostics.Trace.WriteLine($"SetMediaStreamPropertiesAsync 7");
                 }
             }
             finally
