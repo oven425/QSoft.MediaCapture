@@ -24,45 +24,42 @@ namespace QSoft.MediaCapture
             IMFMediaType? pMediaType = null;
             IMFMediaType? pMediaType2 = null;
             IMFCaptureSource? pSource = null;
+            IMFCapturePreviewSink? pPreview = null;
             HRESULT hr = HRESULTS.S_OK;
             try
             {
-                // Get a pointer to the preview sink.
-                if (m_pPreview == null)
+                hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_PREVIEW, out pSink);
+                if (hr != HRESULTS.S_OK) return hr;
+                pPreview = pSink as IMFCapturePreviewSink;
+                if (pPreview == null) return HRESULTS.E_NOTIMPL;
+                if (handle != IntPtr.Zero)
                 {
-                    hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_PREVIEW, out pSink);
+                    hr = pPreview.SetRenderHandle(handle);
                     if (hr != HRESULTS.S_OK) return hr;
-                    m_pPreview = pSink as IMFCapturePreviewSink;
-                    if (m_pPreview == null) return HRESULTS.E_NOTIMPL;
-                    if (handle != IntPtr.Zero)
-                    {
-                        hr = m_pPreview.SetRenderHandle(handle);
-                        if (hr != HRESULTS.S_OK) return hr;
-                    }
-
-                    hr = m_pEngine.GetSource(out pSource);
-                    if (hr != HRESULTS.S_OK) return hr;
-
-
-
-                    // Configure the video format for the preview sink.
-                    hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, out pMediaType);
-                    if (hr != HRESULTS.S_OK) return hr;
-
-                    hr = CloneVideoMediaType(pMediaType, MFConstants.MFVideoFormat_RGB24, out pMediaType2);
-                    if (hr != HRESULTS.S_OK || pMediaType2 == null) return hr;
-
-                    hr = pMediaType2.SetUINT32(MFConstants.MF_MT_ALL_SAMPLES_INDEPENDENT, 1);
-                    if (hr != HRESULTS.S_OK) return hr;
-                    
-                    // Connect the video stream to the preview sink.
-                    using var cm = new ComMemory(Marshal.SizeOf<uint>());
-                    hr = m_pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, pMediaType2, null, cm.Pointer);
-                    if (hr != HRESULTS.S_OK) return hr;
-                    var streamindex = (uint)Marshal.ReadInt32(cm.Pointer);
-                    await this.AddVideoProcessorMFT(pSource, streamindex);
-                    m_pPreview.SetRotation(streamindex, m_Setting.Rotate);
                 }
+
+                hr = m_pEngine.GetSource(out pSource);
+                if (hr != HRESULTS.S_OK) return hr;
+
+
+
+                // Configure the video format for the preview sink.
+                hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, out pMediaType);
+                if (hr != HRESULTS.S_OK) return hr;
+
+                hr = CloneVideoMediaType(pMediaType, MFConstants.MFVideoFormat_RGB24, out pMediaType2);
+                if (hr != HRESULTS.S_OK || pMediaType2 == null) return hr;
+
+                hr = pMediaType2.SetUINT32(MFConstants.MF_MT_ALL_SAMPLES_INDEPENDENT, 1);
+                if (hr != HRESULTS.S_OK) return hr;
+
+                // Connect the video stream to the preview sink.
+                using var cm = new ComMemory(Marshal.SizeOf<uint>());
+                hr = pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, pMediaType2, null, cm.Pointer);
+                if (hr != HRESULTS.S_OK) return hr;
+                var streamindex = (uint)Marshal.ReadInt32(cm.Pointer);
+                await this.AddVideoProcessorMFT(pSource, streamindex);
+                pPreview.SetRotation(streamindex, m_Setting.Rotate);
 
 
                 hr = m_pEngine.StartPreview();
@@ -73,6 +70,7 @@ namespace QSoft.MediaCapture
             }
             finally
             {
+                SafeRelease(pPreview);
                 SafeRelease(pSink);
                 SafeRelease(pMediaType);
                 SafeRelease(pMediaType2);
@@ -91,42 +89,39 @@ namespace QSoft.MediaCapture
             IMFMediaType? pMediaType = null;
             IMFMediaType? pMediaType2 = null;
             IMFCaptureSource? pSource = null;
+            IMFCapturePreviewSink? pPreview = null;
             HRESULT hr = HRESULTS.S_OK;
             try
             {
-                if (m_pPreview == null)
-                {
-                    hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_PREVIEW, out pSink);
-                    if (hr != HRESULTS.S_OK) return hr;
-                    m_pPreview = pSink as IMFCapturePreviewSink;
-                    if (m_pPreview == null) return HRESULTS.E_NOTIMPL;
+                hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_PREVIEW, out pSink);
+                if (hr != HRESULTS.S_OK) return hr;
+                pPreview = pSink as IMFCapturePreviewSink;
+                if (pPreview == null) return HRESULTS.E_NOTIMPL;
 
-                    hr = m_pEngine.GetSource(out pSource);
-                    if (hr != HRESULTS.S_OK) return hr;
+                hr = m_pEngine.GetSource(out pSource);
+                if (hr != HRESULTS.S_OK) return hr;
 
-                    // Configure the video format for the preview sink.
-                    hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, out pMediaType);
-                    if (hr != HRESULTS.S_OK) return hr;
+                // Configure the video format for the preview sink.
+                hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, out pMediaType);
+                if (hr != HRESULTS.S_OK) return hr;
 
-                    hr = CloneVideoMediaType(pMediaType, MFConstants.MFVideoFormat_RGB24, out pMediaType2);
-                    if (hr != HRESULTS.S_OK || pMediaType2 == null) return hr;
+                hr = CloneVideoMediaType(pMediaType, MFConstants.MFVideoFormat_RGB24, out pMediaType2);
+                if (hr != HRESULTS.S_OK || pMediaType2 == null) return hr;
 
-                    hr = pMediaType2.SetUINT32(MFConstants.MF_MT_ALL_SAMPLES_INDEPENDENT, 1);
-                    if (hr != HRESULTS.S_OK) return hr;
+                hr = pMediaType2.SetUINT32(MFConstants.MF_MT_ALL_SAMPLES_INDEPENDENT, 1);
+                if (hr != HRESULTS.S_OK) return hr;
 
-                    // Connect the video stream to the preview sink.
-                    using var cm = new ComMemory(Marshal.SizeOf<uint>());
-                    hr = m_pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, pMediaType2, null, cm.Pointer);
-                    if (hr != HRESULTS.S_OK) return hr;
-                    var streamindex = (uint)Marshal.ReadInt32(cm.Pointer);
+                // Connect the video stream to the preview sink.
+                using var cm = new ComMemory(Marshal.SizeOf<uint>());
+                hr = pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, pMediaType2, null, cm.Pointer);
+                if (hr != HRESULTS.S_OK) return hr;
+                var streamindex = (uint)Marshal.ReadInt32(cm.Pointer);
 
 
-                    hr = m_pPreview.SetSampleCallback(streamindex, samplecallback);
-                    if (hr != HRESULTS.S_OK) return hr;
+                hr = pPreview.SetSampleCallback(streamindex, samplecallback);
+                if (hr != HRESULTS.S_OK) return hr;
 
-                    await this.AddVideoProcessorMFT(pSource, streamindex);
-
-                }
+                await this.AddVideoProcessorMFT(pSource, streamindex);
 
 
                 hr = m_pEngine.StartPreview();
@@ -137,6 +132,7 @@ namespace QSoft.MediaCapture
             }
             finally
             {
+                SafeRelease(pPreview);
                 SafeRelease(pSink);
                 SafeRelease(pMediaType);
                 SafeRelease(pMediaType2);
