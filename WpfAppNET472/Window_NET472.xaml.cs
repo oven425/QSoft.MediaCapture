@@ -45,13 +45,14 @@ namespace WpfAppNET472
         {
             var orientation = System.Windows.Forms.SystemInformation.ScreenOrientation;
             System.Diagnostics.Trace.WriteLine($"orientation:{orientation}");
-            //DirectN.Functions.MFCreateCameraOcclusionStateMonitor()
 
             if (m_MainUI == null)
             {
                 this.DataContext = this.m_MainUI = new MainUI();
-                foreach (var oo in QSoft.MediaCapture.WebCam_MF.GetAllWebCams().Skip(0).Take(1))
+                foreach (var oo in QSoft.MediaCapture.WebCam_MF.GetAllWebCams())
                 {
+                    System.Diagnostics.Trace.WriteLine($"FriendName:{oo.FriendName}");
+
                     m_WebCams[oo.FriendName] = oo;
                 }
                 
@@ -108,12 +109,38 @@ namespace WpfAppNET472
         }
         async Task OpenCamera(int index)
         {
-            foreach(var oo in this.m_WebCams)
+            this.m_MainUI.RecordTypes.Clear();
+            this.m_MainUI.PhotoTypes.Clear();
+            foreach (var oo in this.m_WebCams)
             {
                 oo.Value.Dispose();
             }
             m_WebCam = this.m_WebCams.ElementAt(index).Value;
             await m_WebCam.InitCaptureEngine(new WebCam_MF_Setting());
+            System.Diagnostics.Trace.WriteLine($"{m_WebCam.FriendName}");
+            var capturess = m_WebCam.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
+            System.Diagnostics.Trace.WriteLine($"record types");
+            
+            foreach (var oo in capturess.Where(x => x.SubType == DirectN.MFConstants.MFVideoFormat_NV12)
+                .OrderBy(x => x.Width * x.Height))
+            {
+                this.m_MainUI.RecordTypes.Add(oo);
+                System.Diagnostics.Trace.WriteLine($"{oo.Width}x{oo.Height} {oo.Fps} {oo.SubType.FormatToString()}");
+            }
+            var photoss = m_WebCam.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT);
+            System.Diagnostics.Trace.WriteLine($"photo types");
+
+            foreach (var oo in photoss.Where(x => x.SubType == DirectN.MFConstants.MFVideoFormat_NV12)
+                .OrderBy(x => x.Width * x.Height))
+            {
+                this.m_MainUI.PhotoTypes.Add(oo);
+                System.Diagnostics.Trace.WriteLine($"{oo.Width}x{oo.Height} {oo.Fps} {oo.SubType.FormatToString()}");
+            }
+            if(photoss.Count > 0)
+            {
+                await m_WebCam.SetMediaStreamPropertiesAsync( MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT, this.m_MainUI.PhotoTypes.Last());
+            }
+            m_WebCam.SetMediaStreamPropertiesAsync(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, m_MainUI.RecordTypes.Last());
             await m_WebCam.StartPreview(this.host.Child.Handle);
         }
 
@@ -215,32 +242,12 @@ namespace WpfAppNET472
         }
     }
 
-    public class CameraOcclusionStateMonitor : IMFCameraOcclusionStateMonitor
-    {
-        public HRESULT Start()
-        {
-            throw new NotImplementedException();
-        }
 
-        public HRESULT Stop()
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint GetSupportedStates()
-        {
-            throw new NotImplementedException();
-        }
-    }
-    public class CameraOcclusionStateReportCallback : IMFCameraOcclusionStateReportCallback
-    {
-        public HRESULT OnOcclusionStateReport(IMFCameraOcclusionStateReport occlusionStateReport)
-        {
-            throw new NotImplementedException();
-        }
-    }
     public class MainUI
     {
+        public ObservableCollection<ImageEncodingProperties> RecordTypes { set; get; }=new ObservableCollection<ImageEncodingProperties>();
+        public ObservableCollection<ImageEncodingProperties> PhotoTypes { set; get; }  =new ObservableCollection<ImageEncodingProperties>();
+
         //public ObservableCollection<WebCam_MF> WebCams { set; get; } = new ObservableCollection<WebCam_MF>();
     }
 }
