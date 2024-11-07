@@ -60,6 +60,7 @@ namespace QSoft.MediaCapture
                     hr = source.GetDeviceStreamCategory(i, out var category);
                     if (hr == HRESULTS.S_OK)
                     {
+                        System.Diagnostics.Trace.WriteLine($"{category}:{i}");
                         m_StreamGategory[category] = i;
                     }
                 }

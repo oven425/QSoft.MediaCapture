@@ -39,10 +39,12 @@ namespace WpfAppNET472
 
         MainUI m_MainUI;
         Dictionary<string, WebCam_MF> m_WebCams = new Dictionary<string, WebCam_MF>();
-
+        [DllImport("mfsensorgroup", ExactSpelling = true)]
+        public static extern HRESULT MFCreateSensorGroup([MarshalAs(UnmanagedType.LPWStr)] string SensorGroupSymbolicLink, out IMFSensorGroup ppSensorGroup);
         WebCam_MF m_WebCam;
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
+
             var orientation = System.Windows.Forms.SystemInformation.ScreenOrientation;
             System.Diagnostics.Trace.WriteLine($"orientation:{orientation}");
 
@@ -52,7 +54,16 @@ namespace WpfAppNET472
                 foreach (var oo in QSoft.MediaCapture.WebCam_MF.GetAllWebCams())
                 {
                     System.Diagnostics.Trace.WriteLine($"FriendName:{oo.FriendName}");
-
+                    System.Diagnostics.Trace.WriteLine($"SymbolLinkName:{oo.SymbolLinkName}");
+                    try
+                    {
+                        var hr = DirectN.Functions.MFCreateSensorGroup("SymbolLink", out var group);
+                    }
+                    catch(Exception ee)
+                    {
+                        System.Diagnostics.Trace.WriteLine(ee.Message);
+                    }
+                    
                     m_WebCams[oo.FriendName] = oo;
                 }
                 
@@ -219,12 +230,13 @@ namespace WpfAppNET472
             {
                 case 0:
                     {
-                        m_WebCam.TorchLight.Set(0);
+                        m_WebCam.TorchLight.SetState(TorchLightState.OFF);
                     }
                     break;
                 case 1:
                     {
-                        m_WebCam.TorchLight.Set(1);
+                        m_WebCam.TorchLight.SetState(TorchLightState.ON);
+                        //m_WebCam.TorchLight.Set(1);
                     }
                     break;
             }

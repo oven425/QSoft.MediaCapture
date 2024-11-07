@@ -26,9 +26,6 @@ namespace QSoft.MediaCapture
         public bool IsSupported { private set; get; }
         public long Value => GetValue();
         readonly IMFCaptureEngine? m_pEngine;
-        //IMFCaptureSource? capturesource = null;
-        //IMFMediaSource? devicesource = null;
-        //IAMVideoProcAmp? m_IAMVideoProcAmp;
         public WhiteBalanceControl(IMFCaptureEngine? engine)
         {
             m_pEngine = engine;
@@ -45,21 +42,6 @@ namespace QSoft.MediaCapture
                 }
                 return hr;
             });
-            //this.Init(engine);
-            //if(m_IAMVideoProcAmp != null)
-            //{
-            //    var hr = m_IAMVideoProcAmp.GetRange((int)DirectN.tagVideoProcAmpProperty.VideoProcAmp_WhiteBalance, out var min, out var max, out var delta, out var defaut, out var flag);
-            //    if (hr == HRESULTS.S_OK)
-            //    {
-            //        this.Min = min;
-            //        this.Max = max;
-            //        this.Step = delta;
-            //        IsSupported = true;
-            //        var ff = (DirectN.tagVideoProcAmpFlags)flag;
-            //        this.GetValue();
-            //    }
-            //}
-            
         }
 
         HRESULT GetIAMVideoProcAmp(Func<IAMVideoProcAmp, HRESULT> func)
@@ -88,25 +70,6 @@ namespace QSoft.MediaCapture
             return HRESULTS.S_OK;
         }
 
-        //HRESULT Init(IMFCaptureEngine? engine)
-        //{
-        //    //IMFCaptureSource? capturesource = null;
-        //    //IMFMediaSource? devicesource = null;
-        //    if (engine is null) return HRESULTS.MF_E_NOT_INITIALIZED;
-        //    try
-        //    {
-        //        var hr = engine.GetSource(out capturesource);
-        //        if (hr != HRESULTS.S_OK || capturesource == null) return HRESULTS.S_FALSE;
-        //        capturesource.GetCaptureDeviceSource(MF_CAPTURE_ENGINE_DEVICE_TYPE.MF_CAPTURE_ENGINE_DEVICE_TYPE_VIDEO, out devicesource);
-        //        m_IAMVideoProcAmp = devicesource as IAMVideoProcAmp;
-        //    }
-        //    finally
-        //    {
-        //        //SafeRelease(capturesource);
-        //        //SafeRelease(devicesource);
-        //    }
-        //    return HRESULTS.S_OK;
-        //}
 
         long GetValue()
         {
@@ -128,18 +91,6 @@ namespace QSoft.MediaCapture
 
         public HRESULT SetValue(int value, bool auto)
         {
-            //if (m_IAMVideoProcAmp == null) return HRESULTS.E_NOTIMPL;
-            //var flag = auto switch
-            //{
-            //    true => DirectN.tagVideoProcAmpFlags.VideoProcAmp_Flags_Auto,
-            //    false => DirectN.tagVideoProcAmpFlags.VideoProcAmp_Flags_Manual
-            //};
-            //var aa = value / this.Step;
-            //aa = aa * this.Step;
-            //var hr = this.m_IAMVideoProcAmp.Set((int)DirectN.tagVideoProcAmpProperty.VideoProcAmp_WhiteBalance, (int)aa, (int)flag);
-            //return hr;
-
-
             var flag = auto switch
             {
                 true => DirectN.tagVideoProcAmpFlags.VideoProcAmp_Flags_Auto,
@@ -152,6 +103,19 @@ namespace QSoft.MediaCapture
                 return amp.Set((int)DirectN.tagVideoProcAmpProperty.VideoProcAmp_WhiteBalance, (int)aa, (int)flag);
             });
             return hr;
+        }
+
+
+
+        internal class AMVideoProcAmp(IMFCaptureEngine engine) : IDisposable
+        {
+            IMFCaptureSource? capturesource = null;
+            IMFMediaSource? mediasource = null;
+
+            public void Dispose()
+            {
+                
+            }
         }
     }
 

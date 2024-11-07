@@ -22,6 +22,43 @@ namespace QSoft.MediaCapture
             : base(engine, KSPROPERTY_CAMERACONTROL_EXTENDED.KSPROPERTY_CAMERACONTROL_EXTENDED_TORCHMODE)
         {
         }
+
+        public void SetState(TorchLightState state)
+        {
+            ulong setv = state switch
+            {
+                TorchLightState.OFF=>0,
+                TorchLightState.ON=>1,
+                TorchLightState.ON_ADJUSTABLEPOWER=>2,
+                _=>0
+            };
+            this.Set(setv);
+        }
+
+        public TorchLightState GetState()
+        {
+            var hr = this.Get(out var mode);
+            if(hr == HRESULTS.S_OK)
+            {
+                var getv = mode switch
+                {
+                    0=> TorchLightState.OFF,
+                    1=> TorchLightState.ON,
+                    2=> TorchLightState.ON_ADJUSTABLEPOWER,
+                    _=> TorchLightState.OFF
+                };
+                return getv;
+            }
+            return TorchLightState.OFF;
+        }
+
+     }
+
+    public enum TorchLightState
+    {
+        OFF,
+        ON,
+        ON_ADJUSTABLEPOWER
     }
 
 }

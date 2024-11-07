@@ -146,6 +146,7 @@ namespace QSoft.MediaCapture
                 InitIAMVideoProcAmp();
                 InitFlashLight();
                 InitTorch();
+                InitFaceDection();
                 //System.Diagnostics.Trace.WriteLine($"{sw.ElapsedMilliseconds}");
                 
             }

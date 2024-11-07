@@ -48,6 +48,46 @@ namespace QSoft.MediaCapture
             }
         }
 
+        public HRESULT GetCapabilities(out ulong data)
+        {
+            data = 0;
+            IMFCaptureSource? pSource = null;
+            IMFMediaSource? mediasource = null;
+            IMFGetService? mfservice = null;
+            IMFExtendedCameraController? extendedcameracontroller = null;
+            IMFExtendedCameraControl? extendedcameracontrol = null;
+            if (m_pEngine is null) return HRESULTS.MF_E_NOT_INITIALIZED;
+            try
+            {
+                var hr = m_pEngine.GetSource(out pSource);
+                if (hr != HRESULTS.S_OK) return hr;
+                hr = pSource.GetCaptureDeviceSource(MF_CAPTURE_ENGINE_DEVICE_TYPE.MF_CAPTURE_ENGINE_DEVICE_TYPE_VIDEO, out mediasource);
+                if (hr != HRESULTS.S_OK) return hr;
+                mfservice = mediasource as IMFGetService;
+                if (mfservice == null) return HRESULTS.S_FALSE;
+                hr = mfservice.GetService(Guid.Empty, new Guid("b91ebfee-ca03-4af4-8a82-a31752f4a0fc"), out var con);
+                if (hr != HRESULTS.S_OK) return hr;
+                extendedcameracontroller = con as IMFExtendedCameraController;
+                if (extendedcameracontroller == null) return HRESULTS.S_FALSE;
+                //https://github.com/smourier/DirectN/blob/af1d27a173291bf648d3262952e36629e9420cbc/DirectN/DirectN/Generated/KSPROPERTY_CAMERACONTROL_EXTENDED.cs#L15
+                hr = extendedcameracontroller.GetExtendedCameraControl(0xffffffff, (uint)m_KsProperty, out extendedcameracontrol);
+                if (hr != HRESULTS.S_OK) return hr;
+                System.Diagnostics.Trace.WriteLine($"GetExtendedCameraControl {hr}");
+                data = extendedcameracontrol.GetCapabilities();
+                System.Diagnostics.Trace.WriteLine($"GetCapabilities {data}");
+
+            }
+            finally
+            {
+                WebCam_MF.SafeRelease(extendedcameracontrol);
+                WebCam_MF.SafeRelease(extendedcameracontroller);
+                WebCam_MF.SafeRelease(mfservice);
+                WebCam_MF.SafeRelease(mediasource);
+                WebCam_MF.SafeRelease(pSource);
+            }
+            return HRESULTS.S_OK;
+        }
+
         public HRESULT Get(out ulong mode)
         {
             mode = 0;
@@ -111,9 +151,9 @@ namespace QSoft.MediaCapture
                 //https://github.com/smourier/DirectN/blob/af1d27a173291bf648d3262952e36629e9420cbc/DirectN/DirectN/Generated/KSPROPERTY_CAMERACONTROL_EXTENDED.cs#L15
                 hr = extendedcameracontroller.GetExtendedCameraControl(0xffffffff, (uint)m_KsProperty, out extendedcameracontrol);
                 if (hr != HRESULTS.S_OK) return hr;
-                System.Diagnostics.Trace.WriteLine($"GetExtendedCameraControl {hr}");
+                //System.Diagnostics.Trace.WriteLine($"GetExtendedCameraControl {hr}");
                 var capabilities = extendedcameracontrol.GetCapabilities();
-                System.Diagnostics.Trace.WriteLine($"GetCapabilities {capabilities}");
+                //System.Diagnostics.Trace.WriteLine($"GetCapabilities {capabilities}");
                 hr = extendedcameracontrol.SetFlags(mode);
                 System.Diagnostics.Trace.WriteLine($"SetFlags {hr}");
                 hr = extendedcameracontrol.CommitSettings();

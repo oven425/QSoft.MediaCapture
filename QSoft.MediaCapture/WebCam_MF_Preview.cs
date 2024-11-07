@@ -59,6 +59,8 @@ namespace QSoft.MediaCapture
                 if (hr != HRESULTS.S_OK) return hr;
                 var streamindex = (uint)Marshal.ReadInt32(cm.Pointer);
                 await this.AddVideoProcessorMFT(pSource, streamindex);
+
+
                 pPreview.SetRotation(streamindex, m_Setting.Rotate);
 
 
@@ -120,7 +122,6 @@ namespace QSoft.MediaCapture
 
                 hr = pPreview.SetSampleCallback(streamindex, samplecallback);
                 if (hr != HRESULTS.S_OK) return hr;
-
                 await this.AddVideoProcessorMFT(pSource, streamindex);
 
 
