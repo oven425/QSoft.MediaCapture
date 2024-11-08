@@ -72,9 +72,9 @@ namespace QSoft.MediaCapture
                 //https://github.com/smourier/DirectN/blob/af1d27a173291bf648d3262952e36629e9420cbc/DirectN/DirectN/Generated/KSPROPERTY_CAMERACONTROL_EXTENDED.cs#L15
                 hr = extendedcameracontroller.GetExtendedCameraControl(0xffffffff, (uint)m_KsProperty, out extendedcameracontrol);
                 if (hr != HRESULTS.S_OK) return hr;
-                System.Diagnostics.Trace.WriteLine($"GetExtendedCameraControl {hr}");
+                //System.Diagnostics.Trace.WriteLine($"GetExtendedCameraControl {hr}");
                 data = extendedcameracontrol.GetCapabilities();
-                System.Diagnostics.Trace.WriteLine($"GetCapabilities {data}");
+                //System.Diagnostics.Trace.WriteLine($"GetCapabilities {data}");
 
             }
             finally
@@ -112,13 +112,13 @@ namespace QSoft.MediaCapture
                 //https://github.com/smourier/DirectN/blob/af1d27a173291bf648d3262952e36629e9420cbc/DirectN/DirectN/Generated/KSPROPERTY_CAMERACONTROL_EXTENDED.cs#L15
                 hr = extendedcameracontroller.GetExtendedCameraControl(0xffffffff, (uint)m_KsProperty, out extendedcameracontrol);
                 if (hr != HRESULTS.S_OK) return hr;
-                System.Diagnostics.Trace.WriteLine($"GetExtendedCameraControl {hr}");
+                //System.Diagnostics.Trace.WriteLine($"GetExtendedCameraControl {hr}");
                 var capabilities = extendedcameracontrol.GetCapabilities();
-                System.Diagnostics.Trace.WriteLine($"GetCapabilities {capabilities}");
+                //System.Diagnostics.Trace.WriteLine($"GetCapabilities {capabilities}");
                 mode = extendedcameracontrol.GetFlags();
-                System.Diagnostics.Trace.WriteLine($"GetFlags {mode}");
+                //System.Diagnostics.Trace.WriteLine($"GetFlags {mode}");
                 hr = extendedcameracontrol.CommitSettings();
-                System.Diagnostics.Trace.WriteLine($"CommitSettings {hr}");
+                //System.Diagnostics.Trace.WriteLine($"CommitSettings {hr}");
 
             }
             finally
@@ -155,9 +155,9 @@ namespace QSoft.MediaCapture
                 var capabilities = extendedcameracontrol.GetCapabilities();
                 //System.Diagnostics.Trace.WriteLine($"GetCapabilities {capabilities}");
                 hr = extendedcameracontrol.SetFlags(mode);
-                System.Diagnostics.Trace.WriteLine($"SetFlags {hr}");
+                //System.Diagnostics.Trace.WriteLine($"SetFlags {hr}");
                 hr = extendedcameracontrol.CommitSettings();
-                System.Diagnostics.Trace.WriteLine($"CommitSettings {hr}");
+                //System.Diagnostics.Trace.WriteLine($"CommitSettings {hr}");
 
             }
             finally

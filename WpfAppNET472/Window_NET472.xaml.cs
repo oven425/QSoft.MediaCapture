@@ -130,22 +130,22 @@ namespace WpfAppNET472
             await m_WebCam.InitCaptureEngine(new WebCam_MF_Setting());
             System.Diagnostics.Trace.WriteLine($"{m_WebCam.FriendName}");
             var capturess = m_WebCam.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
-            System.Diagnostics.Trace.WriteLine($"record types");
+            //System.Diagnostics.Trace.WriteLine($"record types");
             
             foreach (var oo in capturess.Where(x => x.SubType == DirectN.MFConstants.MFVideoFormat_NV12)
                 .OrderBy(x => x.Width * x.Height))
             {
                 this.m_MainUI.RecordTypes.Add(oo);
-                System.Diagnostics.Trace.WriteLine($"{oo.Width}x{oo.Height} {oo.Fps} {oo.SubType.FormatToString()}");
+                //System.Diagnostics.Trace.WriteLine($"{oo.Width}x{oo.Height} {oo.Fps} {oo.SubType.FormatToString()}");
             }
             var photoss = m_WebCam.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT);
-            System.Diagnostics.Trace.WriteLine($"photo types");
+            //System.Diagnostics.Trace.WriteLine($"photo types");
 
             foreach (var oo in photoss.Where(x => x.SubType == DirectN.MFConstants.MFVideoFormat_NV12)
                 .OrderBy(x => x.Width * x.Height))
             {
                 this.m_MainUI.PhotoTypes.Add(oo);
-                System.Diagnostics.Trace.WriteLine($"{oo.Width}x{oo.Height} {oo.Fps} {oo.SubType.FormatToString()}");
+                //System.Diagnostics.Trace.WriteLine($"{oo.Width}x{oo.Height} {oo.Fps} {oo.SubType.FormatToString()}");
             }
             if(photoss.Count > 0)
             {
