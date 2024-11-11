@@ -110,7 +110,7 @@ namespace QSoft.MediaCapture
             HRESULT hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_RECORD, out pMediaType);
             if (hr.IsError) return hr;
 
-            hr = CloneVideoMediaType(pMediaType, guidEncodingType, out pMediaType2);
+            hr = WebCam_MF.CloneVideoMediaType(pMediaType, guidEncodingType, out pMediaType2);
             if (hr.IsError) return hr;
             if (pMediaType2 == null)
             {

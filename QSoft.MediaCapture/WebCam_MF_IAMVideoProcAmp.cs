@@ -107,16 +107,6 @@ namespace QSoft.MediaCapture
 
 
 
-        internal class AMVideoProcAmp(IMFCaptureEngine engine) : IDisposable
-        {
-            IMFCaptureSource? capturesource = null;
-            IMFMediaSource? mediasource = null;
-
-            public void Dispose()
-            {
-                
-            }
-        }
     }
 
 }

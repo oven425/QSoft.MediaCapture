@@ -80,7 +80,7 @@ namespace QSoft.MediaCapture
             if (hr != HRESULTS.S_OK || source == null) return null;
             try
             {
-                hr = source.GetCurrentDeviceMediaType(m_StreamGategory[mediastreamtype], out mediatype);
+                source.GetCurrentDeviceMediaType(m_StreamGategory[mediastreamtype], out mediatype);
                 var mm = new ImageEncodingProperties(mediatype, mediastreamtype);
                 var ff = this.GetAvailableMediaStreamProperties(mediastreamtype).FirstOrDefault(x => x.Equals(mm));
                 return ff;
@@ -92,9 +92,10 @@ namespace QSoft.MediaCapture
             }
         }
 
-        TaskCompletionSource<HRESULT> m_TaskSetCurrentType;
-        public async Task SetMediaStreamPropertiesAsync(MF_CAPTURE_ENGINE_STREAM_CATEGORY mediastreamtype, ImageEncodingProperties type)
+        TaskCompletionSource<HRESULT>? m_TaskSetCurrentType;
+        public async Task SetMediaStreamPropertiesAsync(MF_CAPTURE_ENGINE_STREAM_CATEGORY mediastreamtype, ImageEncodingProperties? type)
         {
+            if (type == null) return;
             IMFCaptureSource? source = null;
             if (m_pEngine == null) return;
             var hr = m_pEngine.GetSource(out source);
@@ -162,23 +163,9 @@ namespace QSoft.MediaCapture
 
         }
 
-        //public static bool operator ==(ImageEncodingProperties x, ImageEncodingProperties y)
-        //{
-        //    if(x.Width != y.Width) return false;
-        //    else if(x.Height != y.Height) return false;
-        //    else if(x.SubType != y.SubType) return false;
-        //    else if(x.m_Denominator != y.m_Denominator) return false;
-        //    else if(x.m_Numerator != y.m_Numerator)  return false; 
-        //    return true;
-        //}
-
-        //public static bool operator !=(ImageEncodingProperties x, ImageEncodingProperties y)
-        //{
-        //    return !(x == y);
-        //}
-
-        public bool Equals(ImageEncodingProperties y)
+        public bool Equals(ImageEncodingProperties? y)
         {
+            if(y==null)return false;
             var x = this;
             if (x.Width != y.Width) return false;
             else if (x.Height != y.Height) return false;
@@ -187,21 +174,6 @@ namespace QSoft.MediaCapture
             else if (x.m_Numerator != y.m_Numerator) return false;
             return true;
         }
-    }
-
-    //public static class ImageEncodingPropertiesExtension
-    //{
-    //    public static bool Compare(this ImageEncodingProperties x, ImageEncodingProperties y)
-    //    {
-    //        if (x.Width != y.Width) return false;
-    //        else if (x.Height != y.Height) return false;
-    //        else if (x.SubType != y.SubType) return false;
-    //        else if (x.m_Denominator != y.m_Denominator) return false;
-    //        else if (x.m_Numerator != y.m_Numerator) return false;
-    //        return true;
-    //    }
-    //}
-
-    
+    } 
 
 }

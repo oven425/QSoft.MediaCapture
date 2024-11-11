@@ -13,11 +13,12 @@ namespace QSoft.MediaCapture
         IMFVideoProcessorControl? m_VideoProcessor;
         Task<HRESULT> AddVideoProcessorMFT(IMFCaptureSource source, uint streamindex)
         {
-            IMFMediaType pMediaType;
+            IMFMediaType? pMediaType=null;
             source.GetCurrentDeviceMediaType(streamindex, out pMediaType);
 
             //CLSID_CColorControlDmo
-            this.m_VideoProcessor = Activator.CreateInstance(Type.GetTypeFromCLSID(DirectN.MFConstants.CLSID_VideoProcessorMFT)!) as IMFVideoProcessorControl;
+            var videoprocesstype = Type.GetTypeFromCLSID(DirectN.MFConstants.CLSID_VideoProcessorMFT);
+            this.m_VideoProcessor = Activator.CreateInstance(videoprocesstype) as IMFVideoProcessorControl;
             HRESULT? hr = HRESULTS.S_OK;
             if(this.m_Setting.IsMirror && m_VideoProcessor != null)
             {
@@ -25,11 +26,10 @@ namespace QSoft.MediaCapture
                 //hr = m_VideoProcessor?.SetRotationOverride(90);
                 hr = m_VideoProcessor?.SetMirror(_MF_VIDEO_PROCESSOR_MIRROR.MIRROR_HORIZONTAL);
             }
-            
+
 
             //HRESULT hr;
-            IMFTransform? mft = m_VideoProcessor as IMFTransform;
-            if (mft != null)
+            if (m_VideoProcessor is IMFTransform mft)
             {
                 hr = mft.SetInputType(0, pMediaType, 0);
                 //if (COMBase.Failed(hr))

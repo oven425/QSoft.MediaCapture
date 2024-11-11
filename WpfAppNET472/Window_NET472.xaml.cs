@@ -127,7 +127,10 @@ namespace WpfAppNET472
                 oo.Value.Dispose();
             }
             m_WebCam = this.m_WebCams.ElementAt(index).Value;
-            await m_WebCam.InitCaptureEngine(new WebCam_MF_Setting());
+            await m_WebCam.InitCaptureEngine(new WebCam_MF_Setting()
+            {
+                IsMirror = true,
+            });
             System.Diagnostics.Trace.WriteLine($"{m_WebCam.FriendName}");
             var capturess = m_WebCam.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
             //System.Diagnostics.Trace.WriteLine($"record types");
@@ -151,7 +154,7 @@ namespace WpfAppNET472
             {
                 await m_WebCam.SetMediaStreamPropertiesAsync( MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT, this.m_MainUI.PhotoTypes.Last());
             }
-            m_WebCam.SetMediaStreamPropertiesAsync(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, m_MainUI.RecordTypes.Last());
+            m_WebCam.SetMediaStreamPropertiesAsync(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, m_MainUI.RecordTypes.LastOrDefault());
             await m_WebCam.StartPreview(this.host.Child.Handle);
         }
 

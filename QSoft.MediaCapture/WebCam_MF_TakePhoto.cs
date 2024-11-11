@@ -129,7 +129,7 @@ namespace QSoft.MediaCapture
                 goto done;
             }
 
-            hr = CopyAttribute(pSrcMediaType, pPhotoMediaType, MFConstants.MF_MT_FRAME_SIZE);
+            hr = WebCam_MF.CopyAttribute(pSrcMediaType, pPhotoMediaType, MFConstants.MF_MT_FRAME_SIZE);
             if (hr.IsError)
             {
                 goto done;

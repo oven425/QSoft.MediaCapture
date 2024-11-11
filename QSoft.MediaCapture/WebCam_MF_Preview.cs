@@ -47,7 +47,7 @@ namespace QSoft.MediaCapture
                 hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, out pMediaType);
                 if (hr != HRESULTS.S_OK) return hr;
 
-                hr = CloneVideoMediaType(pMediaType, MFConstants.MFVideoFormat_RGB24, out pMediaType2);
+                hr = WebCam_MF.CloneVideoMediaType(pMediaType, MFConstants.MFVideoFormat_RGB24, out pMediaType2);
                 if (hr != HRESULTS.S_OK || pMediaType2 == null) return hr;
 
                 hr = pMediaType2.SetUINT32(MFConstants.MF_MT_ALL_SAMPLES_INDEPENDENT, 1);
@@ -107,7 +107,7 @@ namespace QSoft.MediaCapture
                 hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, out pMediaType);
                 if (hr != HRESULTS.S_OK) return hr;
 
-                hr = CloneVideoMediaType(pMediaType, MFConstants.MFVideoFormat_RGB24, out pMediaType2);
+                hr = WebCam_MF.CloneVideoMediaType(pMediaType, MFConstants.MFVideoFormat_RGB24, out pMediaType2);
                 if (hr != HRESULTS.S_OK || pMediaType2 == null) return hr;
 
                 hr = pMediaType2.SetUINT32(MFConstants.MF_MT_ALL_SAMPLES_INDEPENDENT, 1);

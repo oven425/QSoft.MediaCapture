@@ -1,6 +1,7 @@
 ﻿using DirectN;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,6 +36,29 @@ namespace QSoft.MediaCapture
 
     public class ExtendedCameraControl
     {
+        [Conditional("DEBUG")]
+        static void TetsALL(IMFCaptureEngine engine)
+        {
+            var enums = Enum.GetValues(typeof(KSPROPERTY_CAMERACONTROL_EXTENDED));
+            var gg = enums.OfType<KSPROPERTY_CAMERACONTROL_EXTENDED>()
+                .Select(x =>
+
+                    new
+                    {
+                        x,
+                        suuport = new ExtendedCameraControl(engine, x).IsSupported
+                    }
+                )
+                .GroupBy(x => x.suuport);
+            foreach (var group in gg)
+            {
+                System.Diagnostics.Trace.WriteLine($"Supprt:{group.Key}");
+                foreach (var ooin in group)
+                {
+                    System.Diagnostics.Trace.WriteLine(ooin.x);
+                }
+            }
+        }
         public bool IsSupported { protected set; get; } = false;
         readonly IMFCaptureEngine? m_pEngine;
         readonly KSPROPERTY_CAMERACONTROL_EXTENDED m_KsProperty;
@@ -149,8 +173,9 @@ namespace QSoft.MediaCapture
                 hr = mfservice.GetService(Guid.Empty, new Guid("b91ebfee-ca03-4af4-8a82-a31752f4a0fc"), out var con);
                 extendedcameracontroller = con as IMFExtendedCameraController;
                 //https://github.com/smourier/DirectN/blob/af1d27a173291bf648d3262952e36629e9420cbc/DirectN/DirectN/Generated/KSPROPERTY_CAMERACONTROL_EXTENDED.cs#L15
+                
                 hr = extendedcameracontroller.GetExtendedCameraControl(0xffffffff, (uint)m_KsProperty, out extendedcameracontrol);
-                if (hr != HRESULTS.S_OK) return hr;
+                if (hr != HRESULTS.S_OK || extendedcameracontrol == null) return hr;
                 //System.Diagnostics.Trace.WriteLine($"GetExtendedCameraControl {hr}");
                 var capabilities = extendedcameracontrol.GetCapabilities();
                 //System.Diagnostics.Trace.WriteLine($"GetCapabilities {capabilities}");

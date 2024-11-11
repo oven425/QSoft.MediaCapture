@@ -55,7 +55,6 @@ namespace QSoft.MediaCapture.WPF
         //}
         public static async Task<HRESULT> StartPreview(this QSoft.MediaCapture.WebCam_MF src, Action<WriteableBitmap?> action, System.Windows.Threading.DispatcherPriority dispatcherpriority = DispatcherPriority.Background)
         {
-            //src.GetPreviewSize(out var width, out var height);
             var enc = src.GetMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
             WriteableBitmap? bmp = null;
             var dispatcher = Dispatcher.FromThread(System.Threading.Thread.CurrentThread);
