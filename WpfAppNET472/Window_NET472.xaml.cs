@@ -55,14 +55,14 @@ namespace WpfAppNET472
                 {
                     System.Diagnostics.Trace.WriteLine($"FriendName:{oo.FriendName}");
                     System.Diagnostics.Trace.WriteLine($"SymbolLinkName:{oo.SymbolLinkName}");
-                    try
-                    {
-                        var hr = DirectN.Functions.MFCreateSensorGroup("SymbolLink", out var group);
-                    }
-                    catch(Exception ee)
-                    {
-                        System.Diagnostics.Trace.WriteLine(ee.Message);
-                    }
+                    //try
+                    //{
+                    //    var hr = DirectN.Functions.MFCreateSensorGroup("SymbolLink", out var group);
+                    //}
+                    //catch(Exception ee)
+                    //{
+                    //    System.Diagnostics.Trace.WriteLine(ee.Message);
+                    //}
                     
                     m_WebCams[oo.FriendName] = oo;
                 }
@@ -155,7 +155,12 @@ namespace WpfAppNET472
                 await m_WebCam.SetMediaStreamPropertiesAsync( MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT, this.m_MainUI.PhotoTypes.Last());
             }
             m_WebCam.SetMediaStreamPropertiesAsync(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, m_MainUI.RecordTypes.LastOrDefault());
+
+            this.host.Visibility = Visibility.Visible;
             await m_WebCam.StartPreview(this.host.Child.Handle);
+
+            //this.host.Visibility = Visibility.Collapsed;
+            //await m_WebCam.StartPreview(bmp=>this.image.Source = bmp);
         }
 
         private void Oo_MediaCaptureFailedEventHandler(object sender, MediaCaptureFailedEventArgs e)
@@ -169,7 +174,11 @@ namespace WpfAppNET472
 
         private async void button_stratpreivew_Click(object sender, RoutedEventArgs e)
         {
-            var hr = await m_WebCam.StartPreview(this.host.Child.Handle);
+            this.host.Visibility = Visibility.Visible;
+            await m_WebCam.StartPreview(this.host.Child.Handle);
+
+            //this.host.Visibility = Visibility.Collapsed;
+            //await m_WebCam.StartPreview(bmp=>this.image.Source = bmp);
         }
 
         private void picture_SizeChanged(object sender, EventArgs e)
@@ -206,6 +215,7 @@ namespace WpfAppNET472
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var combobox = sender as ComboBox;
+            var sw = System.Diagnostics.Stopwatch.StartNew();
             switch (combobox.SelectedIndex)
             {
                 case 0:
@@ -224,11 +234,14 @@ namespace WpfAppNET472
                     }
                     break;
             }
+            sw.Stop();
+            System.Diagnostics.Trace.WriteLine($"FlashLight:{sw.ElapsedMilliseconds}");
         }
 
         private void combobox_torch_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var combobox = sender as ComboBox;
+            var sw = System.Diagnostics.Stopwatch.StartNew();
             switch (combobox.SelectedIndex)
             {
                 case 0:
@@ -239,10 +252,11 @@ namespace WpfAppNET472
                 case 1:
                     {
                         m_WebCam.TorchLight.SetState(TorchLightState.ON);
-                        //m_WebCam.TorchLight.Set(1);
                     }
                     break;
             }
+            sw.Stop();
+            System.Diagnostics.Trace.WriteLine($"TorchLight:{sw.ElapsedMilliseconds}");
 
         }
         int m_Index = -1;

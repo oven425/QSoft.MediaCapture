@@ -33,6 +33,23 @@ namespace QSoft.MediaCapture
             if (System.Threading.Monitor.TryEnter(this.m_Lock))
             {
 #if DEBUG
+                
+                var attrs = pSample.GetUnknown<IMFAttributes>(WebCam_MF.MFSampleExtension_CaptureMetadata);
+                System.Diagnostics.Trace.WriteLine($"attrs: {attrs.Count()}");
+                try
+                {
+                    var buf11 = attrs.Object.GetBlobSize(WebCam_MF.MF_CAPTURE_METADATA_FACEROIS, out var len);
+                    System.Diagnostics.Trace.WriteLine($"GetBlobSize: {buf11} {len}");
+                    var face_ptr = Marshal.AllocHGlobal((int)len);
+                    var header = Marshal.PtrToStructure<tagFaceRectInfoBlobHeader>(face_ptr);
+                    System.Diagnostics.Trace.WriteLine($"header: Size:{header.Size} Count:{header.Count}");
+                    Marshal.FreeHGlobal( face_ptr );
+                }
+                catch (Exception ee)
+                {
+                    System.Diagnostics.Trace.WriteLine(ee.Message);
+                }
+                attrs?.Dispose();
                 if (samplecount == 0)
                 {
                     m_StopWatch = System.Diagnostics.Stopwatch.StartNew();

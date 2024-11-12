@@ -25,6 +25,7 @@ namespace QSoft.MediaCapture
 
         public void SetState(TorchLightState state)
         {
+            if (!this.IsSupported) return;
             ulong setv = state switch
             {
                 TorchLightState.OFF=>0,

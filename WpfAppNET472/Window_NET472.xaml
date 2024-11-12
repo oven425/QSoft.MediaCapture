@@ -13,7 +13,7 @@
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <WindowsFormsHost x:Name="host">
+        <WindowsFormsHost Background="Black" x:Name="host">
             <winform:PictureBox SizeChanged="picture_SizeChanged" x:Name="picture"/>
         </WindowsFormsHost>
         <Image x:Name="image"></Image>

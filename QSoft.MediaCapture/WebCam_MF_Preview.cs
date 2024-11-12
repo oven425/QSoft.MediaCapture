@@ -54,6 +54,7 @@ namespace QSoft.MediaCapture
                 if (hr != HRESULTS.S_OK) return hr;
 
                 // Connect the video stream to the preview sink.
+                
                 using var cm = new ComMemory(Marshal.SizeOf<uint>());
                 hr = pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, pMediaType2, null, cm.Pointer);
                 if (hr != HRESULTS.S_OK) return hr;
@@ -150,6 +151,7 @@ namespace QSoft.MediaCapture
         async public Task<HRESULT?> StopPreview()
         {
             HRESULT hr = HRESULTS.S_OK;
+            IMFCaptureSink? pSink = null;
             try
             {
                 if (m_pEngine == null)
@@ -164,15 +166,26 @@ namespace QSoft.MediaCapture
                 {
                     this.m_TaskStopPreview = new TaskCompletionSource<HRESULT>(hr);
                 }
-
                 hr = m_pEngine.StopPreview();
                 if (hr.IsError) return hr;
                 hr = await this.m_TaskStopPreview.Task;
                 if (hr.IsError) return hr;
+
+                hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_PREVIEW, out pSink);
+                if (hr.IsError) return hr;
+                if(pSink is IMFCapturePreviewSink preview)
+                {
+                    preview.RemoveAllStreams();
+                    SafeRelease(preview);
+                }
+
+                //                pPreview.RemoveAllStreams();
+
                 m_IsPreviewing = false;
             }
             finally
             {
+                SafeRelease(pSink);
                 this.m_TaskStopPreview = null;
             }
             return hr;
