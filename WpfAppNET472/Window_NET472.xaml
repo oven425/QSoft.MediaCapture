@@ -26,22 +26,15 @@
                 <Button x:Name="button_startrecord" Click="button_startrecord_Click">Start Record</Button>
                 <Button x:Name="button_stoprecord" Click="button_stoprecord_Click">Stop Record</Button>
                 <ComboBox ItemsSource="{Binding RecordTypes}">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel>
-                                <TextBlock/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
+
                 </ComboBox>
-                <ComboBox SelectionChanged="ComboBox_SelectionChanged">
+                <ComboBox SelectionChanged="ComboBox_SelectionChanged" IsEnabled="{Binding IsSupportFlash}">
                     <ComboBoxItem>Flash off</ComboBoxItem>
                     <ComboBoxItem>Flash on</ComboBoxItem>
                     <ComboBoxItem>Flash auto</ComboBoxItem>
                 </ComboBox>
-                <ComboBox x:Name="combobox_torch" SelectionChanged="combobox_torch_SelectionChanged">
-                    <ComboBoxItem>Torch off</ComboBoxItem>
-                    <ComboBoxItem>Torch on</ComboBoxItem>
+                <ComboBox ItemsSource="{Binding Torchs}" x:Name="combobox_torch" SelectionChanged="combobox_torch_SelectionChanged" IsEnabled="{Binding IsSupportTorch}">
+
                 </ComboBox>
             </WrapPanel>
             <Slider x:Name="slider_whitebalance" ValueChanged="slider_whitebalance_ValueChanged"  Width="300" IsMoveToPointEnabled="True"/>

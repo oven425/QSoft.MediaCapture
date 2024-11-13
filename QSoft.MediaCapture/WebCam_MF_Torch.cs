@@ -18,17 +18,41 @@ namespace QSoft.MediaCapture
     //https://learn.microsoft.com/en-us/windows-hardware/drivers/stream/ksproperty-cameracontrol-extended-torchmode
     public class TorchLight : ExtendedCameraControl
     {
+        readonly List<TorchLightState> m_SupportStates = [];
         public TorchLight(IMFCaptureEngine? engine)
             : base(engine, KSPROPERTY_CAMERACONTROL_EXTENDED.KSPROPERTY_CAMERACONTROL_EXTENDED_TORCHMODE)
         {
+            var hr = this.GetCapabilities(out var cap);
+            if (hr == HRESULTS.S_OK)
+            {
+                var off = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_OFF;
+                if (off == DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_OFF)
+                {
+                    m_SupportStates.Add(TorchLightState.OFF);
+                }
+                var on = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_ON;
+                if (on == DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_ON)
+                {
+                    m_SupportStates.Add(TorchLightState.ON);
+                }
+                var on_adjistablepower = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_ON_ADJUSTABLEPOWER;
+                if (on_adjistablepower == DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_ON_ADJUSTABLEPOWER)
+                {
+                    m_SupportStates.Add(TorchLightState.ON_ADJUSTABLEPOWER);
+                }
+            }
+            
+
         }
+        public List<TorchLightState> SupportStates=>m_SupportStates;
+
 
         public void SetState(TorchLightState state)
         {
             if (!this.IsSupported) return;
             ulong setv = state switch
             {
-                TorchLightState.OFF=>0,
+                TorchLightState.OFF=>DirectN.Constants.KSCAMERA_EXTENDEDPROP_FLASH_OFF,
                 TorchLightState.ON=>1,
                 TorchLightState.ON_ADJUSTABLEPOWER=>2,
                 _=>0

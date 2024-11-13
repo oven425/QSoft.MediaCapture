@@ -36,63 +36,74 @@ namespace QSoft.MediaCapture
             if (m_pEngine == null) return HRESULTS.MF_E_NOT_INITIALIZED;
 
             if (m_bRecording) return HRESULTS.MF_E_INVALIDREQUEST;
-            m_TaskStartRecord = new TaskCompletionSource<HRESULT>();
-
-            var ext = System.IO.Path.GetExtension(pszDestinationFile);
-            var guidVideoEncoding = ext switch
+            IMFCaptureSink? pSink = null;
+            IMFCaptureSource? pSource = null;
+            HRESULT hr = HRESULTS.S_OK;
+            try
             {
-                ".mp4"=> MFConstants.MFVideoFormat_H264,
-                ".wmv"=> MFConstants.MFVideoFormat_H264,
-                _ =>Guid.Empty
-            };
-            var guidAudioEncoding = ext switch
-            {
-                ".mp4" => MFConstants.MFAudioFormat_AAC,
-                ".wmv" => MFConstants.MFAudioFormat_AAC,
-                ".wma"=> MFConstants.MFAudioFormat_WMAudioV9,
-                _ => Guid.Empty
-            };
-            if (guidAudioEncoding == Guid.Empty && guidVideoEncoding == Guid.Empty)
-            {
-                return HRESULTS.MF_E_INVALIDMEDIATYPE;
-            }
+
+                m_TaskStartRecord = new TaskCompletionSource<HRESULT>();
+
+                var ext = System.IO.Path.GetExtension(pszDestinationFile);
+                var guidVideoEncoding = ext switch
+                {
+                    ".mp4" => MFConstants.MFVideoFormat_H264,
+                    ".wmv" => MFConstants.MFVideoFormat_H264,
+                    _ => Guid.Empty
+                };
+                var guidAudioEncoding = ext switch
+                {
+                    ".mp4" => MFConstants.MFAudioFormat_AAC,
+                    ".wmv" => MFConstants.MFAudioFormat_AAC,
+                    ".wma" => MFConstants.MFAudioFormat_WMAudioV9,
+                    _ => Guid.Empty
+                };
+                if (guidAudioEncoding == Guid.Empty && guidVideoEncoding == Guid.Empty)
+                {
+                    return HRESULTS.MF_E_INVALIDMEDIATYPE;
+                }
 
 
-            HRESULT hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_RECORD, out var pSink);
-            if (hr.IsError) return hr;
-            var pRecord = pSink as IMFCaptureRecordSink;
-
-
-            hr = m_pEngine.GetSource(out var pSource);
-            if (hr.IsError) return hr;
-
-            // Clear any existing streams from previous recordings.
-            if (pRecord == null) return hr;
-            hr = pRecord.RemoveAllStreams();
-            if (hr.IsError) return hr;
-
-            hr = pRecord.SetOutputFileName(pszDestinationFile);
-            if (hr.IsError) return hr;
-
-            // Configure the video and audio streams.
-            if (guidVideoEncoding != Guid.Empty)
-            {
-                hr = ConfigureVideoEncoding(pSource, pRecord, ref guidVideoEncoding);
+                hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_RECORD, out pSink);
                 if (hr.IsError) return hr;
-            }
+                var pRecord = pSink as IMFCaptureRecordSink;
 
-            if (guidAudioEncoding != Guid.Empty)
-            {
-                hr = ConfigureAudioEncoding(pSource, pRecord, guidAudioEncoding);
+
+                hr = m_pEngine.GetSource(out pSource);
                 if (hr.IsError) return hr;
+
+                // Clear any existing streams from previous recordings.
+                if (pRecord == null) return hr;
+                hr = pRecord.RemoveAllStreams();
+                if (hr.IsError) return hr;
+
+                hr = pRecord.SetOutputFileName(pszDestinationFile);
+                if (hr.IsError) return hr;
+
+                // Configure the video and audio streams.
+                if (guidVideoEncoding != Guid.Empty)
+                {
+                    hr = ConfigureVideoEncoding(pSource, pRecord, ref guidVideoEncoding);
+                    if (hr.IsError) return hr;
+                }
+
+                if (guidAudioEncoding != Guid.Empty)
+                {
+                    hr = ConfigureAudioEncoding(pSource, pRecord, guidAudioEncoding);
+                    if (hr.IsError) return hr;
+                }
+
+                hr = m_pEngine.StartRecord();
+                if (hr.IsError) return hr;
+
+                m_bRecording = true;
+                hr = await m_TaskStartRecord.Task;
             }
-
-            hr = m_pEngine.StartRecord();
-            if (hr.IsError) return hr;
-
-            m_bRecording = true;
-            hr = await m_TaskStartRecord.Task;
-        done:
+            finally
+            {
+                SafeRelease(pSink);
+                SafeRelease(pSource);
+            }
             //SafeRelease(&pSink);
             //SafeRelease(&pSource);
             //SafeRelease(&pRecord);
@@ -110,7 +121,7 @@ namespace QSoft.MediaCapture
             HRESULT hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_RECORD, out pMediaType);
             if (hr.IsError) return hr;
 
-            hr = WebCam_MF.CloneVideoMediaType(pMediaType, guidEncodingType, out pMediaType2);
+            hr = CloneVideoMediaType(pMediaType, guidEncodingType, out pMediaType2);
             if (hr.IsError) return hr;
             if (pMediaType2 == null)
             {

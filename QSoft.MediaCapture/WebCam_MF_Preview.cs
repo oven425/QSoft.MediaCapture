@@ -178,9 +178,6 @@ namespace QSoft.MediaCapture
                     preview.RemoveAllStreams();
                     SafeRelease(preview);
                 }
-
-                //                pPreview.RemoveAllStreams();
-
                 m_IsPreviewing = false;
             }
             finally

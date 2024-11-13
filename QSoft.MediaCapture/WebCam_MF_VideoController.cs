@@ -163,6 +163,11 @@ namespace QSoft.MediaCapture
 
         }
 
+        public override string ToString()
+        {
+            return $"{Width}x{Height} {SubType.FormatToString()} {Fps:0}";
+        }
+
         public bool Equals(ImageEncodingProperties? y)
         {
             if(y==null)return false;

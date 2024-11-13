@@ -34,16 +34,25 @@ namespace QSoft.MediaCapture
             {
 #if DEBUG
                 
-                var attrs = pSample.GetUnknown<IMFAttributes>(WebCam_MF.MFSampleExtension_CaptureMetadata);
+                var attrs = pSample.GetUnknown<IMFAttributes>(DirectN.MFConstants.MFSampleExtension_CaptureMetadata);
                 System.Diagnostics.Trace.WriteLine($"attrs: {attrs.Count()}");
                 try
                 {
-                    var buf11 = attrs.Object.GetBlobSize(WebCam_MF.MF_CAPTURE_METADATA_FACEROIS, out var len);
+                    var buf11 = attrs.Object.GetBlobSize(DirectN.MFConstants.MF_CAPTURE_METADATA_FACEROIS, out var len);
+                    //Infrared
                     System.Diagnostics.Trace.WriteLine($"GetBlobSize: {buf11} {len}");
                     var face_ptr = Marshal.AllocHGlobal((int)len);
                     var header = Marshal.PtrToStructure<tagFaceRectInfoBlobHeader>(face_ptr);
                     System.Diagnostics.Trace.WriteLine($"header: Size:{header.Size} Count:{header.Count}");
+                    if(len == 28)
+                    {
+                        var faceinfo = Marshal.PtrToStructure<tagFaceRectInfo>(IntPtr.Add(face_ptr, 8));
+                        System.Diagnostics.Trace.WriteLine($"faceinfo: Size:{faceinfo.Region} confidenceLevel:{faceinfo.confidenceLevel}");
+                    }
+                    
+                    
                     Marshal.FreeHGlobal( face_ptr );
+                    
                 }
                 catch (Exception ee)
                 {

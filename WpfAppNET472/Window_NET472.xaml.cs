@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -131,6 +132,18 @@ namespace WpfAppNET472
             {
                 IsMirror = true,
             });
+            this.m_MainUI.IsSupportTorch = this.m_WebCam.TorchLight.IsSupported;
+            this.m_MainUI.Torchs.Clear();
+            if (this.m_MainUI.IsSupportTorch)
+            {
+                foreach(var oo in this.m_WebCam.TorchLight.SupportStates)
+                {
+                    this.m_MainUI.Torchs.Add(oo);
+                }
+            }
+            
+            this.m_MainUI.IsSupportFlash = this.m_WebCam.FlashLight.IsSupported;
+            
             System.Diagnostics.Trace.WriteLine($"{m_WebCam.FriendName}");
             var capturess = m_WebCam.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
             //System.Diagnostics.Trace.WriteLine($"record types");
@@ -193,12 +206,12 @@ namespace WpfAppNET472
 
         async private void button_takephoto_Click(object sender, RoutedEventArgs e)
         {
-            var hr = await m_WebCam.TakePhoto("123.bmp");
+            var hr = await m_WebCam.TakePhoto($"{DateTime.Now:yyyyMMdd_HHmmss}.jpg");
         }
 
         private async void button_startrecord_Click(object sender, RoutedEventArgs e)
         {
-            var hr = await m_WebCam.StartRecord("123.mp4");
+            var hr = await m_WebCam.StartRecord($"{DateTime.Now:yyyyMMdd_HHmmss}.mp4");
 
         }
 
@@ -272,11 +285,31 @@ namespace WpfAppNET472
     }
 
 
-    public class MainUI
+
+    public class MainUI:INotifyPropertyChanged
     {
+        bool m_IsSupportFlash;
+        bool m_IsSupportTorch;
+        public bool IsSupportTorch
+        {
+            set { m_IsSupportTorch = value;this.Update("IsSupportTorch"); }
+            get => m_IsSupportTorch;
+        }
+        public bool IsSupportFlash
+        {
+            set { m_IsSupportFlash = value; this.Update("IsSupportFlash"); }
+            get => m_IsSupportFlash;
+        }
+
+        public ObservableCollection<TorchLightState> Torchs { set; get; } = new ObservableCollection<TorchLightState>();
         public ObservableCollection<ImageEncodingProperties> RecordTypes { set; get; }=new ObservableCollection<ImageEncodingProperties>();
         public ObservableCollection<ImageEncodingProperties> PhotoTypes { set; get; }  =new ObservableCollection<ImageEncodingProperties>();
 
+        public event PropertyChangedEventHandler PropertyChanged;
+        void Update(string name)
+        {
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)); 
+        }
         //public ObservableCollection<WebCam_MF> WebCams { set; get; } = new ObservableCollection<WebCam_MF>();
     }
 }
