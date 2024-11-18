@@ -59,6 +59,7 @@ namespace QSoft.MediaCapture
                 }
                 else if (guidType == MFConstants.MF_CAPTURE_ENGINE_ALL_EFFECTS_REMOVED)
                 {
+                    m_TaskRemoveAllEffect?.SetResult(hrStatus);
                 }
                 else if (guidType == MFConstants.MF_CAPTURE_SOURCE_CURRENT_DEVICE_MEDIA_TYPE_SET)
                 {

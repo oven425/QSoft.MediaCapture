@@ -152,6 +152,7 @@ namespace QSoft.MediaCapture
         {
             HRESULT hr = HRESULTS.S_OK;
             IMFCaptureSink? pSink = null;
+            IMFCaptureSource? pSource = null;
             try
             {
                 if (m_pEngine == null)
@@ -178,6 +179,9 @@ namespace QSoft.MediaCapture
                     preview.RemoveAllStreams();
                     SafeRelease(preview);
                 }
+                hr = m_pEngine.GetSource(out pSource);
+                if (hr != HRESULTS.S_OK) return hr;
+                RemoveAllVideoProcessorMFT(pSource);
                 m_IsPreviewing = false;
             }
             finally

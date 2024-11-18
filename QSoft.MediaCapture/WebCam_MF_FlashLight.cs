@@ -80,8 +80,8 @@ namespace QSoft.MediaCapture
 
     public class ExtendedCameraControl
     {
-        [Conditional("DEBUG")]
-        static void TetsALL(IMFCaptureEngine engine)
+        //[Conditional("DEBUG")]
+        public static void TetsALL(IMFCaptureEngine engine)
         {
             var enums = Enum.GetValues(typeof(KSPROPERTY_CAMERACONTROL_EXTENDED));
             var gg = enums.OfType<KSPROPERTY_CAMERACONTROL_EXTENDED>()

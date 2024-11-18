@@ -29,64 +29,6 @@ namespace QSoft.MediaCapture
         public string SymbolLinkName { private set; get; } = "";
         public IComObject<IMFActivate>? CaptureObj { private set; get; }
 
-        uint g_ResetToken = 0;
-        IMFDXGIDeviceManager? g_pDXGIMan;
-        HRESULT CreateD3DManager()
-        {
-            var hr = CreateDX11Device(out g_pDX11Device, out var pDX11DeviceContext, out var FeatureLevel);
-
-            if (hr == HRESULTS.S_OK)
-            {
-                hr = DirectN.MFFunctions.MFCreateDXGIDeviceManager(out g_ResetToken, out g_pDXGIMan);
-            }
-
-            if (hr == HRESULTS.S_OK && g_pDXGIMan != null)
-            {
-                hr = g_pDXGIMan.ResetDevice(g_pDX11Device, g_ResetToken);
-            }
-            SafeRelease(pDX11DeviceContext);
-
-            return hr;
-        }
-
-        ID3D11Device? g_pDX11Device;
-        HRESULT CreateDX11Device(out ID3D11Device ppDevice, out ID3D11DeviceContext ppDeviceContext, out D3D_FEATURE_LEVEL pFeatureLevel)
-        {
-            D3D_FEATURE_LEVEL[] levels = new[]{
-                D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_1,
-                D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_11_0,
-                D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_10_1,
-                D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_10_0,
-                D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_9_3,
-                D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_9_2,
-                D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_9_1
-            };
-
-            var hr = DirectN.D3D11Functions.D3D11CreateDevice(
-                null,
-                D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE,
-                IntPtr.Zero,
-                (uint)DirectN.D3D11_CREATE_DEVICE_FLAG.D3D11_CREATE_DEVICE_VIDEO_SUPPORT,
-                levels,
-                (uint)levels.Length,
-                7,
-                out ppDevice,
-                out pFeatureLevel,
-                out ppDeviceContext
-                );
-
-            if (hr == HRESULTS.S_OK)
-            {
-                ID3D10Multithread? pMultithread;
-                pMultithread = ppDevice as ID3D10Multithread;
-                if (hr == HRESULTS.S_OK)
-                {
-                    pMultithread?.SetMultithreadProtected(true);
-                }
-            }
-
-            return hr;
-        }
 
         void DestroyCaptureEngine()
         {
@@ -147,6 +89,7 @@ namespace QSoft.MediaCapture
                 InitFlashLight();
                 InitTorch();
                 InitFaceDection();
+                ExtendedCameraControl.TetsALL(m_pEngine);
                 //System.Diagnostics.Trace.WriteLine($"{sw.ElapsedMilliseconds}");
                 
             }
@@ -158,9 +101,6 @@ namespace QSoft.MediaCapture
             }
             return hr;
         }
-
-
-
 
         public static void SafeRelease<T>(T? obj) where T : class
         {

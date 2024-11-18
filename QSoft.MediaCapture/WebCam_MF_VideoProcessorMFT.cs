@@ -9,10 +9,12 @@ namespace QSoft.MediaCapture
 {
     public partial class WebCam_MF
     {
+        uint m_VideoProcessMFT_Index = 0;
         TaskCompletionSource<HRESULT>? m_TaskAddEffect;
         IMFVideoProcessorControl? m_VideoProcessor;
         Task<HRESULT> AddVideoProcessorMFT(IMFCaptureSource source, uint streamindex)
         {
+            m_VideoProcessMFT_Index = streamindex;
             IMFMediaType? pMediaType=null;
             source.GetCurrentDeviceMediaType(streamindex, out pMediaType);
 
@@ -32,29 +34,22 @@ namespace QSoft.MediaCapture
             if (m_VideoProcessor is IMFTransform mft)
             {
                 hr = mft.SetInputType(0, pMediaType, 0);
-                //if (COMBase.Failed(hr))
-                //{
-                //    System.Diagnostics.Trace.WriteLine($"SetInputType  {hr}");
-                //    goto done;
-                //}
-
-
                 hr = mft.SetOutputType(0, pMediaType, 0);
-                //if (COMBase.Failed(hr))
-                //{
-                //    System.Diagnostics.Trace.WriteLine($"SetOutputType  {hr}");
-                //    goto done;
-                //}
             }
 
             m_TaskAddEffect = new TaskCompletionSource<HRESULT>();
 
             hr = source.AddEffect(streamindex, m_VideoProcessor);
             return m_TaskAddEffect.Task;
-            //object o;
-            //pFactory.CreateInstance(DirectN.MFConstants.CLSID_MFCaptureEngine, typeof(IMFCaptureEngine).GUID, out o);
-            //m_pEngine = o as IMFVideoProcessorControl;
+        }
+        TaskCompletionSource<HRESULT>? m_TaskRemoveAllEffect;
 
+        async Task<HRESULT> RemoveAllVideoProcessorMFT(IMFCaptureSource source)
+        {
+            m_TaskRemoveAllEffect = new();
+            source.RemoveAllEffects(m_VideoProcessMFT_Index);
+            var hr = await m_TaskRemoveAllEffect.Task;
+            return hr;
         }
 
     }
