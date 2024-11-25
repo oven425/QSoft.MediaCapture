@@ -132,7 +132,7 @@ namespace WpfAppNET472
             {
                 IsMirror = true,
             });
-            this.m_MainUI.IsSupportTorch = this.m_WebCam.TorchLight.IsSupported;
+            this.m_MainUI.IsSupportTorch = this.m_WebCam.TorchLight?.IsSupported == true;
             this.m_MainUI.Torchs.Clear();
             if (this.m_MainUI.IsSupportTorch)
             {
@@ -142,7 +142,7 @@ namespace WpfAppNET472
                 }
             }
             
-            this.m_MainUI.IsSupportFlash = this.m_WebCam.FlashLight.IsSupported;
+            this.m_MainUI.IsSupportFlash = this.m_WebCam.FlashLight?.IsSupported==true;
             
             System.Diagnostics.Trace.WriteLine($"{m_WebCam.FriendName}");
             var capturess = m_WebCam.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);

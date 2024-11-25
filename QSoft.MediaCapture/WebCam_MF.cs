@@ -64,8 +64,8 @@ namespace QSoft.MediaCapture
                 if (hr != HRESULTS.S_OK) return hr;
                 //if(used3d)
                 //{
-                //    hr = CreateD3DManager();
-                //    if (hr != HRESULTS.S_OK) return hr;
+                hr = CreateD3DManager();
+                if (hr != HRESULTS.S_OK) return hr;
                 //}
 
                 hr = pAttributes.SetUnknown(MFConstants.MF_CAPTURE_ENGINE_D3D_MANAGER, g_pDXGIMan);
@@ -85,12 +85,10 @@ namespace QSoft.MediaCapture
                 hr = await m_TaskInitialize.Task;
                 sw.Stop();
                 this.SupporCategory();
-                InitIAMVideoProcAmp();
-                InitFlashLight();
-                InitTorch();
-                InitFaceDection();
-                ExtendedCameraControl.TetsALL(m_pEngine);
-                //System.Diagnostics.Trace.WriteLine($"{sw.ElapsedMilliseconds}");
+                //InitIAMVideoProcAmp();
+                //InitFlashLight();
+                //InitTorch();
+                //InitFaceDection();
                 
             }
             finally

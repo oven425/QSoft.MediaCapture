@@ -36,7 +36,7 @@ STDMETHODIMP_(ULONG) CaptureManager::CaptureEngineCB::Release()
     }
     return cRef;
 }
-
+#include <mfapi.h>
 // Callback method to receive events from the capture engine.
 STDMETHODIMP CaptureManager::CaptureEngineCB::OnEvent( _In_ IMFMediaEvent* pEvent)
 {
@@ -54,7 +54,7 @@ STDMETHODIMP CaptureManager::CaptureEngineCB::OnEvent( _In_ IMFMediaEvent* pEven
         {
             hrStatus = hr;
         }
-
+        //IMFVideoProcessorControl2
         hr = pEvent->GetExtendedType(&guidType);
         if (SUCCEEDED(hr))
         {

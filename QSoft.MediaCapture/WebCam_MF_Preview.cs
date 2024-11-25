@@ -163,10 +163,7 @@ namespace QSoft.MediaCapture
                 {
                     return HRESULTS.S_OK;
                 }
-                if (m_TaskStopPreview == null)
-                {
-                    this.m_TaskStopPreview = new TaskCompletionSource<HRESULT>(hr);
-                }
+                this.m_TaskStopPreview = new();
                 hr = m_pEngine.StopPreview();
                 if (hr.IsError) return hr;
                 hr = await this.m_TaskStopPreview.Task;
@@ -181,7 +178,7 @@ namespace QSoft.MediaCapture
                 }
                 hr = m_pEngine.GetSource(out pSource);
                 if (hr != HRESULTS.S_OK) return hr;
-                RemoveAllVideoProcessorMFT(pSource);
+                await RemoveAllVideoProcessorMFT(pSource);
                 m_IsPreviewing = false;
             }
             finally
