@@ -59,6 +59,8 @@ namespace QSoft.MediaCapture
                 hr = pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, pMediaType2, null, cm.Pointer);
                 if (hr != HRESULTS.S_OK) return hr;
                 var streamindex = (uint)Marshal.ReadInt32(cm.Pointer);
+                System.Diagnostics.Trace.WriteLine($"preview:{streamindex}");
+
                 await this.AddVideoProcessorMFT(pSource, streamindex);
 
 
@@ -144,8 +146,6 @@ namespace QSoft.MediaCapture
 
             return hr;
         }
-
-
 
         TaskCompletionSource<HRESULT>? m_TaskStopPreview;
         async public Task<HRESULT?> StopPreview()

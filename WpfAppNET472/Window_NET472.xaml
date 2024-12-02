@@ -25,7 +25,7 @@
                 <Button x:Name="button_takephoto" Click="button_takephoto_Click">Task photo</Button>
                 <Button x:Name="button_startrecord" Click="button_startrecord_Click">Start Record</Button>
                 <Button x:Name="button_stoprecord" Click="button_stoprecord_Click">Stop Record</Button>
-                <ComboBox ItemsSource="{Binding RecordTypes}">
+                <ComboBox ItemsSource="{Binding RecordFormats}">
 
                 </ComboBox>
                 <ComboBox SelectionChanged="ComboBox_SelectionChanged" IsEnabled="{Binding IsSupportFlash}">

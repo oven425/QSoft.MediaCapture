@@ -9,18 +9,18 @@ using System.Threading.Tasks;
 
 namespace QSoft.MediaCapture
 {
-    public class WebCam_MF_Size
-    {
-        public uint Width { set; get; }
-        public uint Height { set; get; }
-    }
+    //public class WebCam_MF_Size
+    //{
+    //    public uint Width { set; get; }
+    //    public uint Height { set; get; }
+    //}
     public class WebCam_MF_Setting
     {
         public bool IsMirror { set; get; }
         public uint Rotate { set; get; }
-        public WebCam_MF_Size Preview { set; get; } = new WebCam_MF_Size();
-        public WebCam_MF_Size Photo { set; get; } = new WebCam_MF_Size();
-        public WebCam_MF_Size Record { set; get; } = new WebCam_MF_Size();
+        //public WebCam_MF_Size Preview { set; get; } = new WebCam_MF_Size();
+        //public WebCam_MF_Size Photo { set; get; } = new WebCam_MF_Size();
+        //public WebCam_MF_Size Record { set; get; } = new WebCam_MF_Size();
     }
     public sealed partial class WebCam_MF: IDisposable
     {

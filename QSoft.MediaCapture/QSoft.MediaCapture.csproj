@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <VersionPrefix>1.0.0.4</VersionPrefix>
-    <TargetFrameworks>net472;net8.0-windows7.0;net6.0-windows7.0</TargetFrameworks>
+    <TargetFrameworks>net460;net472;net8.0-windows7.0;net6.0-windows7.0</TargetFrameworks>
     <LangVersion>12.0</LangVersion>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>

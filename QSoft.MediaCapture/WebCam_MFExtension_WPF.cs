@@ -69,17 +69,6 @@ namespace QSoft.MediaCapture.WPF
                     bmp = new WriteableBitmap((int)enc.Width, (int)enc.Height, 96, 96, PixelFormats.Bgr24, null);
                 });
             }
-
-            //var hr = await src.StartPreview(type =>
-            //{
-            //    var info =  type.GetVideoTypeInfo();
-            //    if (info.subtype != MFConstants.MFVideoFormat_RGB24)
-            //    {
-            //        src.CloneVideoMediaType(type, MFConstants.MFVideoFormat_RGB24, out var dst);
-            //        return dst;
-            //    }
-            //    return null;
-            //}, new MFCaptureEngineOnSampleCallback_WriteableBitmap(bmp, dispatcherpriority));
             var hr = await src.StartPreview(new MFCaptureEngineOnSampleCallback_WriteableBitmap(bmp, dispatcherpriority));
             action?.Invoke(bmp);
             return hr;
