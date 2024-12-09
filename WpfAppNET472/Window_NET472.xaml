@@ -37,7 +37,15 @@
 
                 </ComboBox>
             </WrapPanel>
-            <Slider x:Name="slider_whitebalance" ValueChanged="slider_whitebalance_ValueChanged"  Width="300" IsMoveToPointEnabled="True"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <CheckBox/>
+                <Slider Grid.Column="1" x:Name="slider_whitebalance" ValueChanged="slider_whitebalance_ValueChanged"  IsMoveToPointEnabled="True"/>
+
+            </Grid>
 
         </StackPanel>
 

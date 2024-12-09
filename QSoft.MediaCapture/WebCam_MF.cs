@@ -89,7 +89,7 @@ namespace QSoft.MediaCapture
                 //InitFlashLight();
                 //InitTorch();
                 //InitFaceDection();
-                
+
             }
             finally
             {

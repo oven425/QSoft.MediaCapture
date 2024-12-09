@@ -23,7 +23,7 @@ if(camera != null)
     await camera.StartPreview(host.Child.Handle);
 }
 ```
-try below code when use WPF
+## Preview for WPF
 ```c#
 var camera = QSoft.MediaCapture.WebCam_MF.GetAllWebCams()
     .Find(x => x.FriendName == "USB2.0 HD UVC WebCam");
@@ -31,32 +31,41 @@ if(camera != null)
 {
     await camera.InitCaptureEngine();
     await camera.SetPreviewSize(x => x.FirstOrDefault(y=>y.Width>=640));
-    await camera.StartPreview(x => this.image.Source = x);
+    await camera.StartPreview(bmp=>this.image.Source = bmp);
 }
-
 ```
 
-open multi camera same time in WPF
+# Take photo
+## support format
+* jpg
+* png
+* bmp
 ```c#
-var aa = QSoft.MediaCapture.WebCam_MF.GetAllWebCams()
-    .Select(async (camera, i) =>
-    {
-        await Task.Run(async () =>
-        {
-            await camera.InitCaptureEngine();
-            //await camera.SetPreviewSize(x => x.ElementAt(1));
-            await camera.StartPreview(x =>
-            {
-                this.Dispatcher.Invoke(() =>
-                {
-                    this.image.Source = x;
-                });
+var camera = QSoft.MediaCapture.WebCam_MF.GetAllWebCams()
+    .Find(x => x.FriendName == "USB2.0 HD UVC WebCam");
+if(camera != null)
+{
+    await camera.TakePhtot("123.jpg");
+}
+```
 
-            });
-        });
+# Record
+## Support format:
+- mp4
+    - video: h264
+    - audio: aac
+- wmv
+    - video: h264
+    - audio: aac
 
-    }).ToArray();
-
-await Task.WhenAll(aa);
+```c#
+var camera = QSoft.MediaCapture.WebCam_MF.GetAllWebCams()
+    .Find(x => x.FriendName == "USB2.0 HD UVC WebCam");
+if(camera != null)
+{
+    await camera.StartRecord("123.mp4");
+    await Task.Delay(5000);
+    await camera.StopRecord();
+}
 
 ```

@@ -78,18 +78,24 @@ namespace WpfAppNET472
             {
                 IsMirror = allcamera[m_WebCam.FriendName] == CameraPanel.Front,
             });
-            this.m_MainUI.IsSupportTorch = this.m_WebCam.TorchLight?.IsSupported == true;
-            this.m_MainUI.Torchs.Clear();
-            if (this.m_MainUI.IsSupportTorch)
-            {
-                foreach(var oo in this.m_WebCam.TorchLight.SupportStates)
-                {
-                    this.m_MainUI.Torchs.Add(oo);
-                }
-            }
+            //this.m_MainUI.IsSupportTorch = this.m_WebCam.TorchLight?.IsSupported == true;
+            //this.m_MainUI.Torchs.Clear();
+            //if (this.m_MainUI.IsSupportTorch)
+            //{
+            //    foreach(var oo in this.m_WebCam.TorchLight.SupportStates)
+            //    {
+            //        this.m_MainUI.Torchs.Add(oo);
+            //    }
+            //}
             
-            this.m_MainUI.IsSupportFlash = this.m_WebCam.FlashLight?.IsSupported==true;
-            
+            //this.m_MainUI.IsSupportFlash = this.m_WebCam.FlashLight?.IsSupported==true;
+            //if(this.m_WebCam.WhiteBalance.IsSupported)
+            //{
+            //    this.slider_whitebalance.SmallChange = this.m_WebCam.WhiteBalance.Step;
+            //    this.slider_whitebalance.Minimum = this.m_WebCam.WhiteBalance.Min;
+
+            //    this.slider_whitebalance.Maximum = this.m_WebCam.WhiteBalance.Max;
+            //}
             System.Diagnostics.Trace.WriteLine($"{m_WebCam.FriendName}");
             var capturess = m_WebCam.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
             //System.Diagnostics.Trace.WriteLine($"record types");
@@ -168,31 +174,31 @@ namespace WpfAppNET472
 
         private void slider_whitebalance_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            m_WebCam?.WhiteBalance.SetValue((int)e.NewValue, false);
+            //m_WebCam?.WhiteBalance.SetValue((int)e.NewValue, false);
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var combobox = sender as ComboBox;
             var sw = System.Diagnostics.Stopwatch.StartNew();
-            switch (combobox.SelectedIndex)
-            {
-                case 0:
-                    {
-                        m_WebCam.FlashLight.Set(0);
-                    }
-                    break;
-                case 1:
-                    {
-                        m_WebCam.FlashLight.Set(1);
-                    }
-                    break;
-                case 2:
-                    {
-                        m_WebCam.FlashLight.Set(4);
-                    }
-                    break;
-            }
+            //switch (combobox.SelectedIndex)
+            //{
+            //    case 0:
+            //        {
+            //            m_WebCam.FlashLight.Set(0);
+            //        }
+            //        break;
+            //    case 1:
+            //        {
+            //            m_WebCam.FlashLight.Set(1);
+            //        }
+            //        break;
+            //    case 2:
+            //        {
+            //            m_WebCam.FlashLight.Set(4);
+            //        }
+            //        break;
+            //}
             sw.Stop();
             System.Diagnostics.Trace.WriteLine($"FlashLight:{sw.ElapsedMilliseconds}");
         }
@@ -201,19 +207,19 @@ namespace WpfAppNET472
         {
             var combobox = sender as ComboBox;
             var sw = System.Diagnostics.Stopwatch.StartNew();
-            switch (combobox.SelectedIndex)
-            {
-                case 0:
-                    {
-                        m_WebCam.TorchLight.SetState(TorchLightState.OFF);
-                    }
-                    break;
-                case 1:
-                    {
-                        m_WebCam.TorchLight.SetState(TorchLightState.ON);
-                    }
-                    break;
-            }
+            //switch (combobox.SelectedIndex)
+            //{
+            //    case 0:
+            //        {
+            //            m_WebCam.TorchLight.SetState(TorchLightState.OFF);
+            //        }
+            //        break;
+            //    case 1:
+            //        {
+            //            m_WebCam.TorchLight.SetState(TorchLightState.ON);
+            //        }
+            //        break;
+            //}
             sw.Stop();
             System.Diagnostics.Trace.WriteLine($"TorchLight:{sw.ElapsedMilliseconds}");
 
@@ -247,15 +253,40 @@ namespace WpfAppNET472
             get => m_IsSupportFlash;
         }
 
-        public ObservableCollection<TorchLightState> Torchs { set; get; } = new ObservableCollection<TorchLightState>();
+        //public ObservableCollection<TorchLightState> Torchs { set; get; } = new ObservableCollection<TorchLightState>();
         public ObservableCollection<ImageEncodingProperties> RecordFormats { set; get; }=new ObservableCollection<ImageEncodingProperties>();
         public ObservableCollection<ImageEncodingProperties> PhotoFormats { set; get; }  =new ObservableCollection<ImageEncodingProperties>();
 
         public event PropertyChangedEventHandler PropertyChanged;
-        void Update(string name)
-        {
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)); 
-        }
+        void Update(string name)=> this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         //public ObservableCollection<WebCam_MF> WebCams { set; get; } = new ObservableCollection<WebCam_MF>();
+    }
+
+    public enum VideoAmpState
+    {
+        Auto,
+        Manual
+    }
+
+    public class VideoAmp: INotifyPropertyChanged
+    {
+        int m_Max;
+        int m_Min;
+        int m_Step;
+        int m_Value;
+        VideoAmpState m_VideoAmpState;
+        public int Max
+        {
+            get => m_Max;
+            set { m_Max = value; this.Update("Max"); }
+        }
+        public int Min
+        {
+            get => m_Min;
+            set { m_Min = value; this.Update("Min"); }
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
+        void Update(string name) => this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
     }
 }

@@ -9,6 +9,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Windows.Media.Capture;
 
 namespace WpfApp_NET6
 {
@@ -24,6 +25,8 @@ namespace WpfApp_NET6
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            MediaCapture mm = new MediaCapture();
+            //mm.VideoDeviceController.WhiteBalanceControl.SetPresetAsync
             var webcams = WebCam_MF.EnumDeviceSources();
             await webcams[0].InitializeCaptureManager(webcams[0].VideoDevice.Object, new Setting() {  });
             await webcams[0].StartPreview(x => { this.image.Source = x; });

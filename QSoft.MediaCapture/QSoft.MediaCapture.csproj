@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <VersionPrefix>1.0.0.4</VersionPrefix>
+    <VersionPrefix>1.0.0.5</VersionPrefix>
     <TargetFrameworks>net460;net472;net8.0-windows7.0;net6.0-windows7.0</TargetFrameworks>
     <LangVersion>12.0</LangVersion>
     <ImplicitUsings>disable</ImplicitUsings>
@@ -16,10 +16,15 @@
     <Copyright>Copyright © Ben Hsu 2024</Copyright>
     <Description>Easy use webcam or video capture card</Description>
     <PackageIcon>48720503562_c9ae7998dc_o.jpg</PackageIcon>
-    <PackageReleaseNotes>1. Open dispatch priority setting at StartPreview of WPF
-2. sync DirectN, DirectNCore</PackageReleaseNotes>
+    <PackageReleaseNotes>1. Add takhoto, start record and stop record
+2. sync DirectN, DirectNCore
+3. add version postfix to assembly file</PackageReleaseNotes>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <Title>MediaCapture.NET</Title>
+    <PackageId>$(MSBuildProjectName)</PackageId>
+    <Authors>$(MSBuildProjectName)</Authors>
+    <Product>$(MSBuildProjectName)</Product>
+    <AssemblyName>$(MSBuildProjectName).$(VersionPrefix)</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0-windows7.0'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
