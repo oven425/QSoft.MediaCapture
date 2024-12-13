@@ -76,6 +76,7 @@ namespace WpfAppNET472
             
             await m_WebCam.InitCaptureEngine(new WebCam_MF_Setting()
             {
+                Shared = true,
                 IsMirror = allcamera[m_WebCam.FriendName] == CameraPanel.Front,
             });
             //this.m_MainUI.IsSupportTorch = this.m_WebCam.TorchLight?.IsSupported == true;
