@@ -17,8 +17,10 @@ namespace QSoft.MediaCapture
             var photoformat = ext switch
             {
                 ".jpg" => WICConstants.GUID_ContainerFormatJpeg,
-                ".bmp"=>WICConstants.GUID_ContainerFormatBmp,
-                ".png"=>WICConstants.GUID_ContainerFormatPng,
+                ".bmp"=> WICConstants.GUID_ContainerFormatBmp,
+                ".png"=> WICConstants.GUID_ContainerFormatPng,
+                ".tif" => WICConstants.GUID_ContainerFormatTiff,
+                ".tiff" => WICConstants.GUID_ContainerFormatTiff,
                 _ => Guid.Empty
             };
             if(photoformat == Guid.Empty)
