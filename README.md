@@ -40,6 +40,7 @@ if(camera != null)
 * jpg
 * png
 * bmp
+* tif,tiff
 ```c#
 var camera = QSoft.MediaCapture.WebCam_MF.GetAllWebCams()
     .Find(x => x.FriendName == "USB2.0 HD UVC WebCam");

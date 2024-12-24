@@ -159,7 +159,7 @@ namespace WpfAppNET472
 
         async private void button_takephoto_Click(object sender, RoutedEventArgs e)
         {
-            var hr = await m_WebCam.TakePhoto($"{DateTime.Now:yyyyMMdd_HHmmss}.tif");
+            var hr = await m_WebCam.TakePhoto($"{DateTime.Now:yyyyMMdd_HHmmss}.jpg");
         }
 
         private async void button_startrecord_Click(object sender, RoutedEventArgs e)

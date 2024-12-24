@@ -26,7 +26,7 @@ namespace QSoft.MediaCapture
         int samplecount = 0;
         System.Diagnostics.Stopwatch? m_StopWatch;
 #endif
-        readonly object m_Lock = new object();
+        readonly object m_Lock = new();
 
         public HRESULT OnSample(IMFSample pSample)
         {
