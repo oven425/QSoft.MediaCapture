@@ -122,11 +122,11 @@ namespace WpfAppNET472
             }
             await m_WebCam.SetMediaStreamPropertiesAsync(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, m_MainUI.RecordFormats.LastOrDefault());
 
-            this.host.Visibility = Visibility.Visible;
-            await m_WebCam.StartPreview(this.host.Child.Handle);
+            //this.host.Visibility = Visibility.Visible;
+            //await m_WebCam.StartPreview(this.host.Child.Handle);
 
-            //this.host.Visibility = Visibility.Collapsed;
-            //await m_WebCam.StartPreview(bmp=>this.image.Source = bmp);
+            this.host.Visibility = Visibility.Collapsed;
+            await m_WebCam.StartPreview(bmp => this.image.Source = bmp);
         }
 
         private void Oo_MediaCaptureFailedEventHandler(object sender, MediaCaptureFailedEventArgs e)
@@ -235,6 +235,13 @@ namespace WpfAppNET472
             }
             await this.OpenCamera(m_Index);
         }
+
+        async private void combobox_recordformat_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            await this.m_WebCam.SetMediaStreamPropertiesAsync( MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_PREVIEW, this.m_MainUI.RecordFormat);
+            var combobox = sender as ComboBox;
+            //combobox.SelectedItem as 
+        }
     }
 
 
@@ -243,6 +250,7 @@ namespace WpfAppNET472
     {
         bool m_IsSupportFlash;
         bool m_IsSupportTorch;
+        ImageEncodingProperties m_RecordFormat;
         public bool IsSupportTorch
         {
             set { m_IsSupportTorch = value;this.Update("IsSupportTorch"); }
@@ -252,6 +260,11 @@ namespace WpfAppNET472
         {
             set { m_IsSupportFlash = value; this.Update("IsSupportFlash"); }
             get => m_IsSupportFlash;
+        }
+        public ImageEncodingProperties RecordFormat
+        {
+            set { m_RecordFormat = value; this.Update("RecordFormat"); }
+            get => m_RecordFormat;
         }
 
         //public ObservableCollection<TorchLightState> Torchs { set; get; } = new ObservableCollection<TorchLightState>();

@@ -24,7 +24,7 @@ namespace QSoft.MediaCapture
         
 #if DEBUG
         int samplecount = 0;
-        System.Diagnostics.Stopwatch? m_StopWatch;
+        System.Diagnostics.Stopwatch m_StopWatch = new();
 #endif
         readonly object m_Lock = new();
 
@@ -34,34 +34,35 @@ namespace QSoft.MediaCapture
             {
 #if DEBUG
                 
-                var attrs = pSample.GetUnknown<IMFAttributes>(DirectN.MFConstants.MFSampleExtension_CaptureMetadata);
-                System.Diagnostics.Trace.WriteLine($"attrs: {attrs.Count()}");
-                try
-                {
-                    var buf11 = attrs.Object.GetBlobSize(DirectN.MFConstants.MF_CAPTURE_METADATA_FACEROIS, out var len);
-                    //Infrared
-                    System.Diagnostics.Trace.WriteLine($"GetBlobSize: {buf11} {len}");
-                    var face_ptr = Marshal.AllocHGlobal((int)len);
-                    var header = Marshal.PtrToStructure<tagFaceRectInfoBlobHeader>(face_ptr);
-                    System.Diagnostics.Trace.WriteLine($"header: Size:{header.Size} Count:{header.Count}");
-                    if(len == 28)
-                    {
-                        var faceinfo = Marshal.PtrToStructure<tagFaceRectInfo>(IntPtr.Add(face_ptr, 8));
-                        System.Diagnostics.Trace.WriteLine($"faceinfo: Size:{faceinfo.Region} confidenceLevel:{faceinfo.confidenceLevel}");
-                    }
+                //var attrs = pSample.GetUnknown<IMFAttributes>(DirectN.MFConstants.MFSampleExtension_CaptureMetadata);
+                //System.Diagnostics.Trace.WriteLine($"attrs: {attrs.Count()}");
+                //try
+                //{
+                //    var buf11 = attrs.Object.GetBlobSize(DirectN.MFConstants.MF_CAPTURE_METADATA_FACEROIS, out var len);
+                //    //Infrared
+                //    System.Diagnostics.Trace.WriteLine($"GetBlobSize: {buf11} {len}");
+                //    var face_ptr = Marshal.AllocHGlobal((int)len);
+                //    var header = Marshal.PtrToStructure<tagFaceRectInfoBlobHeader>(face_ptr);
+                //    System.Diagnostics.Trace.WriteLine($"header: Size:{header.Size} Count:{header.Count}");
+                //    if(len == 28)
+                //    {
+                //        var faceinfo = Marshal.PtrToStructure<tagFaceRectInfo>(IntPtr.Add(face_ptr, 8));
+                //        System.Diagnostics.Trace.WriteLine($"faceinfo: Size:{faceinfo.Region} confidenceLevel:{faceinfo.confidenceLevel}");
+                //    }
                     
                     
-                    Marshal.FreeHGlobal( face_ptr );
+                //    Marshal.FreeHGlobal( face_ptr );
                     
-                }
-                catch (Exception ee)
-                {
-                    System.Diagnostics.Trace.WriteLine(ee.Message);
-                }
-                attrs?.Dispose();
+                //}
+                //catch (Exception ee)
+                //{
+                //    System.Diagnostics.Trace.WriteLine(ee.Message);
+                //}
+                //attrs?.Dispose();
                 if (samplecount == 0)
                 {
-                    m_StopWatch = System.Diagnostics.Stopwatch.StartNew();
+                    m_StopWatch.Restart();
+                    //m_StopWatch = System.Diagnostics.Stopwatch.StartNew();
                 }
                 samplecount++;
                 if (samplecount > 100 && m_StopWatch != null)
