@@ -126,7 +126,7 @@ namespace WpfAppNET472
             //await m_WebCam.StartPreview(this.host.Child.Handle);
 
             this.host.Visibility = Visibility.Collapsed;
-            await m_WebCam.StartPreview(bmp => this.image.Source = bmp);
+            await m_WebCam.StartPreview2(bmp => this.image.Source = bmp);
         }
 
         private void Oo_MediaCaptureFailedEventHandler(object sender, MediaCaptureFailedEventArgs e)
@@ -238,7 +238,7 @@ namespace WpfAppNET472
 
         async private void combobox_recordformat_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            await this.m_WebCam.SetMediaStreamPropertiesAsync( MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_PREVIEW, this.m_MainUI.RecordFormat);
+            await this.m_WebCam.SetMediaStreamPropertiesAsync( MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, this.m_MainUI.RecordFormat);
             var combobox = sender as ComboBox;
             //combobox.SelectedItem as 
         }

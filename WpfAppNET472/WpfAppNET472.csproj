@@ -38,8 +38,8 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DirectN, Version=1.17.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DirectN.1.17.0\lib\net46\DirectN.dll</HintPath>
+    <Reference Include="DirectN, Version=1.17.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DirectN.1.17.2\lib\net46\DirectN.dll</HintPath>
     </Reference>
     <Reference Include="QSoft.DevCon.2.0.0.3, Version=2.0.0.3, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\QSoft.DevCon.2.0.0.3\lib\net472\QSoft.DevCon.2.0.0.3.dll</HintPath>

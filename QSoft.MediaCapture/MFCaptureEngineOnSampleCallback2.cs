@@ -29,6 +29,7 @@ namespace QSoft.MediaCapture
 
         public HRESULT OnSample(IMFSample pSample)
         {
+            
             if (System.Threading.Monitor.TryEnter(this.m_Lock))
             {
 #if DEBUG
@@ -75,7 +76,7 @@ namespace QSoft.MediaCapture
                 pSample.ConvertToContiguousBuffer(out var buf);
                 var ptr = buf.Lock(out var max, out var cur);
 
-                OnSample(ptr, cur);
+                //OnSample(ptr, cur);
 
                 buf.Unlock();
                 Marshal.ReleaseComObject(buf);
