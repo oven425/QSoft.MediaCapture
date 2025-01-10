@@ -40,7 +40,7 @@ namespace QSoft.MediaCapture
             SafeRelease(g_pDX11Device);
             SafeRelease(g_pDXGIMan);
             m_IsPreviewing = false;
-            
+            m_WhiteBalanceControl = null;
         }
 
         IMFCaptureEngine? m_pEngine;
@@ -95,6 +95,8 @@ namespace QSoft.MediaCapture
                 //InitFlashLight();
                 //InitTorch();
                 //InitFaceDection();
+                var wwww = this.WhiteBalanceControl.Max;
+                var bbbb = this.WhiteBalanceControl.IsSupport;
 
             }
             finally
