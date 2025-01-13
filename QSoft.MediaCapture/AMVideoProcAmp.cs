@@ -9,11 +9,13 @@ namespace QSoft.MediaCapture
 {
     public class AMVideoProcAmp(IMFCaptureEngine? engine, DirectN.tagVideoProcAmpProperty property)
     {
+        protected AMVideoProcAmpRange? m_Range;
+
         long m_Preset;
         protected long Preset => m_Preset;
         bool m_Support;
         public bool IsSupport { get => m_Support; }
-        protected AMVideoProcAmpRange Range => GetRange();
+        protected AMVideoProcAmpRange Range => m_Range ??= GetRange();
         protected AMVideoProcAmpRange GetRange()
         {
             IMFCaptureSource? capturesource = null;

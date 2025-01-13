@@ -95,8 +95,6 @@ namespace QSoft.MediaCapture
                 //InitFlashLight();
                 //InitTorch();
                 //InitFaceDection();
-                var wwww = this.WhiteBalanceControl.Max;
-                var bbbb = this.WhiteBalanceControl.IsSupport;
 
             }
             finally
