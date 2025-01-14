@@ -88,15 +88,15 @@ namespace WpfAppNET472
             //        this.m_MainUI.Torchs.Add(oo);
             //    }
             //}
-            
-            //this.m_MainUI.IsSupportFlash = this.m_WebCam.FlashLight?.IsSupported==true;
-            //if(this.m_WebCam.WhiteBalance.IsSupported)
-            //{
-            //    this.slider_whitebalance.SmallChange = this.m_WebCam.WhiteBalance.Step;
-            //    this.slider_whitebalance.Minimum = this.m_WebCam.WhiteBalance.Min;
 
-            //    this.slider_whitebalance.Maximum = this.m_WebCam.WhiteBalance.Max;
-            //}
+            //this.m_MainUI.IsSupportFlash = this.m_WebCam.FlashLight?.IsSupported==true;
+            if (this.m_WebCam.WhiteBalanceControl.IsSupport)
+            {
+                this.slider_whitebalance.SmallChange = this.m_WebCam.WhiteBalanceControl.Step;
+                this.slider_whitebalance.Minimum = this.m_WebCam.WhiteBalanceControl.Min;
+
+                this.slider_whitebalance.Maximum = this.m_WebCam.WhiteBalanceControl.Max;
+            }
             System.Diagnostics.Trace.WriteLine($"{m_WebCam.FriendName}");
             var capturess = m_WebCam.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
             //System.Diagnostics.Trace.WriteLine($"record types");
@@ -126,7 +126,7 @@ namespace WpfAppNET472
             //await m_WebCam.StartPreview(this.host.Child.Handle);
 
             this.host.Visibility = Visibility.Collapsed;
-            await m_WebCam.StartPreview2(bmp => this.image.Source = bmp);
+            await m_WebCam.StartPreview(bmp => this.image.Source = bmp);
         }
 
         private void Oo_MediaCaptureFailedEventHandler(object sender, MediaCaptureFailedEventArgs e)
@@ -175,7 +175,18 @@ namespace WpfAppNET472
 
         private void slider_whitebalance_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            //m_WebCam?.WhiteBalance.SetValue((int)e.NewValue, false);
+            if(this.checkbox_wh_auto.IsChecked == false)
+            {
+                m_WebCam?.WhiteBalanceControl.SetValue((int)e.NewValue, false);
+            }
+        }
+
+        private void checkbox_wh_auto_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is CheckBox checkbox)
+            {
+                m_WebCam?.WhiteBalanceControl.SetValue(0, checkbox.IsChecked == true);
+            }
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -240,8 +251,9 @@ namespace WpfAppNET472
         {
             await this.m_WebCam.SetMediaStreamPropertiesAsync( MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, this.m_MainUI.RecordFormat);
             var combobox = sender as ComboBox;
-            //combobox.SelectedItem as 
         }
+
+        
     }
 
 

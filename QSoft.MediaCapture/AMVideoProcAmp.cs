@@ -70,8 +70,21 @@ namespace QSoft.MediaCapture
         //    //isauto = auto;
         //    return vv1;
         //}
+        //public HRESULT SetAuto(bool auto)
+        //{
+        //    var flag = auto switch
+        //    {
+        //        true => DirectN.tagVideoProcAmpFlags.VideoProcAmp_Flags_Auto,
+        //        false => DirectN.tagVideoProcAmpFlags.VideoProcAmp_Flags_Manual
+        //    };
+        //    return HRESULTS.S_OK;
+        //}        
 
-        protected HRESULT SetValue(int value, bool auto)
+        public void SetValue(int value)
+        {
+
+        }
+        public HRESULT SetValue(int value, bool auto)
         {
             var flag = auto switch
             {
