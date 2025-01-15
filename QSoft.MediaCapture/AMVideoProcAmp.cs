@@ -9,6 +9,13 @@ namespace QSoft.MediaCapture
 {
     public class AMVideoProcAmp(IMFCaptureEngine? engine, DirectN.tagVideoProcAmpProperty property)
     {
+        public static AMVideoProcAmp Create(IMFCaptureEngine engine, DirectN.tagVideoProcAmpProperty property)
+        {
+            var videprocamp = new AMVideoProcAmp(engine, property);
+            videprocamp.GetRange();
+            return videprocamp;
+        }
+
         protected AMVideoProcAmpRange? m_Range;
 
         long m_Preset;
