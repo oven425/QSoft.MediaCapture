@@ -115,7 +115,18 @@ namespace QSoft.MediaCapture
     public partial class WebCam_MF
     {
         WhiteBalanceControl? m_WhiteBalanceControl;
-        public WhiteBalanceControl WhiteBalanceControl=> m_WhiteBalanceControl ??= new(m_pEngine);
+        public WhiteBalanceControl WhiteBalanceControl
+        {
+            get
+            {
+                if(m_WhiteBalanceControl is null)
+                {
+                    m_WhiteBalanceControl = new(m_pEngine);
+                    m_WhiteBalanceControl.Init();
+                }
+                return m_WhiteBalanceControl;
+            }
+        }
     }
 
 
@@ -125,7 +136,6 @@ namespace QSoft.MediaCapture
         public long Max =>Range.Max;
         public long Min => Range.Min;
         public long Step => Range.Step;
-
     }
 
 }

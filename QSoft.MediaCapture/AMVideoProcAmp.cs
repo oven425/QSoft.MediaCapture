@@ -16,8 +16,15 @@ namespace QSoft.MediaCapture
             return videprocamp;
         }
 
-        protected AMVideoProcAmpRange? m_Range;
+        internal void Init()
+        {
+            this.GetRange();
+        }
 
+
+
+        protected AMVideoProcAmpRange? m_Range;
+        public bool IsAuto { get; private set; }
         long m_Preset;
         protected long Preset => m_Preset;
         bool m_Support;
@@ -53,44 +60,31 @@ namespace QSoft.MediaCapture
         }
 
 
-        //long GetValue()
-        //{
-        //    //isauto = true;
-        //    var auto = true;
-        //    long vv1 = 0;
-        //    GetIAMVideoProcAmp(amp =>
-        //    {
-        //        var hr = amp.Get((int)DirectN.tagVideoProcAmpProperty.VideoProcAmp_WhiteBalance, out var vv, out var flag);
-        //        if (hr == HRESULTS.S_OK)
-        //        {
-        //            var ff = (DirectN.tagVideoProcAmpFlags)flag;
-        //            auto = ff switch
-        //            {
-        //                tagVideoProcAmpFlags.VideoProcAmp_Flags_Auto => true,
-        //                tagVideoProcAmpFlags.VideoProcAmp_Flags_Manual => false,
-        //                _ => true
-        //            };
-        //            vv1 = vv;
-        //        }
-        //        return hr;
-        //    });
-        //    //isauto = auto;
-        //    return vv1;
-        //}
-        //public HRESULT SetAuto(bool auto)
-        //{
-        //    var flag = auto switch
-        //    {
-        //        true => DirectN.tagVideoProcAmpFlags.VideoProcAmp_Flags_Auto,
-        //        false => DirectN.tagVideoProcAmpFlags.VideoProcAmp_Flags_Manual
-        //    };
-        //    return HRESULTS.S_OK;
-        //}        
-
-        public void SetValue(int value)
+        protected HRESULT GetValue()
         {
-
+            IMFCaptureSource? capturesource = null;
+            IMFMediaSource? mediasource = null;
+            try
+            {
+                var hr = engine.GetSource(out capturesource);
+                if (hr != HRESULTS.S_OK || capturesource == null) return HRESULTS.S_FALSE;
+                capturesource.GetCaptureDeviceSource(MF_CAPTURE_ENGINE_DEVICE_TYPE.MF_CAPTURE_ENGINE_DEVICE_TYPE_VIDEO, out mediasource);
+                var videoprocamp = mediasource as IAMVideoProcAmp;
+                if (videoprocamp != null)
+                {
+                    videoprocamp.Get((int)property, out var vv, out var flag);
+                }
+            }
+            finally
+            {
+                WebCam_MF.SafeRelease(mediasource);
+                WebCam_MF.SafeRelease(capturesource);
+            }
+            return HRESULTS.S_OK;
         }
+
+
+
         public HRESULT SetValue(int value, bool auto)
         {
             var flag = auto switch
