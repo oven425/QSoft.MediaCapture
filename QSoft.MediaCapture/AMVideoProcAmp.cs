@@ -9,27 +9,42 @@ namespace QSoft.MediaCapture
 {
     public class AMVideoProcAmp(IMFCaptureEngine? engine, DirectN.tagVideoProcAmpProperty property)
     {
-        public static AMVideoProcAmp Create(IMFCaptureEngine engine, DirectN.tagVideoProcAmpProperty property)
-        {
-            var videprocamp = new AMVideoProcAmp(engine, property);
-            videprocamp.GetRange();
-            return videprocamp;
-        }
-
         internal void Init()
         {
             this.GetRange();
+            this.GetValue();
+        }
+
+        public long Max { get; private set; }
+        public long Min { get; private set; }
+        public long Step { get; private set; }
+
+        //protected AMVideoProcAmpRange? m_Range;
+        public bool IsAuto
+        {
+            set=> this.SetValue((int)this.m_Value, value);
+            get
+            {
+                var hr = GetValue();
+                return this.m_IsAuto;
+            }
         }
 
 
-
-        protected AMVideoProcAmpRange? m_Range;
-        public bool IsAuto { get; private set; }
-        long m_Preset;
-        protected long Preset => m_Preset;
-        bool m_Support;
-        public bool IsSupport { get => m_Support; }
-        protected AMVideoProcAmpRange Range => m_Range ??= GetRange();
+        public bool IsSupport { get; private set; }
+        public long Value
+        {
+            set
+            {
+                this.SetValue((int)value, this.m_IsAuto);
+            }
+            get
+            {
+                var hr = GetValue();
+                return m_Value;
+            }
+        }
+        //protected AMVideoProcAmpRange Range => m_Range ??= GetRange();
         protected AMVideoProcAmpRange GetRange()
         {
             IMFCaptureSource? capturesource = null;
@@ -45,8 +60,11 @@ namespace QSoft.MediaCapture
                     hr = videoprocamp.GetRange((int)property, out var min, out var max, out var step, out var dd, out var caps);
                     if (hr == HRESULTS.S_OK)
                     {
-                        m_Support = true;
-                        return new AMVideoProcAmpRange(max, min, step);
+                        this.IsSupport = true;
+                        this.Max = max;
+                        this.Min = min;
+                        this.Step = step;
+                        //return new AMVideoProcAmpRange(max, min, step);
                     }
                 }
 
@@ -56,10 +74,12 @@ namespace QSoft.MediaCapture
                 WebCam_MF.SafeRelease(mediasource);
                 WebCam_MF.SafeRelease(capturesource);
             }
-            return new(0, 0, 0);
+            return null;
+            //return new(0, 0, 0);
         }
 
-
+        long m_Value;
+        bool m_IsAuto;
         protected HRESULT GetValue()
         {
             IMFCaptureSource? capturesource = null;
@@ -72,7 +92,9 @@ namespace QSoft.MediaCapture
                 var videoprocamp = mediasource as IAMVideoProcAmp;
                 if (videoprocamp != null)
                 {
-                    videoprocamp.Get((int)property, out var vv, out var flag);
+                    videoprocamp.Get((int)property, out m_Value, out var flags);
+                    var ff = (DirectN.tagVideoProcAmpFlags)flags;
+                    this.m_IsAuto = ff == tagVideoProcAmpFlags.VideoProcAmp_Flags_Auto;
                 }
             }
             finally
@@ -92,8 +114,8 @@ namespace QSoft.MediaCapture
                 true => DirectN.tagVideoProcAmpFlags.VideoProcAmp_Flags_Auto,
                 false => DirectN.tagVideoProcAmpFlags.VideoProcAmp_Flags_Manual
             };
-            var aa = value / this.Range.Step;
-            aa = aa * this.Range.Step;
+            var aa = value / this.Step;
+            aa = aa * this.Step;
 
             if (engine is null) return HRESULTS.MF_E_NOT_INITIALIZED;
             IMFCaptureSource? capturesource = null;
@@ -106,7 +128,12 @@ namespace QSoft.MediaCapture
                 var videoprocamp = mediasource as IAMVideoProcAmp;
                 if (videoprocamp != null)
                 {
-                    videoprocamp.Set((int)property, (int)aa, (int)flag);
+                    hr = videoprocamp.Set((int)property, (int)aa, (int)flag);
+                    if(hr == HRESULTS.S_OK)
+                    {
+                        this.m_Value = aa;
+                        this.m_IsAuto = auto;
+                    }
                 }
             }
             finally

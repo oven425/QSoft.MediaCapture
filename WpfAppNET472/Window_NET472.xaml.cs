@@ -92,6 +92,8 @@ namespace WpfAppNET472
             //this.m_MainUI.IsSupportFlash = this.m_WebCam.FlashLight?.IsSupported==true;
             if (this.m_WebCam.WhiteBalanceControl.IsSupport)
             {
+                this.m_MainUI.WhiteBalance.Value = (int)m_WebCam.WhiteBalanceControl.Value;
+                this.m_MainUI.WhiteBalance.IsAuto = m_WebCam.WhiteBalanceControl.IsAuto;
                 this.slider_whitebalance.SmallChange = this.m_WebCam.WhiteBalanceControl.Step;
                 this.slider_whitebalance.Minimum = this.m_WebCam.WhiteBalanceControl.Min;
 
@@ -175,17 +177,14 @@ namespace WpfAppNET472
 
         private void slider_whitebalance_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if(this.checkbox_wh_auto.IsChecked == false)
-            {
-                m_WebCam?.WhiteBalanceControl.SetValue((int)e.NewValue, false);
-            }
+            m_WebCam.WhiteBalanceControl.Value = (int)e.NewValue;
         }
 
         private void checkbox_wh_auto_Click(object sender, RoutedEventArgs e)
         {
             if (sender is CheckBox checkbox)
             {
-                m_WebCam?.WhiteBalanceControl.SetValue(0, checkbox.IsChecked == true);
+                m_WebCam.WhiteBalanceControl.IsAuto = checkbox.IsChecked == true;
             }
         }
 
@@ -260,6 +259,7 @@ namespace WpfAppNET472
 
     public class MainUI:INotifyPropertyChanged
     {
+        public VideoAmpVM WhiteBalance { set; get; } = new VideoAmpVM();
         bool m_IsSupportFlash;
         bool m_IsSupportTorch;
         ImageEncodingProperties m_RecordFormat;
@@ -294,13 +294,13 @@ namespace WpfAppNET472
         Manual
     }
 
-    public class VideoAmp: INotifyPropertyChanged
+    public class VideoAmpVM: INotifyPropertyChanged
     {
         int m_Max;
         int m_Min;
         int m_Step;
         int m_Value;
-        VideoAmpState m_VideoAmpState;
+        bool m_IsAuto;
         public int Max
         {
             get => m_Max;
@@ -310,6 +310,21 @@ namespace WpfAppNET472
         {
             get => m_Min;
             set { m_Min = value; this.Update("Min"); }
+        }
+        public int Step
+        {
+            get => m_Step;
+            set { m_Step = value; this.Update("Step"); }
+        }
+        public int Value
+        {
+            get => m_Value;
+            set { m_Value = value; this.Update("Value"); }
+        }
+        public bool IsAuto
+        {
+            get => m_IsAuto;
+            set { m_IsAuto = value; this.Update("IsAuto"); }
         }
         public event PropertyChangedEventHandler PropertyChanged;
         void Update(string name) => this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

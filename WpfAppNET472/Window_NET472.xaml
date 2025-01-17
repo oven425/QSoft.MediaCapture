@@ -42,8 +42,8 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <CheckBox x:Name="checkbox_wh_auto" Click="checkbox_wh_auto_Click"/>
-                <Slider Grid.Column="1" x:Name="slider_whitebalance" ValueChanged="slider_whitebalance_ValueChanged"  IsMoveToPointEnabled="True"/>
+                <CheckBox IsChecked="{Binding WhiteBalance.IsAuto}" x:Name="checkbox_wh_auto" Click="checkbox_wh_auto_Click"/>
+                <Slider Grid.Column="1" Value="{Binding WhiteBalance.Value}" x:Name="slider_whitebalance" ValueChanged="slider_whitebalance_ValueChanged"  IsMoveToPointEnabled="True"/>
 
             </Grid>
 
