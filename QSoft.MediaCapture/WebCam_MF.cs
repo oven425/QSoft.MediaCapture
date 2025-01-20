@@ -71,7 +71,7 @@ namespace QSoft.MediaCapture
                 //}
 
                 hr = pAttributes.SetUnknown(MFConstants.MF_CAPTURE_ENGINE_D3D_MANAGER, g_pDXGIMan);
-                if(m_Setting.Shared)
+                if (m_Setting.Shared)
                 {
                     pAttributes.SetUINT32(MFConstants.MF_DEVSOURCE_ATTRIBUTE_FRAMESERVER_SHARE_MODE, 1);
                 }
