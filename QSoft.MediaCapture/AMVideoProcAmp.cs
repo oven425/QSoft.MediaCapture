@@ -45,13 +45,13 @@ namespace QSoft.MediaCapture
             }
         }
         //protected AMVideoProcAmpRange Range => m_Range ??= GetRange();
-        protected AMVideoProcAmpRange GetRange()
+        protected void GetRange()
         {
             IMFCaptureSource? capturesource = null;
             IMFMediaSource? mediasource = null;
             try
             {
-                if (engine is null) return new(0, 0, 0);
+                if (engine is null) return;
                 engine?.GetSource(out capturesource);
                 var hr = capturesource.GetCaptureDeviceSource(MF_CAPTURE_ENGINE_DEVICE_TYPE.MF_CAPTURE_ENGINE_DEVICE_TYPE_VIDEO, out mediasource);
 
@@ -74,8 +74,6 @@ namespace QSoft.MediaCapture
                 WebCam_MF.SafeRelease(mediasource);
                 WebCam_MF.SafeRelease(capturesource);
             }
-            return null;
-            //return new(0, 0, 0);
         }
 
         long m_Value;
@@ -143,12 +141,5 @@ namespace QSoft.MediaCapture
             }
             return HRESULTS.S_OK;
         }
-    }
-
-    public class AMVideoProcAmpRange(long max, long min, long step)
-    {
-        public long Max => max;
-        public long Min => min;
-        public long Step => step;
     }
 }

@@ -25,21 +25,21 @@ namespace QSoft.MediaCapture
         }
     }
 
-    public enum ColorTemperaturePreset
-    {
-        Auto,
-        Manual,
-        Cloudy,
-        Daylight,
-        Flash,
-        Fluorescent,
-        Tungsten,
-        Candlelight
-    }
+    //public enum ColorTemperaturePreset
+    //{
+    //    Auto,
+    //    Manual,
+    //    Cloudy,
+    //    Daylight,
+    //    Flash,
+    //    Fluorescent,
+    //    Tungsten,
+    //    Candlelight
+    //}
 
     public class WhiteBalanceControl(IMFCaptureEngine? engine): AMVideoProcAmp(engine, tagVideoProcAmpProperty.VideoProcAmp_WhiteBalance)
     {
-        public ColorTemperaturePreset Preset { get; }
+        //public ColorTemperaturePreset Preset { get; }
 
     }
 
