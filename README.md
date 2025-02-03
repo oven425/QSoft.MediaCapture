@@ -70,3 +70,10 @@ if(camera != null)
 }
 
 ```
+
+# WhiteBalance contorl
+use IAMVideoProcAmp control, not media founction modern function
+
+# Flash and Torch
+use windows function control, not use windows app sdk,
+but not verify, please tell me, if any question

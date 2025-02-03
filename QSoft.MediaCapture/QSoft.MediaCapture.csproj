@@ -17,7 +17,8 @@
     <Description>Easy use webcam or video capture card</Description>
     <PackageIcon>48720503562_c9ae7998dc_o.jpg</PackageIcon>
     <PackageReleaseNotes>1. add whitebalance porperty can control
-2. add flashlight and torch, but not verify for device</PackageReleaseNotes>
+2. add flashlight and torch, but not verify for device
+3. update new DirectN library</PackageReleaseNotes>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <Title>MediaCapture.NET</Title>
     <PackageId>$(MSBuildProjectName)</PackageId>
