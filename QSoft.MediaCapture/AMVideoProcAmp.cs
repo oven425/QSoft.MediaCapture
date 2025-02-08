@@ -19,10 +19,9 @@ namespace QSoft.MediaCapture
         public long Min { get; private set; }
         public long Step { get; private set; }
 
-        //protected AMVideoProcAmpRange? m_Range;
         public bool IsAuto
         {
-            set=> this.SetValue((int)this.m_Value, value);
+            set => this.SetValue((int)this.m_Value, value);
             get
             {
                 var hr = GetValue();
@@ -45,7 +44,7 @@ namespace QSoft.MediaCapture
             }
         }
         //protected AMVideoProcAmpRange Range => m_Range ??= GetRange();
-        protected void GetRange()
+        internal void GetRange()
         {
             IMFCaptureSource? capturesource = null;
             IMFMediaSource? mediasource = null;
@@ -78,7 +77,7 @@ namespace QSoft.MediaCapture
 
         long m_Value;
         bool m_IsAuto;
-        protected HRESULT GetValue()
+        internal HRESULT GetValue()
         {
             IMFCaptureSource? capturesource = null;
             IMFMediaSource? mediasource = null;
@@ -105,7 +104,7 @@ namespace QSoft.MediaCapture
 
 
 
-        public HRESULT SetValue(int value, bool auto)
+        internal HRESULT SetValue(int value, bool auto)
         {
             var flag = auto switch
             {
@@ -127,7 +126,7 @@ namespace QSoft.MediaCapture
                 if (videoprocamp != null)
                 {
                     hr = videoprocamp.Set((int)property, (int)aa, (int)flag);
-                    if(hr == HRESULTS.S_OK)
+                    if (hr == HRESULTS.S_OK)
                     {
                         this.m_Value = aa;
                         this.m_IsAuto = auto;
@@ -142,4 +141,5 @@ namespace QSoft.MediaCapture
             return HRESULTS.S_OK;
         }
     }
+
 }

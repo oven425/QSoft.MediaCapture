@@ -38,7 +38,7 @@ namespace WpfAppNET472
         {
 
         }
-
+        
         MainUI m_MainUI;
         Dictionary<string, WebCam_MF> m_WebCams = new Dictionary<string, WebCam_MF>();
         [DllImport("mfsensorgroup", ExactSpelling = true)]
