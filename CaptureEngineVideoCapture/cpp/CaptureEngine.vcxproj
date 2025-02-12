@@ -90,12 +90,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Capture.cpp" />
+    <ClCompile Include="MFCaptureEngineOnSampleCallback.cpp" />
     <ClCompile Include="utils.cpp" />
     <ClCompile Include="winmain.cpp" />
     <ClCompile Include="PreviewWnd.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Capture.h" />
+    <ClInclude Include="MFCaptureEngineOnSampleCallback.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

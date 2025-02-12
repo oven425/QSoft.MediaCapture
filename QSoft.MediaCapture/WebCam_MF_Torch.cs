@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+//https://learn.microsoft.com/en-us/windows-hardware/drivers/stream/ksproperty-cameracontrol-extended-torchmode
 
 namespace QSoft.MediaCapture
 {
@@ -11,58 +12,97 @@ namespace QSoft.MediaCapture
     {
         public void InitTorch()
         {
-            this.TorchLight = new TorchLight(this.m_pEngine);
+            this.TorchLight = new TorchLight(new (this.m_pEngine, KSPROPERTY_CAMERACONTROL_EXTENDED.KSPROPERTY_CAMERACONTROL_EXTENDED_TORCHMODE));
         }
         public TorchLight? TorchLight { private set; get; }
     }
-    //https://learn.microsoft.com/en-us/windows-hardware/drivers/stream/ksproperty-cameracontrol-extended-torchmode
-    public class TorchLight : ExtendedCameraControl
+    public class TorchLight(ExtendedCameraControl extctrl) 
     {
-        readonly List<TorchLightState> m_SupportStates = [];
-        public TorchLight(IMFCaptureEngine? engine)
-            : base(engine, KSPROPERTY_CAMERACONTROL_EXTENDED.KSPROPERTY_CAMERACONTROL_EXTENDED_TORCHMODE)
+        public List<TorchLightState> SupportStates => extctrl.GetCapabilities<TorchLightState>(cap=> 
         {
-            var hr = this.GetCapabilities(out var cap);
-            if (hr == HRESULTS.S_OK)
+            List<TorchLightState> supports = [];
+            var off = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_OFF;
+            if (off == DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_OFF)
             {
-                var off = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_OFF;
-                if (off == DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_OFF)
-                {
-                    m_SupportStates.Add(TorchLightState.OFF);
-                }
-                var on = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_ON;
-                if (on == DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_ON)
-                {
-                    m_SupportStates.Add(TorchLightState.ON);
-                }
-                var on_adjistablepower = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_ON_ADJUSTABLEPOWER;
-                if (on_adjistablepower == DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_ON_ADJUSTABLEPOWER)
-                {
-                    m_SupportStates.Add(TorchLightState.ON_ADJUSTABLEPOWER);
-                }
+                supports.Add(TorchLightState.OFF);
             }
+            var on = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_ON;
+            if (on == DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_ON)
+            {
+                supports.Add(TorchLightState.ON);
+            }
+            var on_adjistablepower = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_ON_ADJUSTABLEPOWER;
+            if (on_adjistablepower == DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_ON_ADJUSTABLEPOWER)
+            {
+                supports.Add(TorchLightState.ON_ADJUSTABLEPOWER);
+            }
+            return supports;
+        });
+        public bool IsSupported => extctrl.IsSupported;
+        //public TorchLight(IMFCaptureEngine? engine)
+        //    : base(engine, KSPROPERTY_CAMERACONTROL_EXTENDED.KSPROPERTY_CAMERACONTROL_EXTENDED_TORCHMODE)
+        //{
+        //    this.GetCapabilities<TorchLightState>(cap =>
+        //    {
+        //        List<TorchLightState> supports = [];
+        //        var off = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_OFF;
+        //        if (off == DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_OFF)
+        //        {
+        //            supports.Add(TorchLightState.OFF);
+        //        }
+        //        var on = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_ON;
+        //        if (on == DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_ON)
+        //        {
+        //            supports.Add(TorchLightState.ON);
+        //        }
+        //        var on_adjistablepower = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_ON_ADJUSTABLEPOWER;
+        //        if (on_adjistablepower == DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_ON_ADJUSTABLEPOWER)
+        //        {
+        //            supports.Add(TorchLightState.ON_ADJUSTABLEPOWER);
+        //        }
+        //        return supports;
+        //    });
+        //    //var hr = this.GetCapabilities(out var cap);
+        //    //if (hr == HRESULTS.S_OK)
+        //    //{
+        //    //    var off = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_OFF;
+        //    //    if (off == DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_OFF)
+        //    //    {
+        //    //        m_SupportStates.Add(TorchLightState.OFF);
+        //    //    }
+        //    //    var on = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_ON;
+        //    //    if (on == DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_ON)
+        //    //    {
+        //    //        m_SupportStates.Add(TorchLightState.ON);
+        //    //    }
+        //    //    var on_adjistablepower = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_ON_ADJUSTABLEPOWER;
+        //    //    if (on_adjistablepower == DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_ON_ADJUSTABLEPOWER)
+        //    //    {
+        //    //        m_SupportStates.Add(TorchLightState.ON_ADJUSTABLEPOWER);
+        //    //    }
+        //    //}
 
 
-        }
-        public List<TorchLightState> SupportStates => m_SupportStates;
+        //}
+        //public List<TorchLightState> SupportStates => m_SupportStates;
 
 
         public void SetState(TorchLightState state)
         {
-            if (!this.IsSupported) return;
+            if (!extctrl.IsSupported) return;
             ulong setv = state switch
             {
-                TorchLightState.OFF => DirectN.Constants.KSCAMERA_EXTENDEDPROP_FLASH_OFF,
-                TorchLightState.ON => 1,
-                TorchLightState.ON_ADJUSTABLEPOWER => 2,
-                _ => 0
+                TorchLightState.OFF => DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_OFF,
+                TorchLightState.ON => DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_ON,
+                TorchLightState.ON_ADJUSTABLEPOWER => DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_ON_ADJUSTABLEPOWER,
+                _ => DirectN.Constants.KSCAMERA_EXTENDEDPROP_VIDEOTORCH_OFF
             };
-            this.Set(setv);
+            extctrl.Set(setv);
         }
 
         public TorchLightState GetState()
         {
-            var hr = this.Get(out var mode);
+            var hr = extctrl.Get(out var mode);
             if (hr == HRESULTS.S_OK)
             {
                 var getv = mode switch

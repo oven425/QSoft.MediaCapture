@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -43,6 +44,16 @@ namespace QSoft.MediaCapture
             {
                 this.IsSupported = true;
             }
+        }
+
+        public List<T> GetCapabilities<T>(Func<ulong, List<T>> func) where T : Enum
+        {
+            if(func is null) return [];
+            if (this.GetCapabilities(out var cap) == HRESULTS.S_OK)
+            {
+                return func(cap);
+            }
+            return [];
         }
 
         public HRESULT GetCapabilities(out ulong data)
@@ -114,7 +125,7 @@ namespace QSoft.MediaCapture
                 //System.Diagnostics.Trace.WriteLine($"GetCapabilities {capabilities}");
                 mode = extendedcameracontrol.GetFlags();
                 //System.Diagnostics.Trace.WriteLine($"GetFlags {mode}");
-                hr = extendedcameracontrol.CommitSettings();
+                //hr = extendedcameracontrol.CommitSettings();
                 //System.Diagnostics.Trace.WriteLine($"CommitSettings {hr}");
 
             }
@@ -133,6 +144,7 @@ namespace QSoft.MediaCapture
         public HRESULT Set(ulong mode)
         {
             IMFCaptureSource? pSource = null;
+            IMFMediaSource? mediasource = null;
             IMFGetService? mfservice = null;
             IMFExtendedCameraController? extendedcameracontroller = null;
             IMFExtendedCameraControl? extendedcameracontrol = null;
@@ -140,29 +152,31 @@ namespace QSoft.MediaCapture
             try
             {
                 var hr = m_pEngine.GetSource(out pSource);
-                var sser = pSource.GetCaptureDeviceSource(MF_CAPTURE_ENGINE_DEVICE_TYPE.MF_CAPTURE_ENGINE_DEVICE_TYPE_VIDEO, out var ds);
+                var sser = pSource.GetCaptureDeviceSource(MF_CAPTURE_ENGINE_DEVICE_TYPE.MF_CAPTURE_ENGINE_DEVICE_TYPE_VIDEO, out mediasource);
 
-                mfservice = ds as IMFGetService;
+                mfservice = mediasource as IMFGetService;
                 hr = mfservice.GetService(Guid.Empty, new Guid("b91ebfee-ca03-4af4-8a82-a31752f4a0fc"), out var con);
                 extendedcameracontroller = con as IMFExtendedCameraController;
                 //https://github.com/smourier/DirectN/blob/af1d27a173291bf648d3262952e36629e9420cbc/DirectN/DirectN/Generated/KSPROPERTY_CAMERACONTROL_EXTENDED.cs#L15
 
-                hr = extendedcameracontroller.GetExtendedCameraControl(0xffffffff, (uint)m_KsProperty, out extendedcameracontrol);
+                hr = extendedcameracontroller.GetExtendedCameraControl((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.MF_CAPTURE_ENGINE_MEDIASOURCE, (uint)m_KsProperty, out extendedcameracontrol);
+                System.Diagnostics.Trace.WriteLine($"GetExtendedCameraControl {hr}");
                 if (hr != HRESULTS.S_OK || extendedcameracontrol == null) return hr;
-                //System.Diagnostics.Trace.WriteLine($"GetExtendedCameraControl {hr}");
-                var capabilities = extendedcameracontrol.GetCapabilities();
+                
+                //var capabilities = extendedcameracontrol.GetCapabilities();
                 //System.Diagnostics.Trace.WriteLine($"GetCapabilities {capabilities}");
                 hr = extendedcameracontrol.SetFlags(mode);
-                //System.Diagnostics.Trace.WriteLine($"SetFlags {hr}");
+                System.Diagnostics.Trace.WriteLine($"SetFlags {hr}");
                 hr = extendedcameracontrol.CommitSettings();
-                //System.Diagnostics.Trace.WriteLine($"CommitSettings {hr}");
-
+                System.Diagnostics.Trace.WriteLine($"CommitSettings {hr}");
+                
             }
             finally
             {
                 WebCam_MF.SafeRelease(extendedcameracontrol);
                 WebCam_MF.SafeRelease(extendedcameracontroller);
                 WebCam_MF.SafeRelease(mfservice);
+                WebCam_MF.SafeRelease(mediasource);
                 WebCam_MF.SafeRelease(pSource);
             }
             return HRESULTS.S_OK;

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QSoft.MediaCapture
+namespace QSoft.MediaCapture.DShow
 {
     public class AMVideoProcAmp(IMFCaptureEngine? engine, DirectN.tagVideoProcAmpProperty property)
     {

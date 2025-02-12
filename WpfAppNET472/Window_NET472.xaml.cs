@@ -76,20 +76,20 @@ namespace WpfAppNET472
             
             await m_WebCam.InitCaptureEngine(new WebCam_MF_Setting()
             {
-                Shared = true,
+                Shared = false,
                 IsMirror = allcamera[m_WebCam.FriendName] == CameraPanel.Front,
             });
-            //this.m_MainUI.IsSupportTorch = this.m_WebCam.TorchLight?.IsSupported == true;
-            //this.m_MainUI.Torchs.Clear();
-            //if (this.m_MainUI.IsSupportTorch)
-            //{
-            //    foreach(var oo in this.m_WebCam.TorchLight.SupportStates)
-            //    {
-            //        this.m_MainUI.Torchs.Add(oo);
-            //    }
-            //}
+            this.m_MainUI.IsSupportTorch = this.m_WebCam.TorchLight?.IsSupported == true;
+            this.m_MainUI.Torchs.Clear();
+            if (this.m_MainUI.IsSupportTorch)
+            {
+                foreach (var oo in this.m_WebCam.TorchLight.SupportStates)
+                {
+                    this.m_MainUI.Torchs.Add(oo);
+                }
+            }
 
-            //this.m_MainUI.IsSupportFlash = this.m_WebCam.FlashLight?.IsSupported==true;
+            this.m_MainUI.IsSupportFlash = this.m_WebCam.FlashLight?.IsSupported==true;
             if (this.m_WebCam.WhiteBalanceControl.IsSupport)
             {
                 this.m_MainUI.WhiteBalance.Value = (int)m_WebCam.WhiteBalanceControl.Value;
@@ -107,7 +107,7 @@ namespace WpfAppNET472
                 .OrderBy(x => x.Width * x.Height))
             {
                 this.m_MainUI.RecordFormats.Add(oo);
-                //System.Diagnostics.Trace.WriteLine($"{oo.Width}x{oo.Height} {oo.Fps} {oo.SubType.FormatToString()}");
+                System.Diagnostics.Trace.WriteLine($"{oo.Width}x{oo.Height} {oo.Fps} {oo.SubType.FormatToString()}");
             }
             var photoss = m_WebCam.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT);
             //System.Diagnostics.Trace.WriteLine($"photo types");
@@ -116,7 +116,7 @@ namespace WpfAppNET472
                 .OrderBy(x => x.Width * x.Height))
             {
                 this.m_MainUI.PhotoFormats.Add(oo);
-                //System.Diagnostics.Trace.WriteLine($"{oo.Width}x{oo.Height} {oo.Fps} {oo.SubType.FormatToString()}");
+                System.Diagnostics.Trace.WriteLine($"{oo.Width}x{oo.Height} {oo.Fps} {oo.SubType.FormatToString()}");
             }
             if(photoss.Count > 0)
             {
@@ -192,6 +192,9 @@ namespace WpfAppNET472
         {
             var combobox = sender as ComboBox;
             var sw = System.Diagnostics.Stopwatch.StartNew();
+            var state = combobox.SelectedItem as FlashState?;
+            System.Diagnostics.Trace.WriteLine($"TorchLight:{state}");
+            m_WebCam.FlashLight.SetState(state ?? FlashState.OFF);
             //switch (combobox.SelectedIndex)
             //{
             //    case 0:
@@ -210,29 +213,20 @@ namespace WpfAppNET472
             //        }
             //        break;
             //}
+
             sw.Stop();
-            System.Diagnostics.Trace.WriteLine($"FlashLight:{sw.ElapsedMilliseconds}");
+            System.Diagnostics.Trace.WriteLine($"Set FlashLight:{sw.ElapsedMilliseconds}");
         }
 
         private void combobox_torch_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var combobox = sender as ComboBox;
             var sw = System.Diagnostics.Stopwatch.StartNew();
-            //switch (combobox.SelectedIndex)
-            //{
-            //    case 0:
-            //        {
-            //            m_WebCam.TorchLight.SetState(TorchLightState.OFF);
-            //        }
-            //        break;
-            //    case 1:
-            //        {
-            //            m_WebCam.TorchLight.SetState(TorchLightState.ON);
-            //        }
-            //        break;
-            //}
+            var state = combobox.SelectedItem as TorchLightState?;
+            System.Diagnostics.Trace.WriteLine($"TorchLight:{state}");
+            m_WebCam.TorchLight.SetState(state ?? TorchLightState.OFF);
             sw.Stop();
-            System.Diagnostics.Trace.WriteLine($"TorchLight:{sw.ElapsedMilliseconds}");
+            System.Diagnostics.Trace.WriteLine($"Set TorchLight:{sw.ElapsedMilliseconds}");
 
         }
         int m_Index = -1;
@@ -278,8 +272,9 @@ namespace WpfAppNET472
             set { m_RecordFormat = value; this.Update("RecordFormat"); }
             get => m_RecordFormat;
         }
+        public ObservableCollection<FlashState> FlashLights { set; get; } = new ObservableCollection<FlashState>();
 
-        //public ObservableCollection<TorchLightState> Torchs { set; get; } = new ObservableCollection<TorchLightState>();
+        public ObservableCollection<TorchLightState> Torchs { set; get; } = new ObservableCollection<TorchLightState>();
         public ObservableCollection<ImageEncodingProperties> RecordFormats { set; get; }=new ObservableCollection<ImageEncodingProperties>();
         public ObservableCollection<ImageEncodingProperties> PhotoFormats { set; get; }  =new ObservableCollection<ImageEncodingProperties>();
 
