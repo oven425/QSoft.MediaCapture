@@ -46,16 +46,6 @@ namespace QSoft.MediaCapture
             }
         }
 
-        public List<T> GetCapabilities<T>(Func<ulong, List<T>> func) where T : Enum
-        {
-            if(func is null) return [];
-            if (this.GetCapabilities(out var cap) == HRESULTS.S_OK)
-            {
-                return func(cap);
-            }
-            return [];
-        }
-
         public HRESULT GetCapabilities(out ulong data)
         {
             data = 0;

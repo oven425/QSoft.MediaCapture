@@ -14,13 +14,8 @@ namespace QSoft.MediaCapture
     //    public uint Width { set; get; }
     //    public uint Height { set; get; }
     //}
-
-
     public class WebCam_MF_Setting
     {
-        /// <summary>
-        /// Enable Sahred, maybe cause flashligt, troch can not set state
-        /// </summary>
         public bool Shared { set; get; }
         public bool IsMirror { set; get; }
         public uint Rotate { set; get; }
@@ -98,8 +93,8 @@ namespace QSoft.MediaCapture
                 this.SupporCategory();
                 //ExtendedCameraControl.TetsALL(m_pEngine);
                 //InitIAMVideoProcAmp();
-                //InitFlashLight();
-                //InitTorch();
+                InitFlashLight();
+                InitTorch();
                 //InitFaceDection();
 
             }

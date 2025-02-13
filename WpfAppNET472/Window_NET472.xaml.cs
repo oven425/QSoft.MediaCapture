@@ -126,7 +126,7 @@ namespace WpfAppNET472
 
             this.host.Visibility = Visibility.Visible;
             await m_WebCam.StartPreview(this.host.Child.Handle);
-
+            m_WebCam.TorchLight.Set(1);
             //this.host.Visibility = Visibility.Collapsed;
             //await m_WebCam.StartPreview(bmp => this.image.Source = bmp);
         }

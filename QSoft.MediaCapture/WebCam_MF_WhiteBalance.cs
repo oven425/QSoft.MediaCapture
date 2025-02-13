@@ -1,5 +1,4 @@
 ﻿using DirectN;
-using QSoft.MediaCapture.DShow;
 
 namespace QSoft.MediaCapture
 {
@@ -23,25 +22,21 @@ namespace QSoft.MediaCapture
             }
         }
     }
-}
+//    Auto: 自動調整色溫
 
-namespace QSoft.MediaCapture.DShow
-{
-    //    Auto: 自動調整色溫
+//Candlelight: 大約 1,800 - 2,000 K
 
-    //Candlelight: 大約 1,800 - 2,000 K
+//Cloudy: 大約 6,000 - 7,000 K
 
-    //Cloudy: 大約 6,000 - 7,000 K
+//Daylight: 大約 5,000 - 5,500 K
 
-    //Daylight: 大約 5,000 - 5,500 K
+//Flash: 大約 5,500 - 6,000 K
 
-    //Flash: 大約 5,500 - 6,000 K
+//Fluorescent: 大約 4,000 - 5,000 K
 
-    //Fluorescent: 大約 4,000 - 5,000 K
+//Tungsten: 大約 2,700 - 3,200 K
 
-    //Tungsten: 大約 2,700 - 3,200 K
-
-    //Manual: 可根據需要手動設置具體色溫值
+//Manual: 可根據需要手動設置具體色溫值
     public enum ColorTemperaturePreset
     {
         Auto,
@@ -118,5 +113,4 @@ namespace QSoft.MediaCapture.DShow
             }
         }
     }
-
 }
