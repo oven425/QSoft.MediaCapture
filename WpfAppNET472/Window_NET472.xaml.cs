@@ -77,6 +77,7 @@ namespace WpfAppNET472
             await m_WebCam.InitCaptureEngine(new WebCam_MF_Setting()
             {
                 Shared = false,
+                Rotate = CameraRotates.Rotate90,
                 IsMirror = allcamera[m_WebCam.FriendName] == CameraPanel.Front,
             });
             this.m_MainUI.IsSupportTorch = this.m_WebCam.TorchLight?.IsSupported == true;
@@ -124,11 +125,11 @@ namespace WpfAppNET472
             }
             await m_WebCam.SetMediaStreamPropertiesAsync(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, m_MainUI.RecordFormats.LastOrDefault());
 
-            this.host.Visibility = Visibility.Visible;
-            await m_WebCam.StartPreview(this.host.Child.Handle);
-            m_WebCam.TorchLight.Set(1);
-            //this.host.Visibility = Visibility.Collapsed;
-            //await m_WebCam.StartPreview(bmp => this.image.Source = bmp);
+            //this.host.Visibility = Visibility.Visible;
+            //await m_WebCam.StartPreview(this.host.Child.Handle);
+
+            this.host.Visibility = Visibility.Collapsed;
+            await m_WebCam.StartPreview(bmp => this.image.Source = bmp);
         }
 
         private void Oo_MediaCaptureFailedEventHandler(object sender, MediaCaptureFailedEventArgs e)

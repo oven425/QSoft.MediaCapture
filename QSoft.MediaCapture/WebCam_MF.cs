@@ -14,11 +14,21 @@ namespace QSoft.MediaCapture
     //    public uint Width { set; get; }
     //    public uint Height { set; get; }
     //}
+
+    public enum CameraRotates
+    {
+        Rotate0 = 0,
+        Rotate90 = 90,
+        Rotate180 = 180,
+        Rotate270 = 270,
+        Rotate90Colockwise = -90,
+        Rotate270Colockwise = -270,
+    }
     public class WebCam_MF_Setting
     {
         public bool Shared { set; get; }
         public bool IsMirror { set; get; }
-        public uint Rotate { set; get; }
+        public CameraRotates Rotate { set; get; }
         //public WebCam_MF_Size Preview { set; get; } = new WebCam_MF_Size();
         //public WebCam_MF_Size Photo { set; get; } = new WebCam_MF_Size();
         //public WebCam_MF_Size Record { set; get; } = new WebCam_MF_Size();

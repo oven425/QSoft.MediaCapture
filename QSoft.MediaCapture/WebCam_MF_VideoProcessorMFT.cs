@@ -12,7 +12,7 @@ namespace QSoft.MediaCapture
         uint m_VideoProcessMFT_Index = 0;
         TaskCompletionSource<HRESULT>? m_TaskAddEffect;
         IMFVideoProcessorControl? m_VideoProcessor;
-        //IMFVideoProcessorControl2? m_VideoProcessor2;
+        IMFVideoProcessorControl2? m_VideoProcessor2;
         Task<HRESULT> AddVideoProcessorMFT(IMFCaptureSource source, uint streamindex)
         {
             m_VideoProcessMFT_Index = streamindex;
@@ -23,11 +23,12 @@ namespace QSoft.MediaCapture
                 var videoprocesstype = Type.GetTypeFromCLSID(DirectN.MFConstants.CLSID_VideoProcessorMFT);
                 var aaa = Activator.CreateInstance(videoprocesstype);
                 this.m_VideoProcessor = Activator.CreateInstance(videoprocesstype) as IMFVideoProcessorControl;
-                //this.m_VideoProcessor2 = this.m_VideoProcessor as IMFVideoProcessorControl2;
+                this.m_VideoProcessor2 = this.m_VideoProcessor as IMFVideoProcessorControl2;
                 HRESULT hr;
                 if (this.m_Setting.IsMirror && m_VideoProcessor != null)
                 {
                     hr = m_VideoProcessor.SetMirror(_MF_VIDEO_PROCESSOR_MIRROR.MIRROR_HORIZONTAL);
+                    m_VideoProcessor.SetRotation(_MF_VIDEO_PROCESSOR_ROTATION.ROTATION_NONE);
                     //m_VideoProcessor2.SetRotationOverride(90);
                     if (hr != HRESULTS.S_OK) return Task.FromResult(hr);
                 }
@@ -63,11 +64,9 @@ namespace QSoft.MediaCapture
             {
                 SafeRelease(m_VideoProcessor);
                 m_VideoProcessor = null;
+                m_VideoProcessor2 = null;
             }
             return hr;
         }
-
-        public static readonly Guid IID_IMFVideoProcessorControl2 = new Guid(0xBDE633D3, 0xE1DC, 0x4A7F, 0xA6, 0x93, 0xBB, 0xAE, 0x39, 0x9C, 0x4A, 0x20);
-
     }
 }
