@@ -67,24 +67,30 @@ namespace QSoft.MediaCapture
             if (!this.IsSupported) return;
             ulong setv = state switch
             {
-                FlashState.OFF => 0,
-                FlashState.ON => 1,
-                FlashState.ON_ADJUSTABLEPOWER => 2,
-                _ => 0
+                FlashState.OFF => DirectN.Constants.KSCAMERA_EXTENDEDPROP_FLASH_OFF,
+                FlashState.ON => DirectN.Constants.KSCAMERA_EXTENDEDPROP_FLASH_ON,
+                FlashState.ON_ADJUSTABLEPOWER => DirectN.Constants.KSCAMERA_EXTENDEDPROP_FLASH_ON_ADJUSTABLEPOWER,
+                FlashState.AUTO => DirectN.Constants.KSCAMERA_EXTENDEDPROP_FLASH_AUTO,
+                FlashState.AUTO_ADJUSTABLEPOWER => DirectN.Constants.KSCAMERA_EXTENDEDPROP_FLASH_AUTO_ADJUSTABLEPOWER,
+                _ => DirectN.Constants.KSCAMERA_EXTENDEDPROP_FLASH_OFF
             };
             this.Set(setv);
         }
 
         public FlashState GetState()
         {
+            System.Diagnostics.Debug.WriteLine($"Flash GetState");
             var hr = this.Get(out var mode);
+            System.Diagnostics.Debug.WriteLine($"Flash GetState:{mode}");
             if (hr == HRESULTS.S_OK)
             {
                 var getv = mode switch
                 {
-                    0 => FlashState.OFF,
-                    1 => FlashState.ON,
-                    2 => FlashState.ON_ADJUSTABLEPOWER,
+                    DirectN.Constants.KSCAMERA_EXTENDEDPROP_FLASH_OFF => FlashState.OFF,
+                    DirectN.Constants.KSCAMERA_EXTENDEDPROP_FLASH_ON => FlashState.ON,
+                    DirectN.Constants.KSCAMERA_EXTENDEDPROP_FLASH_ON_ADJUSTABLEPOWER => FlashState.ON_ADJUSTABLEPOWER,
+                    DirectN.Constants.KSCAMERA_EXTENDEDPROP_FLASH_AUTO => FlashState.AUTO,
+                    DirectN.Constants.KSCAMERA_EXTENDEDPROP_FLASH_AUTO_ADJUSTABLEPOWER => FlashState.AUTO_ADJUSTABLEPOWER,
                     _ => FlashState.OFF
                 };
                 return getv;

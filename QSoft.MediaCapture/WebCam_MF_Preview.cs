@@ -162,7 +162,7 @@ namespace QSoft.MediaCapture
         {
             HRESULT hr = HRESULTS.S_OK;
             IMFCaptureSink? pSink = null;
-            IMFCaptureSource? pSource = null;
+            IMFCaptureSource? pSource;
             try
             {
                 if (m_pEngine == null)

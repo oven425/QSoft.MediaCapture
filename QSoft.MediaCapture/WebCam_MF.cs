@@ -193,8 +193,9 @@ namespace QSoft.MediaCapture
 
         }
 
-        public void Dispose()
+        public async void Dispose()
         {
+            await this.StopPreview();
             this.DestroyCaptureEngine();
         }
     }

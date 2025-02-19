@@ -28,10 +28,10 @@
                 <ComboBox x:Name="combobox_recordformat" SelectedItem="{Binding RecordFormat}" SelectionChanged="combobox_recordformat_SelectionChanged" ItemsSource="{Binding RecordFormats}">
 
                 </ComboBox>
-                <ComboBox ItemsSource="{Binding FlashLights}" SelectionChanged="ComboBox_SelectionChanged" IsEnabled="{Binding IsSupportFlash}">
+                <ComboBox SelectedItem="{Binding FlashLight}" ItemsSource="{Binding FlashLights}" SelectionChanged="ComboBox_SelectionChanged" IsEnabled="{Binding IsSupportFlash}">
 
                 </ComboBox>
-                <ComboBox ItemsSource="{Binding Torchs}" x:Name="combobox_torch" SelectionChanged="combobox_torch_SelectionChanged" IsEnabled="{Binding IsSupportTorch}">
+                <ComboBox SelectedItem="{Binding Torch}" ItemsSource="{Binding Torchs}" x:Name="combobox_torch" SelectionChanged="combobox_torch_SelectionChanged" IsEnabled="{Binding IsSupportTorch}">
 
                 </ComboBox>
             </WrapPanel>

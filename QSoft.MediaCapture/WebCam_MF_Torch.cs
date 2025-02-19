@@ -62,7 +62,9 @@ namespace QSoft.MediaCapture
 
         public TorchLightState GetState()
         {
+            System.Diagnostics.Debug.WriteLine($"Torch GetState");
             var hr = this.Get(out var mode);
+            System.Diagnostics.Debug.WriteLine($"Torch GetState:{mode}");
             if (hr == HRESULTS.S_OK)
             {
                 var getv = mode switch

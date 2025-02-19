@@ -111,10 +111,10 @@ namespace QSoft.MediaCapture
                 hr = extendedcameracontroller.GetExtendedCameraControl(0xffffffff, (uint)m_KsProperty, out extendedcameracontrol);
                 if (hr != HRESULTS.S_OK) return hr;
                 //System.Diagnostics.Trace.WriteLine($"GetExtendedCameraControl {hr}");
-                var capabilities = extendedcameracontrol.GetCapabilities();
+                //var capabilities = extendedcameracontrol.GetCapabilities();
                 //System.Diagnostics.Trace.WriteLine($"GetCapabilities {capabilities}");
                 mode = extendedcameracontrol.GetFlags();
-                //System.Diagnostics.Trace.WriteLine($"GetFlags {mode}");
+                System.Diagnostics.Trace.WriteLine($"GetFlags {mode}");
                 //hr = extendedcameracontrol.CommitSettings();
                 //System.Diagnostics.Trace.WriteLine($"CommitSettings {hr}");
 
