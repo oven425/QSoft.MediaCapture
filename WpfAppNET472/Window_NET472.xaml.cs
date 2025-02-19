@@ -54,6 +54,7 @@ namespace WpfAppNET472
             if (m_MainUI == null)
             {
                 this.DataContext = this.m_MainUI = new MainUI();
+                var vvvv = QSoft.MediaCapture.WebCam_MF.GetAllWebCams();
                 foreach (var oo in QSoft.MediaCapture.WebCam_MF.GetAllWebCams())
                 {
                     System.Diagnostics.Trace.WriteLine($"FriendName:{oo.FriendName}");
@@ -75,11 +76,27 @@ namespace WpfAppNET472
             var allcamera = "Camera".Devices()
                 .Select(x => new { friendname=x.GetFriendName(), panel=x.Panel() })
                 .ToDictionary(x=>x.friendname, x=>x.panel);
-            
+            var or = System.Windows.Forms.SystemInformation.ScreenOrientation;
+            CameraRotates rotate = CameraRotates.Rotate0;
+            switch(or)
+            {
+                case System.Windows.Forms.ScreenOrientation.Angle0:
+                    rotate = CameraRotates.Rotate0;
+                    break;
+                case System.Windows.Forms.ScreenOrientation.Angle90:
+                    rotate = CameraRotates.Rotate90;
+                    break;
+                case System.Windows.Forms.ScreenOrientation.Angle180:
+                    rotate = CameraRotates.Rotate180;
+                    break;
+                case System.Windows.Forms.ScreenOrientation.Angle270:
+                    rotate = CameraRotates.Rotate270;
+                    break;
+            }
             await m_WebCam.InitCaptureEngine(new WebCam_MF_Setting()
             {
                 Shared = false,
-                //Rotate = CameraRotates.Rotate90,
+                Rotate = rotate,
                 IsMirror = allcamera[m_WebCam.FriendName] == CameraPanel.Front,
             });
             this.m_MainUI.IsSupportTorch = this.m_WebCam.TorchLight?.IsSupported == true;
