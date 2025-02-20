@@ -21,7 +21,7 @@ namespace QSoft.MediaCapture
 
         public bool IsAuto
         {
-            set => this.SetValue((int)this.m_Value, value);
+            //set => this.SetValue((int)this.m_Value, value);
             get
             {
                 var hr = GetValue();
@@ -33,10 +33,10 @@ namespace QSoft.MediaCapture
         public bool IsSupport { get; private set; }
         public long Value
         {
-            set
-            {
-                this.SetValue((int)value, this.m_IsAuto);
-            }
+            //set
+            //{
+            //    this.SetValue((int)value, this.m_IsAuto);
+            //}
             get
             {
                 var hr = GetValue();

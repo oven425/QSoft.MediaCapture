@@ -60,28 +60,30 @@ namespace QSoft.MediaCapture
                 switch (value)
                 {
                     case ColorTemperaturePreset.Auto:
-                        this.IsAuto = true;
+                        //this.IsAuto = true;
+                        this.SetValue(0, true);
                         break;
                     case ColorTemperaturePreset.Manual:
+                        this.SetValue(0, false);
                         // Set manual value here
                         break;
                     case ColorTemperaturePreset.Candlelight:
-                        this.Value = 1900; // 大約 1,800 - 2,000 K
+                        this.SetValue(1900, false); // 大約 1,800 - 2,000 K
                         break;
                     case ColorTemperaturePreset.Cloudy:
-                        this.Value = 6500; // 大約 6,000 - 7,000 K
+                        this.SetValue(6500, false); // 大約 6,000 - 7,000 K
                         break;
                     case ColorTemperaturePreset.Daylight:
-                        this.Value = 5250; // 大約 5,000 - 5,500 K
+                        this.SetValue(5250, false); // 大約 5,000 - 5,500 K
                         break;
                     case ColorTemperaturePreset.Flash:
-                        this.Value = 5750; // 大約 5,500 - 6,000 K
+                        this.SetValue(5750, false); // 大約 5,500 - 6,000 K
                         break;
                     case ColorTemperaturePreset.Fluorescent:
-                        this.Value = 4500; // 大約 4,000 - 5,000 K
+                        this.SetValue(4500, false); // 大約 4,000 - 5,000 K
                         break;
                     case ColorTemperaturePreset.Tungsten:
-                        this.Value = 2950; // 大約 2,700 - 3,200 K
+                        this.SetValue(2950, false);// 大約 2,700 - 3,200 K
                         break;
                 }
             }

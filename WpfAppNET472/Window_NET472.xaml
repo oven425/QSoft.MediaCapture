@@ -40,7 +40,10 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <CheckBox IsChecked="{Binding WhiteBalance.IsAuto}" x:Name="checkbox_wh_auto" Click="checkbox_wh_auto_Click"/>
+                <ComboBox x:Name="combobox_colortempature" SelectionChanged="combobox_colortempature_SelectionChanged"  SelectedItem="{Binding ColorTemperaturePreset}" ItemsSource="{Binding ColorTemperaturePresets}">
+                    
+                </ComboBox>
+                <!--<CheckBox IsChecked="{Binding WhiteBalance.IsAuto}" x:Name="checkbox_wh_auto" Click="checkbox_wh_auto_Click"/>-->
                 <Slider Grid.Column="1" Value="{Binding WhiteBalance.Value}" x:Name="slider_whitebalance" ValueChanged="slider_whitebalance_ValueChanged"  IsMoveToPointEnabled="True"/>
 
             </Grid>

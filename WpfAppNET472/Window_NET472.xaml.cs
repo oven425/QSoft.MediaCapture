@@ -119,9 +119,14 @@ namespace WpfAppNET472
                     this.m_MainUI.FlashLights.Add(oo);
                 }
             }
-
+            this.m_MainUI.ColorTemperaturePresets.Clear();
             if (this.m_WebCam.WhiteBalanceControl.IsSupport)
             {
+                foreach(var oo in typeof(ColorTemperaturePreset).GetEnumValues().Cast<ColorTemperaturePreset>())
+                {
+                    this.m_MainUI.ColorTemperaturePresets.Add(oo);
+                }
+                this.m_MainUI.ColorTemperaturePreset = this.m_WebCam.WhiteBalanceControl.Preset;
                 this.m_MainUI.WhiteBalance.Value = (int)m_WebCam.WhiteBalanceControl.Value;
                 this.m_MainUI.WhiteBalance.IsAuto = m_WebCam.WhiteBalanceControl.IsAuto;
                 this.slider_whitebalance.SmallChange = this.m_WebCam.WhiteBalanceControl.Step;
@@ -207,15 +212,13 @@ namespace WpfAppNET472
 
         private void slider_whitebalance_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            m_WebCam.WhiteBalanceControl.Value = (int)e.NewValue;
+            
+            //m_WebCam.WhiteBalanceControl.Value = (int)e.NewValue;
         }
 
         private void checkbox_wh_auto_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is CheckBox checkbox)
-            {
-                m_WebCam.WhiteBalanceControl.IsAuto = checkbox.IsChecked == true;
-            }
+
         }
         bool m_bb = false;
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -262,7 +265,16 @@ namespace WpfAppNET472
             var combobox = sender as ComboBox;
         }
 
-        
+
+
+        private void combobox_colortempature_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if(e.RemovedItems.Count >0 && e.AddedItems.Count>0)
+            {
+                this.m_WebCam.WhiteBalanceControl.Preset = this.m_MainUI.ColorTemperaturePreset;
+
+            }
+        }
     }
 
 
@@ -302,6 +314,16 @@ namespace WpfAppNET472
             get => m_Torch;
         }
         public ObservableCollection<TorchLightState> Torchs { set; get; } = new ObservableCollection<TorchLightState>();
+
+        ColorTemperaturePreset m_ColorTemperaturePreset;
+        public ColorTemperaturePreset ColorTemperaturePreset
+        {
+            set { m_ColorTemperaturePreset = value; this.Update("ColorTemperaturePreset"); }
+            get => m_ColorTemperaturePreset;
+        }
+        
+        public ObservableCollection<ColorTemperaturePreset> ColorTemperaturePresets { set; get; } = new ObservableCollection<ColorTemperaturePreset>();
+
         public ObservableCollection<ImageEncodingProperties> RecordFormats { set; get; }=new ObservableCollection<ImageEncodingProperties>();
         public ObservableCollection<ImageEncodingProperties> PhotoFormats { set; get; }  =new ObservableCollection<ImageEncodingProperties>();
 
