@@ -20,6 +20,17 @@
         <StackPanel Grid.Row="1">
             <WrapPanel  ItemWidth="100">
                 <Button x:Name="button_nextcamera" Click="button_nextcamera_Click" >NextCamera</Button>
+                <ComboBox x:Name="combobox_cameras" SelectionChanged="combobox_cameras_SelectionChanged" ItemsSource="{Binding Cameras}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Item1}"/>
+                                <TextBlock Text="-"/>
+                                <TextBlock Text="{Binding Item3}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
                 <Button x:Name="button_stratpreivew" Click="button_stratpreivew_Click">Start preview</Button>
                 <Button x:Name="button_stoppreview" Click="button_stoppreview_Click">Stop preview</Button>
                 <Button x:Name="button_takephoto" Click="button_takephoto_Click">Task photo</Button>
