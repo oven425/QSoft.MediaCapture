@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -96,5 +97,33 @@ namespace QSoft.MediaCapture.WPF
             action?.Invoke(bmp);
             return hr;
         }
+
+        public static async Task<HRESULT> StartPreview(this QSoft.MediaCapture.WebCam_MF src, Func<Image> action, System.Windows.Threading.DispatcherPriority dispatcherpriority = DispatcherPriority.Background)
+        {
+            var enc = src.GetMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
+            WriteableBitmap? bmp = null;
+            var dispatcher = Dispatcher.FromThread(System.Threading.Thread.CurrentThread);
+            if (dispatcher != null)
+            {
+                bmp = new WriteableBitmap((int)enc.Width, (int)enc.Height, 96, 96, PixelFormats.Bgr24, null);
+            }
+            else
+            {
+                await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    bmp = new WriteableBitmap((int)enc.Width, (int)enc.Height, 96, 96, PixelFormats.Bgr24, null);
+                });
+            }
+            var hr = await src.StartPreview(new MFCaptureEngineOnSampleCallback_WriteableBitmap(bmp, dispatcherpriority));
+            if(action?.Invoke() is Image image)
+            {
+                image.Source = bmp;
+                image.LayoutTransform = new RotateTransform((int)src.Setting.Rotate);
+            }
+            
+
+            return hr;
+        }
     }
+
 }

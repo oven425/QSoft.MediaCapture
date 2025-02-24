@@ -66,6 +66,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Test.cs" />
     <Compile Include="Window_NET472.xaml.cs">
       <DependentUpon>Window_NET472.xaml</DependentUpon>
     </Compile>
@@ -106,6 +107,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\QSoft.MediaCapture.WPF\QSoft.MediaCapture.WPF.csproj">
+      <Project>{ea6db88e-56ee-4562-8b9f-84a9c3487640}</Project>
+      <Name>QSoft.MediaCapture.WPF</Name>
+    </ProjectReference>
     <ProjectReference Include="..\QSoft.MediaCapture\QSoft.MediaCapture.csproj">
       <Project>{c0552673-c17e-409d-9031-60be992d024f}</Project>
       <Name>QSoft.MediaCapture</Name>

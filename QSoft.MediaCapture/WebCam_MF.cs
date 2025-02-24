@@ -36,6 +36,7 @@ namespace QSoft.MediaCapture
     public sealed partial class WebCam_MF: IDisposable
     {
         WebCam_MF_Setting m_Setting = new WebCam_MF_Setting();
+        public WebCam_MF_Setting Setting => m_Setting;
         public string FriendName { private set; get; } = "";
         public string SymbolLinkName { private set; get; } = "";
         public IComObject<IMFActivate>? CaptureObj { private set; get; }

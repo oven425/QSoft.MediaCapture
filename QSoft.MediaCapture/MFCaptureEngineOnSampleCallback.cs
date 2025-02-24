@@ -27,7 +27,6 @@ namespace QSoft.MediaCapture
         System.Diagnostics.Stopwatch m_StopWatch = new();
 #endif
         readonly object m_Lock = new();
-
         public HRESULT OnSample(IMFSample pSample)
         {
             if (System.Threading.Monitor.TryEnter(this.m_Lock))

@@ -64,7 +64,6 @@ namespace QSoft.MediaCapture
                 else if (guidType == MFConstants.MF_CAPTURE_SOURCE_CURRENT_DEVICE_MEDIA_TYPE_SET)
                 {
                     m_TaskSetCurrentType?.SetResult(hrStatus);
-                    //m_TaskSetMediaType?.SetResult(hrStatus);
                 }
                 else if (guidType == MFConstants.MF_CAPTURE_ENGINE_ERROR)
                 {

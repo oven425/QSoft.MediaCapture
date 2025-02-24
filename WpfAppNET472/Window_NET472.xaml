@@ -16,7 +16,11 @@
         <WindowsFormsHost Background="Black" x:Name="host">
             <winform:PictureBox SizeChanged="picture_SizeChanged" x:Name="picture"/>
         </WindowsFormsHost>
-        <Image x:Name="image"></Image>
+        <Image x:Name="image">
+            <!--<Image.LayoutTransform>
+                <RotateTransform Angle="90"/>
+            </Image.LayoutTransform>-->
+        </Image>
         <StackPanel Grid.Row="1">
             <WrapPanel  ItemWidth="100">
                 <Button x:Name="button_nextcamera" Click="button_nextcamera_Click" >NextCamera</Button>

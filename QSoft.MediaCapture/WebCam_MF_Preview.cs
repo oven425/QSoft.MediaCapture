@@ -131,11 +131,9 @@ namespace QSoft.MediaCapture
                 if (hr != HRESULTS.S_OK) return hr;
                 var streamindex = (uint)Marshal.ReadInt32(cm.Pointer);
 
-
                 hr = pPreview.SetSampleCallback(streamindex, samplecallback);
                 if (hr != HRESULTS.S_OK) return hr;
                 await this.AddVideoProcessorMFT(pSource, streamindex);
-
 
                 hr = m_pEngine.StartPreview();
                 if (hr != HRESULTS.S_OK) return hr;

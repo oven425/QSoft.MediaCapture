@@ -179,11 +179,11 @@ namespace WpfAppNET472
             }
             await m_WebCam.SetMediaStreamPropertiesAsync(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, m_MainUI.RecordFormats.LastOrDefault());
 
-            this.host.Visibility = Visibility.Visible;
-            await m_WebCam.StartPreview(this.host.Child.Handle);
+            //this.host.Visibility = Visibility.Visible;
+            //await m_WebCam.StartPreview(this.host.Child.Handle);
             m_bb = true;
-            //this.host.Visibility = Visibility.Collapsed;
-            //await m_WebCam.StartPreview(bmp => this.image.Source = bmp);
+            this.host.Visibility = Visibility.Collapsed;
+            await m_WebCam.StartPreview(bmp => this.image.Source = bmp);
         }
 
         async Task OpenCamera(WebCam_MF webcam, QSoft.DevCon.CameraPanel panel)
@@ -279,11 +279,11 @@ namespace WpfAppNET472
             }
             await m_WebCam.SetMediaStreamPropertiesAsync(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, m_MainUI.RecordFormats.LastOrDefault());
 
-            this.host.Visibility = Visibility.Visible;
-            await m_WebCam.StartPreview(this.host.Child.Handle);
+            //this.host.Visibility = Visibility.Visible;
+            //await m_WebCam.StartPreview(this.host.Child.Handle);
             m_bb = true;
-            //this.host.Visibility = Visibility.Collapsed;
-            //await m_WebCam.StartPreview(bmp => this.image.Source = bmp);
+            this.host.Visibility = Visibility.Collapsed;
+            await m_WebCam.StartPreview(() => this.image);
         }
 
         private void Oo_MediaCaptureFailedEventHandler(object sender, MediaCaptureFailedEventArgs e)
