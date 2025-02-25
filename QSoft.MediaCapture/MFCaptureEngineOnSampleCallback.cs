@@ -10,6 +10,42 @@ using System.Windows.Media.Imaging;
 
 namespace QSoft.MediaCapture
 {
+    public partial class MFCaptureEngineOnSampleCallback
+    {
+        internal void ParseFace(IMFSample pSample)
+        {
+
+        }
+    }
+
+    public class RawEventArgs(byte[] raw) : EventArgs
+    {
+        public byte[] RawData { get; } = raw;
+    }
+
+    public interface IPassRaw
+    {
+        internal void Transert(byte[] data);
+    }
+            
+    public partial class MFCaptureEngineOnSampleCallback
+    {
+        internal IPassRaw? TranseRaw { set; get; }
+        byte[]? m_RawBuffer;
+        internal void RawEvent(IntPtr data, uint len)
+        {
+            if(TranseRaw is not null)
+            {
+                if (m_RawBuffer?.Length != len)
+                {
+                    m_RawBuffer = new byte[len];
+                }
+                Marshal.Copy(data, this.m_RawBuffer, 0, (int)len);
+                TranseRaw.Transert(m_RawBuffer);
+            }
+            
+        }
+    }
     public partial class MFCaptureEngineOnSampleCallback : IMFCaptureEngineOnSampleCallback
     {
 #if NET8_0_OR_GREATER
@@ -20,7 +56,7 @@ namespace QSoft.MediaCapture
         [DllImport("kernel32.dll", EntryPoint = "CopyMemory", SetLastError = false)]
         internal static extern void CopyMemory(IntPtr dest, IntPtr src, uint count);
 #endif
-
+        
         
 #if DEBUG
         int samplecount = 0;
@@ -32,7 +68,7 @@ namespace QSoft.MediaCapture
             if (System.Threading.Monitor.TryEnter(this.m_Lock))
             {
 #if DEBUG
-                
+                this.ParseFace(pSample);
                 //var attrs = pSample.GetUnknown<IMFAttributes>(DirectN.MFConstants.MFSampleExtension_CaptureMetadata);
                 //System.Diagnostics.Trace.WriteLine($"attrs: {attrs.Count()}");
                 //try
@@ -74,7 +110,7 @@ namespace QSoft.MediaCapture
 #endif
                 pSample.ConvertToContiguousBuffer(out var buf);
                 var ptr = buf.Lock(out var max, out var cur);
-
+                RawEvent(ptr, cur);
                 OnSample(ptr, cur);
 
                 buf.Unlock();

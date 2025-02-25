@@ -8,6 +8,27 @@ using System.Threading.Tasks;
 
 namespace QSoft.MediaCapture
 {
+    //public partial class WebCam_MF:IMFCaptureEngineOnSampleCallback
+    //{
+    //    public class RgbRawEventArgs:EventArgs
+    //    {
+    //        public byte[] RawData;
+    //    }
+    //    object m_Lock = new object();
+    //    public EventHandler<RgbRawEventArgs> handler;
+    //    public HRESULT OnSample(IMFSample pSample)
+    //    {
+    //        if(System.Threading.Monitor.TryEnter(m_Lock))
+    //        {
+    //            handler?.Invoke(this, new RgbRawEventArgs());
+
+    //            System.Threading.Monitor.Exit(m_Lock);
+    //        }
+    //        Marshal.ReleaseComObject(m_Lock);
+    //        return HRESULTS.S_OK;
+    //        //throw new NotImplementedException();
+    //    }
+    //}
     public partial class WebCam_MF
     {
         bool m_IsPreviewing = false;

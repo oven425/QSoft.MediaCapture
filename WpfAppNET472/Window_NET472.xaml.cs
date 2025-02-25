@@ -219,6 +219,10 @@ namespace WpfAppNET472
                 Rotate = rotate,
                 IsMirror = panel == CameraPanel.Front,
             });
+            m_WebCam.FrameArrived += (sender, args) =>
+            {
+                System.Diagnostics.Trace.WriteLine($"{args.RawData.Length}");
+            };
             this.m_MainUI.IsSupportTorch = this.m_WebCam.TorchLight?.IsSupported == true;
             this.m_MainUI.Torchs.Clear();
             if (this.m_MainUI.IsSupportTorch)

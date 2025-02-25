@@ -114,14 +114,15 @@ namespace QSoft.MediaCapture.WPF
                     bmp = new WriteableBitmap((int)enc.Width, (int)enc.Height, 96, 96, PixelFormats.Bgr24, null);
                 });
             }
-            var hr = await src.StartPreview(new MFCaptureEngineOnSampleCallback_WriteableBitmap(bmp, dispatcherpriority));
+            var mfff = new MFCaptureEngineOnSampleCallback_WriteableBitmap(bmp, dispatcherpriority);
+            mfff.TranseRaw = src;
+            var hr = await src.StartPreview(mfff);
             if(action?.Invoke() is Image image)
             {
                 image.Source = bmp;
                 image.LayoutTransform = new RotateTransform((int)src.Setting.Rotate);
             }
             
-
             return hr;
         }
     }

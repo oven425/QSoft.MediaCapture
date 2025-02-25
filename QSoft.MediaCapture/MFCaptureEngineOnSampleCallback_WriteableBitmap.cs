@@ -18,6 +18,8 @@ namespace QSoft.MediaCapture.WPF
             this.m_Bmp = data;
         }
 
+        
+
         protected override void OnSample(nint data, uint len)
         {
             m_Bmp?.Dispatcher.Invoke(() =>
