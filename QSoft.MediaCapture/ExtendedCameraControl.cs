@@ -10,29 +10,28 @@ namespace QSoft.MediaCapture
 {
     public class ExtendedCameraControl
     {
-        //[Conditional("DEBUG")]
-        //public static void TetsALL(IMFCaptureEngine engine)
-        //{
-        //    var enums = Enum.GetValues(typeof(KSPROPERTY_CAMERACONTROL_EXTENDED));
-        //    var gg = enums.OfType<KSPROPERTY_CAMERACONTROL_EXTENDED>()
-        //        .Select(x =>
+        public static void TetsALL(IMFCaptureEngine engine)
+        {
+            var enums = Enum.GetValues(typeof(KSPROPERTY_CAMERACONTROL_EXTENDED));
+            var gg = enums.OfType<KSPROPERTY_CAMERACONTROL_EXTENDED>()
+                .Select(x =>
 
-        //            new
-        //            {
-        //                x,
-        //                suuport = new ExtendedCameraControl(engine, x).IsSupported
-        //            }
-        //        )
-        //        .GroupBy(x => x.suuport);
-        //    foreach (var group in gg)
-        //    {
-        //        System.Diagnostics.Trace.WriteLine($"Supprt:{group.Key}");
-        //        foreach (var ooin in group)
-        //        {
-        //            System.Diagnostics.Trace.WriteLine(ooin.x);
-        //        }
-        //    }
-        //}
+                    new
+                    {
+                        x,
+                        suuport = new ExtendedCameraControl(engine, x).IsSupported
+                    }
+                )
+                .GroupBy(x => x.suuport);
+            foreach (var group in gg)
+            {
+                System.Diagnostics.Trace.WriteLine($"Supprt:{group.Key}");
+                foreach (var ooin in group)
+                {
+                    System.Diagnostics.Trace.WriteLine(ooin.x);
+                }
+            }
+        }
         public bool IsSupported { protected set; get; } = false;
         readonly IMFCaptureEngine? m_pEngine;
         readonly KSPROPERTY_CAMERACONTROL_EXTENDED m_KsProperty;

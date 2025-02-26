@@ -24,7 +24,7 @@
     <PackageId>$(MSBuildProjectName)</PackageId>
     <Authors>$(MSBuildProjectName)</Authors>
     <Product>$(MSBuildProjectName)</Product>
-    <AssemblyName>$(MSBuildProjectName).$(VersionPrefix)</AssemblyName>
+    <AssemblyName></AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0-windows7.0'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -18,44 +20,43 @@ namespace QSoft.MediaCapture.WPF
     /// <summary>
     /// CameraView.xaml 的互動邏輯
     /// </summary>
-    public partial class CameraView : System.Windows.Controls.UserControl
+    public partial class CameraView : UserControl
     {
-        public static readonly DependencyProperty PreviewSourceProperty = DependencyProperty.Register("PreviewSource", typeof(QSoft.MediaCapture.WebCam_MF), typeof(CameraView), new PropertyMetadata(CameraSourcePropertyChanged));
-        public static readonly DependencyProperty CameraViewModeProperty = DependencyProperty.Register("CameraViewMode", typeof(CameraViewModes), typeof(CameraView), new PropertyMetadata(null));
+        readonly public static DependencyProperty PreviewSourceProperty = DependencyProperty.Register("PreviewSource", typeof(QSoft.MediaCapture.WebCam_MF), typeof(CameraView), new PropertyMetadata(null, PreviewSourcePropertyChange));
+        [Category("CameraView")]
+        public QSoft.MediaCapture.WebCam_MF PreviewSource
+        {
+            set=>SetValue(PreviewSourceProperty, value);
+            get=> (QSoft.MediaCapture.WebCam_MF)GetValue(PreviewSourceProperty);
+        }
+        static async void PreviewSourcePropertyChange(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if(d is CameraView view)
+            {
+                if(e.NewValue is null && e.OldValue is QSoft.MediaCapture.WebCam_MF oldcam)
+                {
+                    
+                    await oldcam.StopPreview();
+                }
+                else if(e.NewValue is QSoft.MediaCapture.WebCam_MF newcam)
+                {
+                    await newcam.StartPreview(IntPtr.Zero);
+                }
+            }
+        }
+
+        
+
+
         public CameraView()
         {
             InitializeComponent();
         }
+    }
 
-        public QSoft.MediaCapture.WebCam_MF PreviewSource
-        {
-            get { return (QSoft.MediaCapture.WebCam_MF)GetValue(PreviewSourceProperty); }
-            set { SetValue(PreviewSourceProperty, value); }
-        }
-        static async void CameraSourcePropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
-        {
-            var cameraview = obj as CameraView;
-            if (e.NewValue is QSoft.MediaCapture.WebCam_MF camera)
-            {
-                
-                //camera.StartPreview();
-            }
-            else if(e.NewValue is null && e.OldValue is QSoft.MediaCapture.WebCam_MF oldcamera)
-            {
-                await oldcamera.StopPreview();
-            }
-        }
-
-        public CameraViewModes CameraViewMode
-        {
-            get { return (CameraViewModes)GetValue(CameraViewModeProperty); }
-            set { SetValue(CameraViewModeProperty, value); }
-        }
-
-        public enum CameraViewModes
-        {
-            Handle,
-            WriteableBitmap
-        }
+    public enum RenderMode
+    {
+        Handle,
+        WritableBitmap
     }
 }

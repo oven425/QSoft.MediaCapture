@@ -1,0 +1,9 @@
+﻿<Application x:Class="QSoft.MediaCapture.WPF_NET472T.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:QSoft.MediaCapture.WPF_NET472T"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+         
+    </Application.Resources>
+</Application>

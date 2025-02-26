@@ -16,7 +16,7 @@ namespace QSoft.MediaCapture
                     //m_WhiteBalanceControl = new(amp);
                     m_WhiteBalanceControl = new(m_pEngine);
                     m_WhiteBalanceControl.Init();
-                    var bb = m_WhiteBalanceControl.IsAuto;
+                    //var bb = m_WhiteBalanceControl.IsAuto;
                 }
                 return m_WhiteBalanceControl;
             }

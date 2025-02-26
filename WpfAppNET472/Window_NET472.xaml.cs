@@ -119,6 +119,7 @@ namespace WpfAppNET472
                 Rotate = rotate,
                 IsMirror = allcamera[m_WebCam.FriendName] == CameraPanel.Front,
             });
+
             this.m_MainUI.IsSupportTorch = this.m_WebCam.TorchLight?.IsSupported == true;
             this.m_MainUI.Torchs.Clear();
             if (this.m_MainUI.IsSupportTorch)
@@ -286,6 +287,7 @@ namespace WpfAppNET472
             //this.host.Visibility = Visibility.Visible;
             //await m_WebCam.StartPreview(this.host.Child.Handle);
             m_bb = true;
+
             this.host.Visibility = Visibility.Collapsed;
             await m_WebCam.StartPreview(() => this.image);
         }

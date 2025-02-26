@@ -17,6 +17,7 @@ namespace QSoft.MediaCapture
     }
     public partial class WebCam_MF : IMFCaptureEngineOnEventCallback
     {
+        //public event EventHandler<EventArgs>? MediaTypeChangeEventHandler;
         public event EventHandler<MediaCaptureFailedEventArgs>? MediaCaptureFailedEventHandler;
         public HRESULT OnEvent(IMFMediaEvent pEvent)
         {
@@ -25,7 +26,7 @@ namespace QSoft.MediaCapture
             {
                 hrStatus = hr;
             }
-
+            var streamindex = pEvent.GetInt32(MFConstants.MF_CAPTURE_ENGINE_EVENT_STREAM_INDEX);
             hr = pEvent.GetExtendedType(out Guid guidType);
             if (hr == HRESULTS.S_OK)
             {
@@ -64,6 +65,7 @@ namespace QSoft.MediaCapture
                 else if (guidType == MFConstants.MF_CAPTURE_SOURCE_CURRENT_DEVICE_MEDIA_TYPE_SET)
                 {
                     m_TaskSetCurrentType?.SetResult(hrStatus);
+                    //MediaTypeChangeEventHandler?.Invoke(this, new EventArgs());
                 }
                 else if (guidType == MFConstants.MF_CAPTURE_ENGINE_ERROR)
                 {

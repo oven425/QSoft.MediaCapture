@@ -102,8 +102,7 @@ namespace QSoft.MediaCapture
                 hr = await m_TaskInitialize.Task;
                 sw.Stop();
                 this.SupporCategory();
-                //ExtendedCameraControl.TetsALL(m_pEngine);
-                //InitIAMVideoProcAmp();
+                ExtendedCameraControl.TetsALL(m_pEngine);
                 InitFlashLight();
                 InitTorch();
                 //InitFaceDection();

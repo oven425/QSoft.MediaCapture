@@ -23,7 +23,7 @@ namespace QSoft.MediaCapture
         public byte[] RawData { get; } = raw;
     }
 
-    public interface IPassRaw
+    interface IPassRaw
     {
         internal void Transert(byte[] data);
     }
