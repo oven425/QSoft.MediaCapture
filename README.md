@@ -2,15 +2,6 @@
 if submodule Direct or DirectCore show new version, please don't update
 
 # Quick start
-## Search all video capture
-```c#
-foreach(var oo in QSoft.MediaCapture.WebCam_MF.GetAllWebCams())
-{
-    System.Diagnostics.Trace.WriteLine(oo.FriendName);
-    System.Diagnostics.Trace.WriteLine(oo.SymbolLinkName);
-}
-```
-and filter FriendName, SymbolLinkName get it
 # Create from symbolLink
 ```c#
 var allcameras = QSoft.DevCon.DevConExtension.KSCATEGORY_VIDEO_CAMERA.DevicesFromInterface()
@@ -22,6 +13,11 @@ var allcameras = QSoft.DevCon.DevConExtension.KSCATEGORY_VIDEO_CAMERA.DevicesFro
 var firstcamera = allcameras.FirstOrDefault();
 if(firstcamera is null) return;
 var camera = WebCam_MF.CreateFromSymbollink(firstcamera.symbollink);
+await camera.InitCaptureEngine(new WebCam_MF_Setting()
+    {
+        IsMirror = firstcamera.panel==CameraPanel.Front
+    });
+await camera.StartPreview(host.Child.Handle);
 ```
 
 # Init and start preview
