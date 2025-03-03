@@ -11,6 +11,18 @@ foreach(var oo in QSoft.MediaCapture.WebCam_MF.GetAllWebCams())
 }
 ```
 and filter FriendName, SymbolLinkName get it
+# Create from symbolLink
+```c#
+var allcameras = QSoft.DevCon.DevConExtension.KSCATEGORY_VIDEO_CAMERA.DevicesFromInterface()
+                    .Select(x => new
+                    {
+                        symbollink = x.DevicePath(),
+                        panel = x.As().Panel()
+                    });
+var firstcamera = allcameras.FirstOrDefault();
+if(firstcamera is null) return;
+var camera = WebCam_MF.CreateFromSymbollink(firstcamera.symbollink);
+```
 
 # Init and start preview
 ```c#
@@ -72,8 +84,39 @@ if(camera != null)
 ```
 
 # WhiteBalance contorl
-use IAMVideoProcAmp control, not media founction modern function
+first check this device support  this function after Init camera success
+```c#
+if (camera.WhiteBalanceControl.IsSupport)
+{
+    //can set predefined value
+    camera.WhiteBalanceControl.Preset = ColorTemperaturePreset.Auto;
+}
 
+```
+
+# Flash
+first check this device support  this function after Init camera success
+```c#
+if(camera.FlashLight?.IsSupported)
+{
+    //Flash support function
+    var supportfunc = camera.FlashLight.SupportStates;
+    //below usually use state if camera supports flashlight
+    camera.FlashLight.SetState(FlashState.OFF);
+    camera.FlashLight.SetState(FlashState.ON);
+    camera.FlashLight.SetState(FlashState.AUTO);
+}
+
+```
 # Flash and Torch
-use windows function control, not use windows app sdk,
-but not verify, please tell me, if any question
+first check this device support  this function after Init camera success
+```c#
+if(camera.TorchLight?.IsSupported)
+{
+    //Flash support function
+    var supportfunc = camera.TorchLight.SupportStates;
+    //below usually use state if camera supports torch light
+    camera.TorchLight.SetState(FlashState.OFF);
+    camera.TorchLight.SetState(FlashState.ON);
+}
+
