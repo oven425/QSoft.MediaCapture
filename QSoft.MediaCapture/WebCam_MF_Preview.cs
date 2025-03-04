@@ -140,11 +140,11 @@ namespace QSoft.MediaCapture
                 hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, out pMediaType);
                 if (hr != HRESULTS.S_OK) return hr;
 
-                hr = WebCam_MF.CloneVideoMediaType(pMediaType, MFConstants.MFVideoFormat_RGB24, out pMediaType2);
+                hr = WebCam_MF.CloneVideoMediaType(pMediaType, MFConstants.MFVideoFormat_RGB32, out pMediaType2);
                 if (hr != HRESULTS.S_OK || pMediaType2 == null) return hr;
 
-                hr = pMediaType2.SetUINT32(MFConstants.MF_MT_ALL_SAMPLES_INDEPENDENT, 1);
-                if (hr != HRESULTS.S_OK) return hr;
+                //hr = pMediaType2.SetUINT32(MFConstants.MF_MT_ALL_SAMPLES_INDEPENDENT, 1);
+                //if (hr != HRESULTS.S_OK) return hr;
 
                 // Connect the video stream to the preview sink.
                 using var cm = new ComMemory(Marshal.SizeOf<uint>());
@@ -154,7 +154,11 @@ namespace QSoft.MediaCapture
 
                 hr = pPreview.SetSampleCallback(streamindex, samplecallback);
                 if (hr != HRESULTS.S_OK) return hr;
-                await this.AddVideoProcessorMFT(pSource, streamindex);
+                if(this.m_Setting.IsMirror)
+                {
+                    await this.AddVideoProcessorMFT(pSource, streamindex);
+                }
+                
 
                 hr = m_pEngine.StartPreview();
                 if (hr != HRESULTS.S_OK) return hr;

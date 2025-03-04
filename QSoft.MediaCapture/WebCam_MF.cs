@@ -29,6 +29,7 @@ namespace QSoft.MediaCapture
         public bool Shared { set; get; }
         public bool IsMirror { set; get; }
         public CameraRotates Rotate { set; get; }
+        public bool UseD3D { set; get; }
         //public WebCam_MF_Size Preview { set; get; } = new WebCam_MF_Size();
         //public WebCam_MF_Size Photo { set; get; } = new WebCam_MF_Size();
         //public WebCam_MF_Size Record { set; get; } = new WebCam_MF_Size();
@@ -63,6 +64,7 @@ namespace QSoft.MediaCapture
             m_Setting.IsMirror = setting.IsMirror;
             m_Setting.Rotate = setting.Rotate;
             m_Setting.Shared = setting.Shared;
+            m_Setting.UseD3D = setting.UseD3D;
             m_TaskInitialize = new TaskCompletionSource<HRESULT>();
             HRESULT? hr = HRESULTS.S_OK;
             IMFAttributes? pAttributes = null;
@@ -75,11 +77,11 @@ namespace QSoft.MediaCapture
                 if (hr != HRESULTS.S_OK) return hr;
                 hr = MFFunctions.MFCreateAttributes(out pAttributes, 1);
                 if (hr != HRESULTS.S_OK) return hr;
-                //if(used3d)
-                //{
-                hr = CreateD3DManager();
-                if (hr != HRESULTS.S_OK) return hr;
-                //}
+                if (m_Setting.UseD3D)
+                {
+                    hr = CreateD3DManager();
+                    if (hr != HRESULTS.S_OK) return hr;
+                }
 
                 hr = pAttributes.SetUnknown(MFConstants.MF_CAPTURE_ENGINE_D3D_MANAGER, g_pDXGIMan);
                 if (m_Setting.Shared)

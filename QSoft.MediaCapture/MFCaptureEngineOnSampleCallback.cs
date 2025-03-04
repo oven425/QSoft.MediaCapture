@@ -65,10 +65,12 @@ namespace QSoft.MediaCapture
         readonly object m_Lock = new();
         public HRESULT OnSample(IMFSample pSample)
         {
+            //Marshal.ReleaseComObject(pSample);
+            //return HRESULTS.S_OK;
             if (System.Threading.Monitor.TryEnter(this.m_Lock))
             {
 #if DEBUG
-                this.ParseFace(pSample);
+                //this.ParseFace(pSample);
                 //var attrs = pSample.GetUnknown<IMFAttributes>(DirectN.MFConstants.MFSampleExtension_CaptureMetadata);
                 //System.Diagnostics.Trace.WriteLine($"attrs: {attrs.Count()}");
                 //try
@@ -110,7 +112,7 @@ namespace QSoft.MediaCapture
 #endif
                 pSample.ConvertToContiguousBuffer(out var buf);
                 var ptr = buf.Lock(out var max, out var cur);
-                RawEvent(ptr, cur);
+                //RawEvent(ptr, cur);
                 OnSample(ptr, cur);
 
                 buf.Unlock();

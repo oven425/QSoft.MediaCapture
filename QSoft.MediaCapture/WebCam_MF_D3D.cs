@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 namespace QSoft.MediaCapture
 {
+    //video_capture_dxgi_device_manager.cc
+    //https://chromium.googlesource.com/chromium/src/+/4a5565fb749ca181fcf0b28b7ac6092562b1cf94/media/capture/video/win/video_capture_dxgi_device_manager.cc
     public partial class WebCam_MF
     {
         uint g_ResetToken = 0;
@@ -42,13 +44,29 @@ namespace QSoft.MediaCapture
                 D3D_FEATURE_LEVEL.D3D_FEATURE_LEVEL_9_1
             };
 
+            //var hr = DirectN.D3D11Functions.D3D11CreateDevice(
+            //    null,
+            //    D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE,
+            //    IntPtr.Zero,
+            //    (uint)DirectN.D3D11_CREATE_DEVICE_FLAG.D3D11_CREATE_DEVICE_VIDEO_SUPPORT,
+            //    levels,
+            //    (uint)levels.Length,
+            //    7,
+            //    out ppDevice,
+            //    out pFeatureLevel,
+            //    out ppDeviceContext
+            //    );
+
+
+            var device_flags =
+      (DirectN.D3D11_CREATE_DEVICE_FLAG.D3D11_CREATE_DEVICE_VIDEO_SUPPORT | DirectN.D3D11_CREATE_DEVICE_FLAG.D3D11_CREATE_DEVICE_BGRA_SUPPORT);
             var hr = DirectN.D3D11Functions.D3D11CreateDevice(
                 null,
                 D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_HARDWARE,
                 IntPtr.Zero,
-                (uint)DirectN.D3D11_CREATE_DEVICE_FLAG.D3D11_CREATE_DEVICE_VIDEO_SUPPORT,
-                levels,
-                (uint)levels.Length,
+                (uint)device_flags,
+                null,
+                0,
                 7,
                 out ppDevice,
                 out pFeatureLevel,

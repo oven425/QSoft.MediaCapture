@@ -30,7 +30,7 @@ namespace QSoft.MediaCapture
                     hr = m_VideoProcessor.SetMirror(_MF_VIDEO_PROCESSOR_MIRROR.MIRROR_HORIZONTAL);
                     m_VideoProcessor.SetRotation(_MF_VIDEO_PROCESSOR_ROTATION.ROTATION_NONE);
                     //m_VideoProcessor2.SetRotationOverride(90);
-                    if (hr != HRESULTS.S_OK) return Task.FromResult(hr);
+                    //if (hr != HRESULTS.S_OK) return Task.FromResult(hr);
                 }
 
 

@@ -23,7 +23,8 @@
         </Image>
         <StackPanel Grid.Row="1">
             <WrapPanel  ItemWidth="100">
-                <Button x:Name="button_nextcamera" Click="button_nextcamera_Click" >NextCamera</Button>
+                <!--<Button x:Name="button_nextcamera" Click="button_nextcamera_Click" >NextCamera</Button>-->
+                <CheckBox IsChecked="{Binding UseD3D}">use d3d</CheckBox>
                 <ComboBox x:Name="combobox_cameras" SelectionChanged="combobox_cameras_SelectionChanged" ItemsSource="{Binding Cameras}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>

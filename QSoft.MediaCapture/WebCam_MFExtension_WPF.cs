@@ -105,7 +105,7 @@ namespace QSoft.MediaCapture.WPF
             var dispatcher = Dispatcher.FromThread(System.Threading.Thread.CurrentThread);
             if (dispatcher != null)
             {
-                bmp = new WriteableBitmap((int)enc.Width, (int)enc.Height, 96, 96, PixelFormats.Bgr24, null);
+                bmp = new WriteableBitmap((int)enc.Width, (int)enc.Height, 96, 96, PixelFormats.Bgra32, null);
             }
             else
             {
