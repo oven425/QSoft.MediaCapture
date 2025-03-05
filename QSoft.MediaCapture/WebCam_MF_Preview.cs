@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace QSoft.MediaCapture
 {
@@ -68,7 +69,7 @@ namespace QSoft.MediaCapture
                 hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, out pMediaType);
                 if (hr != HRESULTS.S_OK) return hr;
 
-                hr = WebCam_MF.CloneVideoMediaType(pMediaType, MFConstants.MFVideoFormat_RGB24, out pMediaType2);
+                hr = WebCam_MF.CloneVideoMediaType(pMediaType, MFConstants.MFVideoFormat_RGB32, out pMediaType2);
                 if (hr != HRESULTS.S_OK || pMediaType2 == null) return hr;
 
                 hr = pMediaType2.SetUINT32(MFConstants.MF_MT_ALL_SAMPLES_INDEPENDENT, 1);
@@ -91,6 +92,7 @@ namespace QSoft.MediaCapture
                 var streamindex = (uint)Marshal.ReadInt32(cm.Pointer);
                 System.Diagnostics.Trace.WriteLine($"preview streamindex:{streamindex}");
 
+                //await this.AddVideoStabilization(pSource, streamindex);
                 await this.AddVideoProcessorMFT(pSource, streamindex);
 
 
@@ -136,6 +138,7 @@ namespace QSoft.MediaCapture
                 hr = m_pEngine.GetSource(out pSource);
                 if (hr != HRESULTS.S_OK) return hr;
 
+
                 // Configure the video format for the preview sink.
                 hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, out pMediaType);
                 if (hr != HRESULTS.S_OK) return hr;
@@ -143,8 +146,8 @@ namespace QSoft.MediaCapture
                 hr = WebCam_MF.CloneVideoMediaType(pMediaType, MFConstants.MFVideoFormat_RGB32, out pMediaType2);
                 if (hr != HRESULTS.S_OK || pMediaType2 == null) return hr;
 
-                //hr = pMediaType2.SetUINT32(MFConstants.MF_MT_ALL_SAMPLES_INDEPENDENT, 1);
-                //if (hr != HRESULTS.S_OK) return hr;
+                hr = pMediaType2.SetUINT32(MFConstants.MF_MT_ALL_SAMPLES_INDEPENDENT, 1);
+                if (hr != HRESULTS.S_OK) return hr;
 
                 // Connect the video stream to the preview sink.
                 using var cm = new ComMemory(Marshal.SizeOf<uint>());

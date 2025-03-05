@@ -13,8 +13,9 @@ namespace QSoft.MediaCapture
         TaskCompletionSource<HRESULT>? m_TaskAddEffect;
         IMFVideoProcessorControl? m_VideoProcessor;
         IMFVideoProcessorControl2? m_VideoProcessor2;
-        Task<HRESULT> AddVideoProcessorMFT(IMFCaptureSource source, uint streamindex)
+        async Task<HRESULT> AddVideoProcessorMFT(IMFCaptureSource source, uint streamindex)
         {
+            
             m_VideoProcessMFT_Index = streamindex;
             IMFMediaType? pMediaType=null;
             try
@@ -32,21 +33,21 @@ namespace QSoft.MediaCapture
                     //m_VideoProcessor2.SetRotationOverride(90);
                     //if (hr != HRESULTS.S_OK) return Task.FromResult(hr);
                 }
-
+                
 
                 if (m_VideoProcessor is IMFTransform mft)
                 {
                     hr = mft.SetInputType(0, pMediaType, 0);
-                    if (hr != HRESULTS.S_OK) return Task.FromResult(hr);
+                    if (hr != HRESULTS.S_OK) return hr;
                     hr = mft.SetOutputType(0, pMediaType, 0);
-                    if (hr != HRESULTS.S_OK) return Task.FromResult(hr);
+                    if (hr != HRESULTS.S_OK) return hr;
                 }
 
                 m_TaskAddEffect = new();
 
                 hr = source.AddEffect(streamindex, m_VideoProcessor);
-                if (hr != HRESULTS.S_OK) return Task.FromResult(hr);
-                return m_TaskAddEffect.Task;
+                if (hr != HRESULTS.S_OK) return hr;
+                return  await m_TaskAddEffect.Task;
             }
             finally
             {

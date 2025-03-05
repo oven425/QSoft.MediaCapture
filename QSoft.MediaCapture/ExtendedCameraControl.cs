@@ -1,6 +1,7 @@
 ﻿using DirectN;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -10,6 +11,7 @@ namespace QSoft.MediaCapture
 {
     public class ExtendedCameraControl
     {
+        [Conditional("DEBUG")]
         public static void TetsALL(IMFCaptureEngine engine)
         {
             var enums = Enum.GetValues(typeof(KSPROPERTY_CAMERACONTROL_EXTENDED));

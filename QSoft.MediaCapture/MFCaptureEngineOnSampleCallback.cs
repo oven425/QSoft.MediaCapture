@@ -108,6 +108,7 @@ namespace QSoft.MediaCapture
                     var fps = samplecount / m_StopWatch.Elapsed.TotalSeconds;
                     System.Diagnostics.Trace.WriteLine($"fps:{fps}");
                     samplecount = 0;
+
                 }
 #endif
                 pSample.ConvertToContiguousBuffer(out var buf);
