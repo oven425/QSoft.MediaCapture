@@ -284,9 +284,17 @@ namespace WpfAppNET472
             }
             await m_WebCam.SetMediaStreamPropertiesAsync(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, m_MainUI.RecordFormats.LastOrDefault());
 
+            
+            m_bb = true;
+            //await StartPreviewAsync();
+
+
+        }
+
+        async Task StartPreviewAsync()
+        {
             this.host.Visibility = Visibility.Visible;
             await m_WebCam.StartPreview(this.host.Child.Handle);
-            m_bb = true;
 
             //this.host.Visibility = Visibility.Collapsed;
             //await m_WebCam.StartPreview(() => this.image);
@@ -303,11 +311,7 @@ namespace WpfAppNET472
 
         private async void button_stratpreivew_Click(object sender, RoutedEventArgs e)
         {
-            this.host.Visibility = Visibility.Visible;
-            await m_WebCam.StartPreview(this.host.Child.Handle);
-
-            //this.host.Visibility = Visibility.Collapsed;
-            //await m_WebCam.StartPreview(bmp=>this.image.Source = bmp);
+            await StartPreviewAsync();
         }
 
         private void picture_SizeChanged(object sender, EventArgs e)

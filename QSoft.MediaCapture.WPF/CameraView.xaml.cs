@@ -35,7 +35,6 @@ namespace QSoft.MediaCapture.WPF
             {
                 if(e.NewValue is null && e.OldValue is QSoft.MediaCapture.WebCam_MF oldcam)
                 {
-                    
                     await oldcam.StopPreview();
                 }
                 else if(e.NewValue is QSoft.MediaCapture.WebCam_MF newcam)
@@ -44,9 +43,6 @@ namespace QSoft.MediaCapture.WPF
                 }
             }
         }
-
-        
-
 
         public CameraView()
         {

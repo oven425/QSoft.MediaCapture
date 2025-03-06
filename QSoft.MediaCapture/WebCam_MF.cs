@@ -45,13 +45,12 @@ namespace QSoft.MediaCapture
 
         void DestroyCaptureEngine()
         {
-            SafeRelease(m_VideoProcessor);
             SafeRelease(m_pEngine);
 
             g_pDXGIMan?.ResetDevice(g_pDX11Device, g_ResetToken);
             SafeRelease(g_pDX11Device);
             SafeRelease(g_pDXGIMan);
-            m_IsPreviewing = false;
+            //m_IsPreviewing = false;
             m_WhiteBalanceControl = null;
         }
 
@@ -198,6 +197,7 @@ namespace QSoft.MediaCapture
         public async void Dispose()
         {
             await this.StopPreview();
+            await this.StopRecord();
             this.DestroyCaptureEngine();
         }
     }

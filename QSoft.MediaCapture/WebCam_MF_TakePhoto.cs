@@ -33,7 +33,7 @@ namespace QSoft.MediaCapture
             IMFCaptureSource? pSource = null;
             IMFMediaType? pMediaType = null;
             IMFMediaType? pMediaType2 = null;
-            bool bHasPhotoStream = true;
+            //bool bHasPhotoStream = true;
             HRESULT hr = HRESULTS.S_OK;
             if (m_pEngine == null) return HRESULTS.MF_E_NOT_INITIALIZED;
             try
@@ -68,19 +68,13 @@ namespace QSoft.MediaCapture
 
                 hr = pPhoto.RemoveAllStreams();
                 if (hr.IsError) return hr;
-                //DWORD dwSinkStreamIndex;
-                //IntPtr pp = Marshal.AllocHGlobal(4);
-                // Try to connect the first still image stream to the photo sink
-                //uint dwSinkStreamIndex = 0;
-                if (bHasPhotoStream)
-                {
-                    using var cm = new ComMemory(Marshal.SizeOf<uint>());
-                    hr = pPhoto.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_PHOTO, pMediaType2, null, cm.Pointer);
-                    var dwSinkStreamIndex = (uint)Marshal.ReadInt32(cm.Pointer);
-                    System.Diagnostics.Trace.WriteLine($"Phtot:{dwSinkStreamIndex}");
-                }
+                using var cm = new ComMemory(Marshal.SizeOf<uint>());
+                hr = pPhoto.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_PHOTO, pMediaType2, null, cm.Pointer);
+                var dwSinkStreamIndex = (uint)Marshal.ReadInt32(cm.Pointer);
+                System.Diagnostics.Debug.WriteLine($"AddStream photo{dwSinkStreamIndex}");
 
                 if (hr.IsError) return hr;
+                await this.AddVideoProcessorMFT(pSource, dwSinkStreamIndex);
 
                 hr = pPhoto.SetOutputFileName(pszFileName);
                 if (hr.IsError) return hr;

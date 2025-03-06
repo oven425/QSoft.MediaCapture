@@ -32,7 +32,7 @@ namespace QSoft.MediaCapture
     //}
     public partial class WebCam_MF
     {
-        bool m_IsPreviewing = false;
+        //bool m_IsPreviewing = false;
         TaskCompletionSource<HRESULT>? m_TaskStartPreview;
         async public Task<HRESULT> StartPreview(IntPtr handle)
         {
@@ -40,7 +40,7 @@ namespace QSoft.MediaCapture
 
             m_TaskStartPreview = new TaskCompletionSource<HRESULT>();
 
-            if (m_IsPreviewing) return HRESULTS.S_OK;
+            //if (m_IsPreviewing) return HRESULTS.S_OK;
 
             IMFCaptureSink? pSink = null;
             IMFMediaType? pMediaType = null;
@@ -91,8 +91,8 @@ namespace QSoft.MediaCapture
                 if (hr != HRESULTS.S_OK) return hr;
                 var streamindex = (uint)Marshal.ReadInt32(cm.Pointer);
                 System.Diagnostics.Trace.WriteLine($"preview streamindex:{streamindex}");
-
-                //await this.AddVideoStabilization(pSource, streamindex);
+                
+                System.Diagnostics.Debug.WriteLine($"AddStream preview{streamindex}");
                 await this.AddVideoProcessorMFT(pSource, streamindex);
 
 
@@ -103,7 +103,7 @@ namespace QSoft.MediaCapture
                 if (hr != HRESULTS.S_OK) return hr;
                 hr = await m_TaskStartPreview.Task;
                 m_TaskStartPreview = null;
-                m_IsPreviewing = true;
+                //m_IsPreviewing = true;
             }
             finally
             {
@@ -120,7 +120,7 @@ namespace QSoft.MediaCapture
         async public Task<HRESULT> StartPreview(IMFCaptureEngineOnSampleCallback samplecallback)
         {
             if (m_pEngine == null) return HRESULTS.MF_E_NOT_INITIALIZED;
-            if (m_IsPreviewing) return HRESULTS.S_OK;
+            //if (m_IsPreviewing) return HRESULTS.S_OK;
             m_TaskStartPreview = new TaskCompletionSource<HRESULT>();
             IMFCaptureSink? pSink = null;
             IMFMediaType? pMediaType = null;
@@ -154,7 +154,7 @@ namespace QSoft.MediaCapture
                 hr = pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, pMediaType2, null, cm.Pointer);
                 if (hr != HRESULTS.S_OK) return hr;
                 var streamindex = (uint)Marshal.ReadInt32(cm.Pointer);
-
+                System.Diagnostics.Debug.WriteLine($"AddStream preview{streamindex}");
                 hr = pPreview.SetSampleCallback(streamindex, samplecallback);
                 if (hr != HRESULTS.S_OK) return hr;
                 if(this.m_Setting.IsMirror)
@@ -167,7 +167,7 @@ namespace QSoft.MediaCapture
                 if (hr != HRESULTS.S_OK) return hr;
                 hr = await m_TaskStartPreview.Task;
                 m_TaskStartPreview = null;
-                m_IsPreviewing = true;
+                //m_IsPreviewing = true;
             }
             finally
             {
@@ -188,17 +188,17 @@ namespace QSoft.MediaCapture
         {
             HRESULT hr = HRESULTS.S_OK;
             IMFCaptureSink? pSink = null;
-            IMFCaptureSource? pSource;
+            IMFCaptureSource? pSource = null;
             try
             {
                 if (m_pEngine == null)
                 {
                     return HRESULTS.MF_E_NOT_INITIALIZED;
                 }
-                if (!m_IsPreviewing)
-                {
-                    return HRESULTS.S_OK;
-                }
+                //if (!m_IsPreviewing)
+                //{
+                //    return HRESULTS.S_OK;
+                //}
                 this.m_TaskStopPreview = new();
                 hr = m_pEngine.StopPreview();
                 if (hr.IsError) return hr;
@@ -214,12 +214,13 @@ namespace QSoft.MediaCapture
                 }
                 hr = m_pEngine.GetSource(out pSource);
                 if (hr != HRESULTS.S_OK) return hr;
-                await RemoveAllVideoProcessorMFT(pSource);
-                m_IsPreviewing = false;
+                //await RemoveAllVideoProcessorMFT(pSource);
+                //m_IsPreviewing = false;
             }
             finally
             {
                 SafeRelease(pSink);
+                SafeRelease(pSource);
                 this.m_TaskStopPreview = null;
             }
             return hr;

@@ -83,7 +83,7 @@ namespace QSoft.MediaCapture
                 // Configure the video and audio streams.
                 if (guidVideoEncoding != Guid.Empty)
                 {
-                    hr = ConfigureVideoEncoding(pSource, pRecord, ref guidVideoEncoding);
+                    hr = await ConfigureVideoEncoding(pSource, pRecord, guidVideoEncoding);
                     if (hr.IsError) return hr;
                 }
 
@@ -111,7 +111,7 @@ namespace QSoft.MediaCapture
             return hr;
         }
 
-        HRESULT ConfigureVideoEncoding(IMFCaptureSource pSource, IMFCaptureRecordSink pRecord, ref Guid guidEncodingType)
+        async Task<HRESULT> ConfigureVideoEncoding(IMFCaptureSource pSource, IMFCaptureRecordSink pRecord, Guid guidEncodingType)
         {
             IMFMediaType? pMediaType = null;
             IMFMediaType? pMediaType2 = null;
@@ -169,6 +169,8 @@ namespace QSoft.MediaCapture
                 hr = pRecord.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_RECORD, pMediaType2, null, cm.Pointer);
                 var streamindex = (uint)Marshal.ReadInt32(cm.Pointer);
                 hr = pRecord.SetRotation(streamindex, (uint)this.m_Setting.Rotate);
+                System.Diagnostics.Debug.WriteLine($"AddStream record{streamindex}");
+                await this.AddVideoProcessorMFT(pSource, streamindex);
             }
         done:
             SafeRelease(pMediaType);
@@ -195,7 +197,6 @@ namespace QSoft.MediaCapture
 
             uiEncodingBitrate = (uint)uiBitrate;
 
-        done:
 
             return hr;
         }
