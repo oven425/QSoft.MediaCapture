@@ -17,15 +17,10 @@
             <winform:PictureBox SizeChanged="picture_SizeChanged" x:Name="picture"/>
         </WindowsFormsHost>
         <Image x:Name="image">
-            <!--<Image.LayoutTransform>
-                <RotateTransform Angle="90"/>
-            </Image.LayoutTransform>-->
         </Image>
         <StackPanel Grid.Row="1">
             <WrapPanel  ItemWidth="100">
-                <!--<Button x:Name="button_nextcamera" Click="button_nextcamera_Click" >NextCamera</Button>-->
-                <CheckBox IsChecked="{Binding UseD3D}">use d3d</CheckBox>
-                <ComboBox x:Name="combobox_cameras" SelectionChanged="combobox_cameras_SelectionChanged" ItemsSource="{Binding Cameras}">
+                <ComboBox SelectedItem="{Binding Camrea}" x:Name="combobox_cameras" SelectionChanged="combobox_cameras_SelectionChanged" ItemsSource="{Binding Cameras}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
@@ -41,15 +36,12 @@
                 <Button x:Name="button_takephoto" Click="button_takephoto_Click">Task photo</Button>
                 <Button x:Name="button_startrecord" Click="button_startrecord_Click">Start Record</Button>
                 <Button x:Name="button_stoprecord" Click="button_stoprecord_Click">Stop Record</Button>
-                <ComboBox x:Name="combobox_recordformat" SelectedItem="{Binding RecordFormat}" SelectionChanged="combobox_recordformat_SelectionChanged" ItemsSource="{Binding RecordFormats}">
 
-                </ComboBox>
-                <ComboBox SelectedItem="{Binding FlashLight}" ItemsSource="{Binding FlashLights}" SelectionChanged="ComboBox_SelectionChanged" IsEnabled="{Binding IsSupportFlash}">
+                <ComboBox x:Name="combobox_recordformat" SelectionChanged="combobox_recordformat_SelectionChanged" ItemsSource="{Binding VideoCaptureFormats}"/>
+                <ComboBox x:Name="combobox_photodepency" SelectedItem="{Binding PhotoDependentFormats}" ItemsSource="{Binding PhotoDependentFormats}"/>
 
-                </ComboBox>
-                <ComboBox SelectedItem="{Binding Torch}" ItemsSource="{Binding Torchs}" x:Name="combobox_torch" SelectionChanged="combobox_torch_SelectionChanged" IsEnabled="{Binding IsSupportTorch}">
-
-                </ComboBox>
+                <ComboBox SelectedItem="{Binding FlashLight}" ItemsSource="{Binding FlashLights}" SelectionChanged="ComboBox_SelectionChanged" IsEnabled="{Binding IsSupportFlash}"/>
+                <ComboBox SelectedItem="{Binding Torch}" ItemsSource="{Binding Torchs}" x:Name="combobox_torch" SelectionChanged="combobox_torch_SelectionChanged" IsEnabled="{Binding IsSupportTorch}"/>
             </WrapPanel>
             <Grid>
                 <Grid.ColumnDefinitions>

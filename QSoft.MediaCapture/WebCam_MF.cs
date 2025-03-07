@@ -34,7 +34,7 @@ namespace QSoft.MediaCapture
         //public WebCam_MF_Size Photo { set; get; } = new WebCam_MF_Size();
         //public WebCam_MF_Size Record { set; get; } = new WebCam_MF_Size();
     }
-    public sealed partial class WebCam_MF: IDisposable
+    public sealed partial class WebCam_MF : IDisposable
     {
         WebCam_MF_Setting m_Setting = new WebCam_MF_Setting();
         public WebCam_MF_Setting Setting => m_Setting;
@@ -72,7 +72,7 @@ namespace QSoft.MediaCapture
             DestroyCaptureEngine();
             try
             {
-                
+
                 if (hr != HRESULTS.S_OK) return hr;
                 hr = MFFunctions.MFCreateAttributes(out pAttributes, 1);
                 if (hr != HRESULTS.S_OK) return hr;
@@ -80,16 +80,15 @@ namespace QSoft.MediaCapture
                 {
                     hr = CreateD3DManager();
                     if (hr != HRESULTS.S_OK) return hr;
+                    hr = pAttributes.SetUnknown(MFConstants.MF_CAPTURE_ENGINE_D3D_MANAGER, g_pDXGIMan);
                 }
-
-                hr = pAttributes.SetUnknown(MFConstants.MF_CAPTURE_ENGINE_D3D_MANAGER, g_pDXGIMan);
                 if (m_Setting.Shared)
                 {
                     pAttributes.SetUINT32(MFConstants.MF_DEVSOURCE_ATTRIBUTE_FRAMESERVER_SHARE_MODE, 1);
                 }
                 if (hr != HRESULTS.S_OK) return hr;
                 var tty = Type.GetTypeFromCLSID(DirectN.MFConstants.CLSID_MFCaptureEngineClassFactory, true);
-                if(tty == null) return hr;
+                if (tty == null) return hr;
                 pFactory = Activator.CreateInstance(tty) as IMFCaptureEngineClassFactory;
                 object? o = null;
                 hr = pFactory?.CreateInstance(DirectN.MFConstants.CLSID_MFCaptureEngine, typeof(IMFCaptureEngine).GUID, out o);
@@ -126,7 +125,7 @@ namespace QSoft.MediaCapture
             }
         }
 
-        
+
 
 
 
@@ -185,7 +184,7 @@ namespace QSoft.MediaCapture
             rc.bottom = height;
 
             Marshal.StructureToPtr(rc, prc, true);
-            if(previewsink != null)
+            if (previewsink != null)
             {
                 previewsink.UpdateVideo(IntPtr.Zero, prc, IntPtr.Zero);
             }

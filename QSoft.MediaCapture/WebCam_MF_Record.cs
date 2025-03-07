@@ -151,7 +151,7 @@ namespace QSoft.MediaCapture
             if (hr.IsError) return hr;
 
             // Connect the video stream to the recording sink.
-            if(this.m_Setting.Rotate == CameraRotates.Rotate90 
+            if (this.m_Setting.Rotate == CameraRotates.Rotate90
                 || this.m_Setting.Rotate == CameraRotates.Rotate270
                 || this.m_Setting.Rotate == CameraRotates.Rotate90Colockwise
                 || this.m_Setting.Rotate == CameraRotates.Rotate270Colockwise)
@@ -169,7 +169,7 @@ namespace QSoft.MediaCapture
                 hr = pRecord.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_RECORD, pMediaType2, null, cm.Pointer);
                 var streamindex = (uint)Marshal.ReadInt32(cm.Pointer);
                 hr = pRecord.SetRotation(streamindex, (uint)this.m_Setting.Rotate);
-                System.Diagnostics.Debug.WriteLine($"AddStream record{streamindex}");
+                System.Diagnostics.Trace.WriteLine($"AddStream record{streamindex}");
                 await this.AddVideoProcessorMFT(pSource, streamindex);
             }
         done:
@@ -213,7 +213,7 @@ namespace QSoft.MediaCapture
         {
             if (pType.TryGetRatio(MFConstants.MF_MT_FRAME_RATE, out pNumerator, out pDenominator))
             {
-                
+
             }
             return HRESULTS.S_OK;
         }

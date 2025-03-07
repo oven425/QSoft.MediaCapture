@@ -27,14 +27,14 @@ namespace QSoft.MediaCapture
     {
         internal void Transert(byte[] data);
     }
-            
+
     public partial class MFCaptureEngineOnSampleCallback
     {
         internal IPassRaw? TranseRaw { set; get; }
         byte[]? m_RawBuffer;
         internal void RawEvent(IntPtr data, uint len)
         {
-            if(TranseRaw is not null)
+            if (TranseRaw is not null)
             {
                 if (m_RawBuffer?.Length != len)
                 {
@@ -43,7 +43,7 @@ namespace QSoft.MediaCapture
                 Marshal.Copy(data, this.m_RawBuffer, 0, (int)len);
                 TranseRaw.Transert(m_RawBuffer);
             }
-            
+
         }
     }
     public partial class MFCaptureEngineOnSampleCallback : IMFCaptureEngineOnSampleCallback
@@ -56,8 +56,8 @@ namespace QSoft.MediaCapture
         [DllImport("kernel32.dll", EntryPoint = "CopyMemory", SetLastError = false)]
         internal static extern void CopyMemory(IntPtr dest, IntPtr src, uint count);
 #endif
-        
-        
+
+
 #if DEBUG
         int samplecount = 0;
         System.Diagnostics.Stopwatch m_StopWatch = new();
@@ -86,10 +86,10 @@ namespace QSoft.MediaCapture
                 //        var faceinfo = Marshal.PtrToStructure<tagFaceRectInfo>(IntPtr.Add(face_ptr, 8));
                 //        System.Diagnostics.Trace.WriteLine($"faceinfo: Size:{faceinfo.Region} confidenceLevel:{faceinfo.confidenceLevel}");
                 //    }
-                    
-                    
+
+
                 //    Marshal.FreeHGlobal( face_ptr );
-                    
+
                 //}
                 //catch (Exception ee)
                 //{
@@ -113,7 +113,7 @@ namespace QSoft.MediaCapture
 #endif
                 pSample.ConvertToContiguousBuffer(out var buf);
                 var ptr = buf.Lock(out var max, out var cur);
-                //RawEvent(ptr, cur);
+                RawEvent(ptr, cur);
                 OnSample(ptr, cur);
 
                 buf.Unlock();

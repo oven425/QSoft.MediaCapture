@@ -23,7 +23,7 @@ namespace QSoft.MediaCapture
             {
                 source.GetCurrentDeviceMediaType(streamindex, out pMediaType);
                 var videoprocesstype = Type.GetTypeFromCLSID(DirectN.MFConstants.CLSID_VideoProcessorMFT);
-                var aaa = Activator.CreateInstance(videoprocesstype);
+
                 var videoprocessmft = Activator.CreateInstance(videoprocesstype) as IMFVideoProcessorControl;
                 //this.m_VideoProcessor2 = this.m_VideoProcessor as IMFVideoProcessorControl2;
                 HRESULT hr;

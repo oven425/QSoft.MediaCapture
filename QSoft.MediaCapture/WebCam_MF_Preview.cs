@@ -91,7 +91,7 @@ namespace QSoft.MediaCapture
                 if (hr != HRESULTS.S_OK) return hr;
                 var streamindex = (uint)Marshal.ReadInt32(cm.Pointer);
                 System.Diagnostics.Trace.WriteLine($"preview streamindex:{streamindex}");
-                
+
                 System.Diagnostics.Debug.WriteLine($"AddStream preview{streamindex}");
                 await this.AddVideoProcessorMFT(pSource, streamindex);
 
@@ -157,11 +157,11 @@ namespace QSoft.MediaCapture
                 System.Diagnostics.Debug.WriteLine($"AddStream preview{streamindex}");
                 hr = pPreview.SetSampleCallback(streamindex, samplecallback);
                 if (hr != HRESULTS.S_OK) return hr;
-                if(this.m_Setting.IsMirror)
+                if (this.m_Setting.IsMirror)
                 {
                     await this.AddVideoProcessorMFT(pSource, streamindex);
                 }
-                
+
 
                 hr = m_pEngine.StartPreview();
                 if (hr != HRESULTS.S_OK) return hr;
@@ -207,7 +207,7 @@ namespace QSoft.MediaCapture
 
                 hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_PREVIEW, out pSink);
                 if (hr.IsError) return hr;
-                if(pSink is IMFCapturePreviewSink preview)
+                if (pSink is IMFCapturePreviewSink preview)
                 {
                     preview.RemoveAllStreams();
                     SafeRelease(preview);

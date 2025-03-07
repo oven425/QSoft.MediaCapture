@@ -79,119 +79,15 @@ namespace WpfAppNET472
                     }
                     this.m_MainUI.Cameras.Add(Tuple.Create(nn, oo.symbollink, oo.panel));
                 }
+                this.combobox_cameras.SelectedIndex = 0;
             }
         }
-        //async Task OpenCamera(int index)
-        //{
-        //    m_bb = false;
-        //    this.m_MainUI.RecordFormats.Clear();
-        //    this.m_MainUI.PhotoFormats.Clear();
-        //    foreach (var oo in this.m_WebCams)
-        //    {
-        //        oo.Value.Dispose();
-        //    }
-
-        //    //WebCam_MF.CreateFromSymbollink(cccs.ElementAt(0).symbollink);
-        //    m_WebCam = this.m_WebCams.ElementAt(index).Value;
-        //    var allcamera = "Camera".Devices()
-        //        .Select(x => new { friendname=x.GetFriendName(), panel=x.Panel() })
-        //        .ToDictionary(x=>x.friendname, x=>x.panel);
-        //    var or = System.Windows.Forms.SystemInformation.ScreenOrientation;
-        //    CameraRotates rotate = CameraRotates.Rotate0;
-        //    switch(or)
-        //    {
-        //        case System.Windows.Forms.ScreenOrientation.Angle0:
-        //            rotate = CameraRotates.Rotate0;
-        //            break;
-        //        case System.Windows.Forms.ScreenOrientation.Angle90:
-        //            rotate = CameraRotates.Rotate90;
-        //            break;
-        //        case System.Windows.Forms.ScreenOrientation.Angle180:
-        //            rotate = CameraRotates.Rotate180;
-        //            break;
-        //        case System.Windows.Forms.ScreenOrientation.Angle270:
-        //            rotate = CameraRotates.Rotate270;
-        //            break;
-        //    }
-        //    await m_WebCam.InitCaptureEngine(new WebCam_MF_Setting()
-        //    {
-        //        Shared = false,
-        //        Rotate = rotate,
-        //        IsMirror = allcamera[m_WebCam.FriendName] == CameraPanel.Front,
-        //    });
-
-        //    this.m_MainUI.IsSupportTorch = this.m_WebCam.TorchLight?.IsSupported == true;
-        //    this.m_MainUI.Torchs.Clear();
-        //    if (this.m_MainUI.IsSupportTorch)
-        //    {
-        //        foreach (var oo in this.m_WebCam.TorchLight.SupportStates)
-        //        {
-        //            this.m_MainUI.Torchs.Add(oo);
-        //        }
-        //        this.m_MainUI.Torch = this.m_WebCam.TorchLight.GetState();
-        //    }
-
-        //    this.m_MainUI.IsSupportFlash = this.m_WebCam.FlashLight?.IsSupported==true;
-        //    this.m_MainUI.FlashLights.Clear();
-        //    if (this.m_MainUI.IsSupportFlash)
-        //    {
-        //        foreach (var oo in this.m_WebCam.FlashLight.SupportStates)
-        //        {
-        //            this.m_MainUI.FlashLights.Add(oo);
-        //        }
-        //    }
-        //    this.m_MainUI.ColorTemperaturePresets.Clear();
-        //    if (this.m_WebCam.WhiteBalanceControl.IsSupport)
-        //    {
-        //        foreach(var oo in typeof(ColorTemperaturePreset).GetEnumValues().Cast<ColorTemperaturePreset>())
-        //        {
-        //            this.m_MainUI.ColorTemperaturePresets.Add(oo);
-        //        }
-        //        this.m_MainUI.ColorTemperaturePreset = this.m_WebCam.WhiteBalanceControl.Preset;
-        //        this.m_MainUI.WhiteBalance.Value = (int)m_WebCam.WhiteBalanceControl.Value;
-        //        this.m_MainUI.WhiteBalance.IsAuto = m_WebCam.WhiteBalanceControl.IsAuto;
-        //        this.slider_whitebalance.SmallChange = this.m_WebCam.WhiteBalanceControl.Step;
-        //        this.slider_whitebalance.Minimum = this.m_WebCam.WhiteBalanceControl.Min;
-
-        //        this.slider_whitebalance.Maximum = this.m_WebCam.WhiteBalanceControl.Max;
-        //    }
-        //    System.Diagnostics.Trace.WriteLine($"{m_WebCam.FriendName}");
-        //    var capturess = m_WebCam.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
-        //    //System.Diagnostics.Trace.WriteLine($"record types");
-            
-        //    foreach (var oo in capturess.Where(x => x.SubType == DirectN.MFConstants.MFVideoFormat_NV12)
-        //        .OrderBy(x => x.Width * x.Height))
-        //    {
-        //        this.m_MainUI.RecordFormats.Add(oo);
-        //        //System.Diagnostics.Trace.WriteLine($"{oo.Width}x{oo.Height} {oo.Fps} {oo.SubType.FormatToString()}");
-        //    }
-        //    var photoss = m_WebCam.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT);
-        //    //System.Diagnostics.Trace.WriteLine($"photo types");
-
-        //    foreach (var oo in photoss.Where(x => x.SubType == DirectN.MFConstants.MFVideoFormat_NV12)
-        //        .OrderBy(x => x.Width * x.Height))
-        //    {
-        //        this.m_MainUI.PhotoFormats.Add(oo);
-        //        //System.Diagnostics.Trace.WriteLine($"{oo.Width}x{oo.Height} {oo.Fps} {oo.SubType.FormatToString()}");
-        //    }
-        //    if(photoss.Count > 0)
-        //    {
-        //        await m_WebCam.SetMediaStreamPropertiesAsync( MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT, this.m_MainUI.PhotoFormats.Last());
-        //    }
-        //    await m_WebCam.SetMediaStreamPropertiesAsync(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, m_MainUI.RecordFormats.LastOrDefault());
-
-        //    this.host.Visibility = Visibility.Visible;
-        //    await m_WebCam.StartPreview(this.host.Child.Handle);
-        //    m_bb = true;
-        //    //this.host.Visibility = Visibility.Collapsed;
-        //    //await m_WebCam.StartPreview(bmp => this.image.Source = bmp);
-        //}
 
         async Task OpenCamera(WebCam_MF webcam, QSoft.DevCon.CameraPanel panel)
         {
             m_bb = false;
-            this.m_MainUI.RecordFormats.Clear();
-            this.m_MainUI.PhotoFormats.Clear();
+            this.m_MainUI.VideoCaptureFormats.Clear();
+            this.m_MainUI.PhotoDependentFormats.Clear();
 
             m_WebCam?.Dispose();
             m_WebCam = webcam;
@@ -266,8 +162,7 @@ namespace WpfAppNET472
             foreach (var oo in capturess.Where(x => x.SubType == DirectN.MFConstants.MFVideoFormat_NV12)
                 .OrderBy(x => x.Width * x.Height))
             {
-                this.m_MainUI.RecordFormats.Add(oo);
-                //System.Diagnostics.Trace.WriteLine($"{oo.Width}x{oo.Height} {oo.Fps} {oo.SubType.FormatToString()}");
+                this.m_MainUI.VideoCaptureFormats.Add(oo);
             }
             var photoss = m_WebCam.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT);
             //System.Diagnostics.Trace.WriteLine($"photo types");
@@ -275,14 +170,13 @@ namespace WpfAppNET472
             foreach (var oo in photoss.Where(x => x.SubType == DirectN.MFConstants.MFVideoFormat_NV12)
                 .OrderBy(x => x.Width * x.Height))
             {
-                this.m_MainUI.PhotoFormats.Add(oo);
-                //System.Diagnostics.Trace.WriteLine($"{oo.Width}x{oo.Height} {oo.Fps} {oo.SubType.FormatToString()}");
+                this.m_MainUI.PhotoDependentFormats.Add(oo);
             }
             if (photoss.Count > 0)
             {
-                await m_WebCam.SetMediaStreamPropertiesAsync(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT, this.m_MainUI.PhotoFormats.Last());
+                await m_WebCam.SetMediaStreamPropertiesAsync(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT, this.m_MainUI.PhotoDependentFormats.LastOrDefault());
             }
-            await m_WebCam.SetMediaStreamPropertiesAsync(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, m_MainUI.RecordFormats.LastOrDefault());
+            await m_WebCam.SetMediaStreamPropertiesAsync(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, m_MainUI.VideoCaptureFormats.LastOrDefault());
 
             
             m_bb = true;
@@ -378,16 +272,6 @@ namespace WpfAppNET472
             System.Diagnostics.Trace.WriteLine($"get TorchLight:{m_WebCam.TorchLight.GetState()}");
 
         }
-        int m_Index = -1;
-        //async private void button_nextcamera_Click(object sender, RoutedEventArgs e)
-        //{
-        //    m_Index++;
-        //    if(this.m_Index >= this.m_WebCams.Count)
-        //    {
-        //        m_Index = 0;
-        //    }
-        //    await this.OpenCamera(m_Index);
-        //}
 
         async private void combobox_recordformat_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -464,9 +348,15 @@ namespace WpfAppNET472
         public bool UseD3D { set; get; }
         public ObservableCollection<ColorTemperaturePreset> ColorTemperaturePresets { set; get; } = new ObservableCollection<ColorTemperaturePreset>();
 
-        public ObservableCollection<ImageEncodingProperties> RecordFormats { set; get; }=new ObservableCollection<ImageEncodingProperties>();
-        public ObservableCollection<ImageEncodingProperties> PhotoFormats { set; get; }  =new ObservableCollection<ImageEncodingProperties>();
+        public ObservableCollection<ImageEncodingProperties> VideoCaptureFormats { set; get; }=new ObservableCollection<ImageEncodingProperties>();
+        public ObservableCollection<ImageEncodingProperties> PhotoDependentFormats { set; get; } = new ObservableCollection<ImageEncodingProperties>();
         public ObservableCollection<Tuple<string , string, QSoft.DevCon.CameraPanel>> Cameras { set; get; } = new ObservableCollection<Tuple<string, string, CameraPanel>>();
+        //Tuple<string, string, QSoft.DevCon.CameraPanel> m_Camera;
+        //public Tuple<string, string, QSoft.DevCon.CameraPanel> Camera
+        //{
+        //    set { m_Camera = value; this.Update("Camera"); }
+        //    get => m_Camera;
+        //}
         public event PropertyChangedEventHandler PropertyChanged;
         void Update(string name)=> this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         //public ObservableCollection<WebCam_MF> WebCams { set; get; } = new ObservableCollection<WebCam_MF>();
