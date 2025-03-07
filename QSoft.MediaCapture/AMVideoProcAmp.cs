@@ -51,9 +51,10 @@ namespace QSoft.MediaCapture
             try
             {
                 if (engine is null) return;
-                engine?.GetSource(out capturesource);
-                var hr = capturesource.GetCaptureDeviceSource(MF_CAPTURE_ENGINE_DEVICE_TYPE.MF_CAPTURE_ENGINE_DEVICE_TYPE_VIDEO, out mediasource);
-
+                var hr = engine?.GetSource(out capturesource);
+                if(hr != HRESULTS.S_OK || capturesource is null) return;
+                hr = capturesource.GetCaptureDeviceSource(MF_CAPTURE_ENGINE_DEVICE_TYPE.MF_CAPTURE_ENGINE_DEVICE_TYPE_VIDEO, out mediasource);
+                if (hr != HRESULTS.S_OK) return;
                 if (mediasource is IAMVideoProcAmp videoprocamp)
                 {
                     hr = videoprocamp.GetRange((int)property, out var min, out var max, out var step, out var dd, out var caps);
@@ -63,10 +64,9 @@ namespace QSoft.MediaCapture
                         this.Max = max;
                         this.Min = min;
                         this.Step = step;
-                        //return new AMVideoProcAmpRange(max, min, step);
                     }
                 }
-
+                 
             }
             finally
             {
@@ -79,6 +79,7 @@ namespace QSoft.MediaCapture
         bool m_IsAuto;
         internal HRESULT GetValue()
         {
+            if (engine is null) return HRESULTS.MF_E_NOT_INITIALIZED;
             IMFCaptureSource? capturesource = null;
             IMFMediaSource? mediasource = null;
             try

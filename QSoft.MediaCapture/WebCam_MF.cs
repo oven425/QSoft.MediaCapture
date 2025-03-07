@@ -9,12 +9,6 @@ using System.Threading.Tasks;
 
 namespace QSoft.MediaCapture
 {
-    //public class WebCam_MF_Size
-    //{
-    //    public uint Width { set; get; }
-    //    public uint Height { set; get; }
-    //}
-
     public enum CameraRotates
     {
         Rotate0 = 0,
@@ -26,13 +20,11 @@ namespace QSoft.MediaCapture
     }
     public class WebCam_MF_Setting
     {
+        //use shared property may be caused flashlight, torch not work
         public bool Shared { set; get; }
         public bool IsMirror { set; get; }
         public CameraRotates Rotate { set; get; }
         public bool UseD3D { set; get; }
-        //public WebCam_MF_Size Preview { set; get; } = new WebCam_MF_Size();
-        //public WebCam_MF_Size Photo { set; get; } = new WebCam_MF_Size();
-        //public WebCam_MF_Size Record { set; get; } = new WebCam_MF_Size();
     }
     public sealed partial class WebCam_MF : IDisposable
     {
@@ -50,7 +42,7 @@ namespace QSoft.MediaCapture
             g_pDXGIMan?.ResetDevice(g_pDX11Device, g_ResetToken);
             SafeRelease(g_pDX11Device);
             SafeRelease(g_pDXGIMan);
-            //m_IsPreviewing = false;
+
             m_WhiteBalanceControl = null;
         }
 

@@ -143,7 +143,8 @@ namespace QSoft.MediaCapture
             try
             {
                 var hr = m_pEngine.GetSource(out pSource);
-                var sser = pSource.GetCaptureDeviceSource(MF_CAPTURE_ENGINE_DEVICE_TYPE.MF_CAPTURE_ENGINE_DEVICE_TYPE_VIDEO, out mediasource);
+                if (hr != HRESULTS.S_OK) return hr;
+                hr = pSource.GetCaptureDeviceSource(MF_CAPTURE_ENGINE_DEVICE_TYPE.MF_CAPTURE_ENGINE_DEVICE_TYPE_VIDEO, out mediasource);
 
                 mfservice = mediasource as IMFGetService;
                 hr = mfservice.GetService(Guid.Empty, new Guid("b91ebfee-ca03-4af4-8a82-a31752f4a0fc"), out var con);
