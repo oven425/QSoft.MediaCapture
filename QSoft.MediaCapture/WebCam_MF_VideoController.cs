@@ -137,6 +137,7 @@ namespace QSoft.MediaCapture
         readonly uint m_Numerator;
         readonly uint m_Denominator;
         public float Fps { set; get; }
+        public uint ImageSize { get; }   
         public ImageEncodingProperties(IMFMediaType mediaType, MF_CAPTURE_ENGINE_STREAM_CATEGORY categroy, uint index=uint.MaxValue)
         {
             MediaType = mediaType;
@@ -160,12 +161,16 @@ namespace QSoft.MediaCapture
             {
                 this.Fps = (float)m_Numerator / m_Denominator;
             }
-
+            if(DirectN.Functions.MFCalculateImageSize(this.SubType, this.Width, this.Height, out var imagesize) == HRESULTS.S_OK)
+            {
+                this.ImageSize = imagesize;
+            }
+            //MFCalculateImageSize
         }
 
         public override string ToString()
         {
-            return $"{Width}x{Height} {SubType.FormatToString()} {Fps:0}";
+            return $"{Width}x{Height} {SubType.FormatToString()} {Fps:0} {ImageSize}";
         }
 
         public bool Equals(ImageEncodingProperties? y)

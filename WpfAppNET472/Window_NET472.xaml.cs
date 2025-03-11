@@ -48,6 +48,10 @@ namespace WpfAppNET472
         
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
+
+
+
+
             var orientation = System.Windows.Forms.SystemInformation.ScreenOrientation;
             System.Diagnostics.Trace.WriteLine($"orientation:{orientation}");
 
@@ -139,6 +143,7 @@ namespace WpfAppNET472
                 {
                     this.m_MainUI.FlashLights.Add(oo);
                 }
+                this.m_MainUI.FlashLight = this.m_WebCam.FlashLight.GetState();
             }
             this.m_MainUI.ColorTemperaturePresets.Clear();
             if (this.m_WebCam.WhiteBalanceControl.IsSupport)

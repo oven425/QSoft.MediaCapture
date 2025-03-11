@@ -17,6 +17,7 @@ namespace QSoft.MediaCapture
                 {
                     FriendName = x.GetString(MFConstants.MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME),
                     SymbolLinkName = x.GetString(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK),
+                    
                     CaptureObj = x
                 };
                 return mf;
@@ -31,6 +32,7 @@ namespace QSoft.MediaCapture
             IMFActivate act;
             var hhr = DirectN.Functions.MFCreateDeviceSourceActivate(attrs.Object, out act);
             var mfcreate = new ComObject<IMFActivate>(act);
+            var aa = mfcreate.GetString(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_AUDCAP_SYMBOLIC_LINK);
             return new WebCam_MF
             {
                 FriendName = mfcreate.GetString(MFConstants.MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME),
