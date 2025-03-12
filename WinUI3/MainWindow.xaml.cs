@@ -13,6 +13,11 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Media.Core;
+using QSoft.DevCon;
+using System.Windows.Controls;
+using Windows.Media.MediaProperties;
+using QSoft.MediaCapture;
+
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -31,13 +36,38 @@ namespace WinUI3
 
         private async void myButton_Click(object sender, RoutedEventArgs e)
         {
-            var webcams = QSoft.MediaCapture.WebCam_MF.GetAllWebCams();
-            var webcam = webcams.FirstOrDefault();
-            var hr = await webcam.InitCaptureEngine(new QSoft.MediaCapture.WebCam_MF_Setting());
-            webcam.StartPreview(new AA());
-            myButton.Content = "Clicked";
-            MediaStreamSource streamSource = null;
+            //var webcams = QSoft.MediaCapture.WebCam_MF.GetAllWebCams();
+            //var webcam = webcams.FirstOrDefault();
+            //var hr = await webcam.InitCaptureEngine(new QSoft.MediaCapture.WebCam_MF_Setting());
+            //webcam.StartPreview(new AA());
+            //myButton.Content = "Clicked";
+            //MediaStreamSource streamSource = null;
             //MediaStreamSource
+        }
+
+        async private void Window_Activated(object sender, WindowActivatedEventArgs args)
+        {
+            var aa = QSoft.DevCon.DevConExtension.KSCATEGORY_VIDEO_CAMERA.DevicesFromInterface()
+                .Select(x => new { path = x.DevicePath(), panel = x.As().Panel() })
+                .FirstOrDefault();
+            var webcam = WebCam_MF.CreateFromSymbollink(aa.path);
+            await webcam.InitCaptureEngine(new WebCam_MF_Setting()
+            {
+                IsMirror = aa.panel == CameraPanel.Front
+            });
+            var encdoing = VideoEncodingProperties.CreateUncompressed("nv12", 640, 480);
+            var vd = new VideoStreamDescriptor(encdoing);
+            var source = new MediaStreamSource(vd);
+            source.IsLive = true;
+            source.CanSeek = false;
+            source.SampleRequested += Source_SampleRequested;
+            preview.Source = MediaSource.CreateFromMediaStreamSource(source);
+            preview.AutoPlay = true;
+        }
+
+        private void Source_SampleRequested(MediaStreamSource sender, MediaStreamSourceSampleRequestedEventArgs args)
+        {
+            
         }
     }
 

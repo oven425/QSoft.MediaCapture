@@ -8,6 +8,6 @@
         xmlns:wpf="clr-namespace:QSoft.MediaCapture.WPF;assembly=QSoft.MediaCapture.WPF"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <!--<wpf:CameraView PreviewSource=""/>-->
+        <wpf:CameraView/>
     </Grid>
 </Window>
