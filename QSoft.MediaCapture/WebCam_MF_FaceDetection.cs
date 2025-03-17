@@ -1,33 +1,68 @@
-﻿//using DirectN;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
+﻿using DirectN;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-//namespace QSoft.MediaCapture
-//{
+namespace QSoft.MediaCapture
+{
 
-//    //https://code.stanford.edu/mpsilver/2208_kinect_sdk/-/blob/81e355c5fc26034743205132b3de9cf8b961543d/src/color/mfcamerareader.cpp
-//    public partial class WebCam_MF
-//    {
-//        public void InitFaceDection()
-//        {
+    //https://code.stanford.edu/mpsilver/2208_kinect_sdk/-/blob/81e355c5fc26034743205132b3de9cf8b961543d/src/color/mfcamerareader.cpp
+    public partial class WebCam_MF
+    {
+        FaceDetectionControl? m_FaceDetectionControl;
+        public FaceDetectionControl? FaceDetectionControl=> this.m_FaceDetectionControl ??= new(this.m_pEngine);
+    }
 
-//            this.FaceDetectionControl = new (this.m_pEngine);
-//            //this.FaceDetectionControl.GetCapabilities(out var cc);
-//            //System.Diagnostics.Trace.WriteLine($"FaceDection:{this.FaceDetectionControl.IsSupported} {cc}");
-//        }
-//        public FaceDetectionControl? FaceDetectionControl { set; get; }
-//    }
+    public class FaceDetectionControl : ExtendedCameraControl
+    {
+        public FaceDetectionControl(IMFCaptureEngine? engine)
+            : base(engine, KSPROPERTY_CAMERACONTROL_EXTENDED.KSPROPERTY_CAMERACONTROL_EXTENDED_FACEDETECTION)
+        {
+            var hr = this.GetCapabilities(out var cap);
+            if(hr == HRESULTS.S_OK)
+            {
+                var preview = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_PREVIEW;
+                if (preview == DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_PREVIEW)
+                {
+                    SupportStates.Add(FaceDetectionState.PREVIEW);
+                }
+                var video = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_VIDEO;
+                if (video == DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_VIDEO)
+                {
+                    SupportStates.Add(FaceDetectionState.VIDEO);
+                }
+                var photo = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_PHOTO;
+                if (photo == DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_PHOTO)
+                {
+                    SupportStates.Add(FaceDetectionState.PHOTO);
+                }
+                var blink = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_BLINK;
+                if (blink == DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_BLINK)
+                {
+                    SupportStates.Add(FaceDetectionState.BLINK);
+                }
+                var smile = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_SMILE;
+                if (smile == DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_SMILE)
+                {
+                    SupportStates.Add(FaceDetectionState.SMILE);
+                }
+            }
+        }
+        readonly public List<FaceDetectionState> SupportStates = [];
+    }
 
-//    public class FaceDetectionControl : ExtendedCameraControl
-//    {
-//        public FaceDetectionControl(IMFCaptureEngine? engine)
-//            : base(engine, KSPROPERTY_CAMERACONTROL_EXTENDED.KSPROPERTY_CAMERACONTROL_EXTENDED_ISO)
-//        {
-//        }
+    [Flags]
+    public enum FaceDetectionState
+    {
+        OFF = 0x0000000000000000,
+        PREVIEW = 0x0000000000000001,
+        VIDEO = 0x0000000000000002,
+        PHOTO = 0x0000000000000004,
+        BLINK = 0x0000000000000008,
+        SMILE = 0x0000000000000010
+    }
 
-//    }
 
-//}
+}

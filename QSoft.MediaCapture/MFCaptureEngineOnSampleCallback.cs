@@ -65,37 +65,45 @@ namespace QSoft.MediaCapture
         readonly object m_Lock = new();
         public HRESULT OnSample(IMFSample pSample)
         {
-            //Marshal.ReleaseComObject(pSample);
-            //return HRESULTS.S_OK;
             if (System.Threading.Monitor.TryEnter(this.m_Lock))
             {
 #if DEBUG
                 //this.ParseFace(pSample);
-                //var attrs = pSample.GetUnknown<IMFAttributes>(DirectN.MFConstants.MFSampleExtension_CaptureMetadata);
+                var attrs = pSample.GetUnknown<IMFAttributes>(DirectN.MFConstants.MFSampleExtension_CaptureMetadata);
+                if(attrs is not null)
+                {
+                    var attrs_count = attrs.Object.Count();
+                    for(uint i = 0; i < attrs_count; i++)
+                    {
+                        var key = attrs.Object.GetItemByIndex(i, out var guidkey, null);
+                        System.Diagnostics.Trace.WriteLine($"key: {key} {guidkey}");
+                    }   
+                }
+                
                 //System.Diagnostics.Trace.WriteLine($"attrs: {attrs.Count()}");
                 //try
                 //{
                 //    var buf11 = attrs.Object.GetBlobSize(DirectN.MFConstants.MF_CAPTURE_METADATA_FACEROIS, out var len);
                 //    //Infrared
                 //    System.Diagnostics.Trace.WriteLine($"GetBlobSize: {buf11} {len}");
-                //    var face_ptr = Marshal.AllocHGlobal((int)len);
-                //    var header = Marshal.PtrToStructure<tagFaceRectInfoBlobHeader>(face_ptr);
-                //    System.Diagnostics.Trace.WriteLine($"header: Size:{header.Size} Count:{header.Count}");
-                //    if(len == 28)
-                //    {
-                //        var faceinfo = Marshal.PtrToStructure<tagFaceRectInfo>(IntPtr.Add(face_ptr, 8));
-                //        System.Diagnostics.Trace.WriteLine($"faceinfo: Size:{faceinfo.Region} confidenceLevel:{faceinfo.confidenceLevel}");
-                //    }
+                //    //var face_ptr = Marshal.AllocHGlobal((int)len);
+                //    //var header = Marshal.PtrToStructure<tagFaceRectInfoBlobHeader>(face_ptr);
+                //    //System.Diagnostics.Trace.WriteLine($"header: Size:{header.Size} Count:{header.Count}");
+                //    //if (len == 28)
+                //    //{
+                //    //    var faceinfo = Marshal.PtrToStructure<tagFaceRectInfo>(IntPtr.Add(face_ptr, 8));
+                //    //    System.Diagnostics.Trace.WriteLine($"faceinfo: Size:{faceinfo.Region} confidenceLevel:{faceinfo.confidenceLevel}");
+                //    //}
 
 
-                //    Marshal.FreeHGlobal( face_ptr );
+                //    //Marshal.FreeHGlobal(face_ptr);
 
                 //}
                 //catch (Exception ee)
                 //{
                 //    System.Diagnostics.Trace.WriteLine(ee.Message);
                 //}
-                //attrs?.Dispose();
+                attrs?.Dispose();
                 if (samplecount == 0)
                 {
                     m_StopWatch.Restart();

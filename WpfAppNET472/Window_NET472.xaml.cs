@@ -120,10 +120,10 @@ namespace WpfAppNET472
                 IsMirror = panel == CameraPanel.Front,
                 UseD3D = this.m_MainUI.UseD3D
             });
-            m_WebCam.FrameArrived += (sender, args) =>
-            {
-                System.Diagnostics.Trace.WriteLine($"{args.RawData.Length}");
-            };
+            //m_WebCam.FrameArrived += (sender, args) =>
+            //{
+            //    System.Diagnostics.Trace.WriteLine($"FrameArrived:{args.RawData.Length}");
+            //};
             this.m_MainUI.IsSupportTorch = this.m_WebCam.TorchLight?.IsSupported == true;
             this.m_MainUI.Torchs.Clear();
             if (this.m_MainUI.IsSupportTorch)
@@ -144,6 +144,10 @@ namespace WpfAppNET472
                     this.m_MainUI.FlashLights.Add(oo);
                 }
                 this.m_MainUI.FlashLight = this.m_WebCam.FlashLight.GetState();
+            }
+            if(this.m_WebCam.FaceDetectionControl.IsSupported)
+            {
+                var oi = this.m_WebCam.FaceDetectionControl.SupportStates;
             }
             this.m_MainUI.ColorTemperaturePresets.Clear();
             if (this.m_WebCam.WhiteBalanceControl.IsSupport)
@@ -192,11 +196,12 @@ namespace WpfAppNET472
 
         async Task StartPreviewAsync()
         {
-            this.host.Visibility = Visibility.Visible;
-            await m_WebCam.StartPreview(this.host.Child.Handle);
+            //this.host.Visibility = Visibility.Visible;
+            //await m_WebCam.StartPreview(this.host.Child.Handle);
 
-            //this.host.Visibility = Visibility.Collapsed;
-            //await m_WebCam.StartPreview(() => this.image);
+            this.host.Visibility = Visibility.Collapsed;
+
+            await m_WebCam.StartPreview(() => this.image);
         }
 
         private void Oo_MediaCaptureFailedEventHandler(object sender, MediaCaptureFailedEventArgs e)
