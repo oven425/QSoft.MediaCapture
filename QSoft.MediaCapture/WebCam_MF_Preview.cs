@@ -192,7 +192,7 @@ namespace QSoft.MediaCapture
 
                 // Connect the video stream to the preview sink.
                 using var cm = new ComMemory(Marshal.SizeOf<uint>());
-                hr = pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, pMediaType2, null, cm.Pointer);
+                hr = pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, pMediaType, null, cm.Pointer);
                 if (hr != HRESULTS.S_OK) return hr;
                 var streamindex = (uint)Marshal.ReadInt32(cm.Pointer);
                 System.Diagnostics.Debug.WriteLine($"AddStream preview{streamindex}");

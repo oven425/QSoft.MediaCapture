@@ -22,11 +22,12 @@
         </SplitView.Pane>
 
         <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
             <MediaPlayerElement x:Name="preview"/>
-            <!--<TextBlock Text="Content"
-                   FontSize="24"
-                   VerticalAlignment="Center"
-                   HorizontalAlignment="Center"/>-->
+            <Button Click="myButton_Click">aaa</Button>
         </Grid>
     </SplitView>
 </Window>
