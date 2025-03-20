@@ -51,6 +51,27 @@ namespace QSoft.MediaCapture
             }
         }
         readonly public List<FaceDetectionState> SupportStates = [];
+
+        public FaceDetectionState GetState()
+        {
+            //System.Diagnostics.Debug.WriteLine($"Torch GetState");
+            //var hr = this.Get(out var mode);
+            //System.Diagnostics.Debug.WriteLine($"Torch GetState:{mode}");
+            //if (hr == HRESULTS.S_OK)
+            //{
+            //    var getv = mode switch
+            //    {
+            //        0 => TorchLightState.OFF,
+            //        1 => TorchLightState.ON,
+            //        2 => TorchLightState.ON_ADJUSTABLEPOWER,
+            //        _ => TorchLightState.OFF
+            //    };
+            //    return getv;
+            //}
+            //return TorchLightState.OFF;
+
+            return FaceDetectionState.OFF| FaceDetectionState.BLINK;
+        }
     }
 
     [Flags]
