@@ -10,13 +10,13 @@ using System.Windows.Media.Imaging;
 
 namespace QSoft.MediaCapture
 {
-    public partial class MFCaptureEngineOnSampleCallback
-    {
-        internal void ParseFace(IMFSample pSample)
-        {
+    //public partial class MFCaptureEngineOnSampleCallback
+    //{
+    //    internal void ParseFace(IMFSample pSample)
+    //    {
 
-        }
-    }
+    //    }
+    //}
 
     public class RawEventArgs(byte[] raw) : EventArgs
     {
@@ -70,16 +70,28 @@ namespace QSoft.MediaCapture
 #if DEBUG
                 //this.ParseFace(pSample);
                 var attrs = pSample.GetUnknown<IMFAttributes>(DirectN.MFConstants.MFSampleExtension_CaptureMetadata);
-                if(attrs is not null)
+                if (attrs is not null)
                 {
-                    var attrs_count = attrs.Object.Count();
-                    for(uint i = 0; i < attrs_count; i++)
+                    var face = attrs.Object.GetBlob(DirectN.MFConstants.MF_CAPTURE_METADATA_FACEROIS);
+                    using var mem = new System.IO.MemoryStream(face);
+                    var br = new System.IO.BinaryReader(mem);
+                    var size = br.ReadUInt32();
+                    var count = br.ReadUInt32();
+                    if(count > 0)
                     {
-                        var key = attrs.Object.GetItemByIndex(i, out var guidkey, null);
-                        System.Diagnostics.Trace.WriteLine($"key: {key} {guidkey}");
-                    }   
+                        var left = br.ReadInt32();
+                        var top = br.ReadInt32();
+                        var right = br.ReadInt32();
+                        var bottom = br.ReadInt32();
+                        var level = br.ReadInt32();
+                        System.Diagnostics.Trace.WriteLine($"face: {left} {top} {right} {bottom} {level}");
+
+
+
+                    }
                 }
                 
+
                 //System.Diagnostics.Trace.WriteLine($"attrs: {attrs.Count()}");
                 //try
                 //{

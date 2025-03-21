@@ -148,7 +148,9 @@ namespace WpfAppNET472
             if(this.m_WebCam.FaceDetectionControl.IsSupported)
             {
                 var oi = this.m_WebCam.FaceDetectionControl.SupportStates;
+                var ss = m_WebCam.FaceDetectionControl.GetState();
             }
+
             this.m_MainUI.ColorTemperaturePresets.Clear();
             if (this.m_WebCam.WhiteBalanceControl.IsSupport)
             {
