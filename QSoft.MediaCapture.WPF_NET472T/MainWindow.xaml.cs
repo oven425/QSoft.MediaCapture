@@ -23,7 +23,7 @@ namespace QSoft.MediaCapture.WPF_NET472T
         public MainWindow()
         {
             InitializeComponent();
-            
+            //this.cameraview.PreviewSource = new Uri("rtsp://
         }
     }
 }

@@ -124,6 +124,7 @@ namespace WpfAppNET472
             //{
             //    System.Diagnostics.Trace.WriteLine($"FrameArrived:{args.RawData.Length}");
             //};
+            //m_WebCam.
             this.m_MainUI.IsSupportTorch = this.m_WebCam.TorchLight?.IsSupported == true;
             this.m_MainUI.Torchs.Clear();
             if (this.m_MainUI.IsSupportTorch)

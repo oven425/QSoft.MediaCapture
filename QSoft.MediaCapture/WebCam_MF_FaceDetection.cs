@@ -72,6 +72,8 @@ namespace QSoft.MediaCapture
 
             return FaceDetectionState.OFF| FaceDetectionState.BLINK;
         }
+
+        public event EventHandler<FaceDetectionEventArgs>? FaceDetectionEvent;
     }
 
     [Flags]
@@ -86,4 +88,10 @@ namespace QSoft.MediaCapture
     }
 
 
+
+    public class FaceDetectionEventArgs : EventArgs
+    {
+        public List<tagFaceRectInfo> RawData { get; } = [];
+        public List<(double left, double top, double right, double bottom)> FaceRects { get; } = [];
+    }
 }

@@ -18,6 +18,8 @@ namespace QSoft.MediaCapture
     //    }
     //}
 
+
+
     public class RawEventArgs(byte[] raw) : EventArgs
     {
         public byte[] RawData { get; } = raw;
@@ -79,13 +81,27 @@ namespace QSoft.MediaCapture
                     var count = br.ReadUInt32();
                     if(count > 0)
                     {
-                        var left = br.ReadInt32();
-                        var top = br.ReadInt32();
-                        var right = br.ReadInt32();
-                        var bottom = br.ReadInt32();
+                        var left_q31 = br.ReadInt32();
+                        var top_q31 = br.ReadInt32();
+                        var right_q31 = br.ReadInt32();
+                        var bottom_q31 = br.ReadInt32();
                         var level = br.ReadInt32();
-                        System.Diagnostics.Trace.WriteLine($"face: {left} {top} {right} {bottom} {level}");
+                        var left_ = left_q31 / 2147483648.0;
+                        var right_ = right_q31 / 2147483648.0;
+                        var top_ = top_q31 / 2147483648.0;
+                        var bottom_ = bottom_q31 / 2147483648.0;
+                        //System.Diagnostics.Trace.WriteLine($"face: {left_*1280} {right_*1280}  {level}");
+                        System.Diagnostics.Trace.WriteLine($"face: {top_ * 720} {bottom_ * 720}  {level}");
 
+
+                        //var left_ = left_q31 / 2147483648.0;
+                        //var top_ = top_q31 / 2147483648.0;
+                        //var right_ = right_q31 / 2147483648.0;
+                        //var bottom_ = bottom_q31 / 2147483648.0;
+                        //System.Diagnostics.Trace.WriteLine($"face: {left_} {top_} {right_} {bottom_} {level}");
+
+
+                        //2147483648
 
 
                     }

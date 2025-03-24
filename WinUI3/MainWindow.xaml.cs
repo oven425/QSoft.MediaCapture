@@ -21,6 +21,7 @@ using QSoft.DevCon;
 using System.Runtime.InteropServices;
 using System.Collections.Concurrent;
 using System.Collections;
+using Microsoft.UI.Xaml.Media.Imaging;
 
 
 // To learn more about WinUI, the WinUI project structure,
@@ -55,6 +56,9 @@ namespace WinUI3
             {
                 IsMirror = true
             });
+            SurfaceImageSource ss = new SurfaceImageSource(1280, 720);
+            
+
             var aa1 = webcam.GetMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
             await webcam.StartPreview(new AA(queue) );
             var encdoing = VideoEncodingProperties.CreateUncompressed(MediaEncodingSubtypes.Nv12, 1280, 720);

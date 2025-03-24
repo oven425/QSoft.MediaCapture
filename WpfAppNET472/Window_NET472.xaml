@@ -16,8 +16,18 @@
         <WindowsFormsHost Background="Black" x:Name="host">
             <winform:PictureBox SizeChanged="picture_SizeChanged" x:Name="picture"/>
         </WindowsFormsHost>
-        <Image x:Name="image">
-        </Image>
+        <Grid>
+            <Image x:Name="image">
+            </Image>
+            <ItemsControl ItemsSource="{Binding Faces}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Rectangle Stroke="Red" StrokeThickness="2" Width="{Binding Width}" Height="{Binding Height}" Margin="{Binding Margin}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+        
         <StackPanel Grid.Row="1">
             <WrapPanel  ItemWidth="100">
                 <ComboBox SelectedItem="{Binding Camrea}" x:Name="combobox_cameras" SelectionChanged="combobox_cameras_SelectionChanged" ItemsSource="{Binding Cameras}">

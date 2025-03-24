@@ -103,6 +103,10 @@
       <Project>{667b0fd3-1753-48c2-b51e-683535a04c04}</Project>
       <Name>QSoft.MediaCapture.WPF</Name>
     </ProjectReference>
+    <ProjectReference Include="..\QSoft.MediaCapture\QSoft.MediaCapture.csproj">
+      <Project>{c0552673-c17e-409d-9031-60be992d024f}</Project>
+      <Name>QSoft.MediaCapture</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="DirectN.png" />
