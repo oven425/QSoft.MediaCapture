@@ -10,16 +10,6 @@ using System.Windows.Media.Imaging;
 
 namespace QSoft.MediaCapture
 {
-    //public partial class MFCaptureEngineOnSampleCallback
-    //{
-    //    internal void ParseFace(IMFSample pSample)
-    //    {
-
-    //    }
-    //}
-
-
-
     public class RawEventArgs(byte[] raw) : EventArgs
     {
         public byte[] RawData { get; } = raw;
@@ -32,6 +22,7 @@ namespace QSoft.MediaCapture
 
     public partial class MFCaptureEngineOnSampleCallback
     {
+        internal QSoft.MediaCapture.WebCam_MF? Parent { set; get; }
         internal IPassRaw? TranseRaw { set; get; }
         byte[]? m_RawBuffer;
         internal void RawEvent(IntPtr data, uint len)
@@ -75,36 +66,38 @@ namespace QSoft.MediaCapture
                 if (attrs is not null)
                 {
                     var face = attrs.Object.GetBlob(DirectN.MFConstants.MF_CAPTURE_METADATA_FACEROIS);
-                    using var mem = new System.IO.MemoryStream(face);
-                    var br = new System.IO.BinaryReader(mem);
-                    var size = br.ReadUInt32();
-                    var count = br.ReadUInt32();
-                    if(count > 0)
-                    {
-                        var left_q31 = br.ReadInt32();
-                        var top_q31 = br.ReadInt32();
-                        var right_q31 = br.ReadInt32();
-                        var bottom_q31 = br.ReadInt32();
-                        var level = br.ReadInt32();
-                        var left_ = left_q31 / 2147483648.0;
-                        var right_ = right_q31 / 2147483648.0;
-                        var top_ = top_q31 / 2147483648.0;
-                        var bottom_ = bottom_q31 / 2147483648.0;
-                        //System.Diagnostics.Trace.WriteLine($"face: {left_*1280} {right_*1280}  {level}");
-                        System.Diagnostics.Trace.WriteLine($"face: {top_ * 720} {bottom_ * 720}  {level}");
+                    this.Parent?.FaceDetectionControl?.ParseFaceDetectionData(face);
+                    //using var mem = new System.IO.MemoryStream(face);
+                    //var br = new System.IO.BinaryReader(mem);
+                    //var size = br.ReadUInt32();
+                    //var count = br.ReadUInt32();
+                    
+                    //if(count > 0)
+                    //{
+                    //    var left_q31 = br.ReadInt32();
+                    //    var top_q31 = br.ReadInt32();
+                    //    var right_q31 = br.ReadInt32();
+                    //    var bottom_q31 = br.ReadInt32();
+                    //    var level = br.ReadInt32();
+                    //    var left_ = left_q31 / 2147483648.0;
+                    //    var right_ = right_q31 / 2147483648.0;
+                    //    var top_ = top_q31 / 2147483648.0;
+                    //    var bottom_ = bottom_q31 / 2147483648.0;
+                    //    //System.Diagnostics.Trace.WriteLine($"face: {left_*1280} {right_*1280}  {level}");
+                    //    System.Diagnostics.Trace.WriteLine($"face: {top_ * 720} {bottom_ * 720}  {level}");
 
 
-                        //var left_ = left_q31 / 2147483648.0;
-                        //var top_ = top_q31 / 2147483648.0;
-                        //var right_ = right_q31 / 2147483648.0;
-                        //var bottom_ = bottom_q31 / 2147483648.0;
-                        //System.Diagnostics.Trace.WriteLine($"face: {left_} {top_} {right_} {bottom_} {level}");
+                    //    //var left_ = left_q31 / 2147483648.0;
+                    //    //var top_ = top_q31 / 2147483648.0;
+                    //    //var right_ = right_q31 / 2147483648.0;
+                    //    //var bottom_ = bottom_q31 / 2147483648.0;
+                    //    //System.Diagnostics.Trace.WriteLine($"face: {left_} {top_} {right_} {bottom_} {level}");
 
 
-                        //2147483648
+                    //    //2147483648
 
 
-                    }
+                    //}
                 }
                 
 

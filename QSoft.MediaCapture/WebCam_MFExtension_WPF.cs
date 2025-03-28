@@ -116,6 +116,7 @@ namespace QSoft.MediaCapture.WPF
             }
             var mfff = new MFCaptureEngineOnSampleCallback_WriteableBitmap(bmp, dispatcherpriority);
             mfff.TranseRaw = src;
+            mfff.Parent = src;
             var hr = await src.StartPreview(mfff);
             if(action?.Invoke() is Image image)
             {

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,6 +15,8 @@ namespace QSoft.MediaCapture
         FaceDetectionControl? m_FaceDetectionControl;
         public FaceDetectionControl? FaceDetectionControl=> this.m_FaceDetectionControl ??= new(this.m_pEngine);
     }
+
+    
 
     public class FaceDetectionControl : ExtendedCameraControl
     {
@@ -70,10 +73,48 @@ namespace QSoft.MediaCapture
             }
             return FaceDetectionState.PREVIEW;
 
-            return FaceDetectionState.OFF| FaceDetectionState.BLINK;
         }
 
         public event EventHandler<FaceDetectionEventArgs>? FaceDetectionEvent;
+
+        internal void ParseFaceDetectionData(byte[] face)
+        {
+            if (this.FaceDetectionEvent is null) return;
+            if(!this.IsSupported) return;
+            using var mem = new System.IO.MemoryStream(face);
+            var br = new System.IO.BinaryReader(mem);
+            var size = br.ReadUInt32();
+            var count = br.ReadUInt32();
+
+            if (count > 0)
+            {
+                var left_q31 = br.ReadInt32();
+                var top_q31 = br.ReadInt32();
+                var right_q31 = br.ReadInt32();
+                var bottom_q31 = br.ReadInt32();
+                var level = br.ReadInt32();
+                var left_ = left_q31 / 2147483648.0;
+                var right_ = right_q31 / 2147483648.0;
+                var top_ = top_q31 / 2147483648.0;
+                var bottom_ = bottom_q31 / 2147483648.0;
+                //System.Diagnostics.Trace.WriteLine($"face: {left_*1280} {right_*1280}  {level}");
+                System.Diagnostics.Trace.WriteLine($"face: {top_ * 720} {bottom_ * 720}  {level}");
+
+
+                //var left_ = left_q31 / 2147483648.0;
+                //var top_ = top_q31 / 2147483648.0;
+                //var right_ = right_q31 / 2147483648.0;
+                //var bottom_ = bottom_q31 / 2147483648.0;
+                //System.Diagnostics.Trace.WriteLine($"face: {left_} {top_} {right_} {bottom_} {level}");
+
+
+                //2147483648
+
+                //FaceDetectionEvent?.Invoke(this, new FaceDetectionEventArgs { RawData = new List<tagFaceRectInfo> { new tagFaceRectInfo { left = left_, top = top_, right = right_, bottom = bottom_ } } });
+            }
+
+
+        }
     }
 
     [Flags]
@@ -91,7 +132,7 @@ namespace QSoft.MediaCapture
 
     public class FaceDetectionEventArgs : EventArgs
     {
-        public List<tagFaceRectInfo> RawData { get; } = [];
+        public byte[] RawData { get; } = [];
         public List<(double left, double top, double right, double bottom)> FaceRects { get; } = [];
     }
 }
