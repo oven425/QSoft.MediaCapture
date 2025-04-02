@@ -150,6 +150,10 @@ namespace WpfAppNET472
             {
                 var oi = this.m_WebCam.FaceDetectionControl.SupportStates;
                 var ss = m_WebCam.FaceDetectionControl.GetState();
+                m_WebCam.FaceDetectionControl.FaceDetectionEvent += (sender, args) =>
+                {
+                    System.Diagnostics.Trace.WriteLine($"FaceDetectionEvent:{args.FaceRects.Count}");
+                };
             }
 
             this.m_MainUI.ColorTemperaturePresets.Clear();

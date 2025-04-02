@@ -85,8 +85,8 @@ namespace QSoft.MediaCapture
             var br = new System.IO.BinaryReader(mem);
             var size = br.ReadUInt32();
             var count = br.ReadUInt32();
-
-            if (count > 0)
+            var facerects = new List<(double left, double top, double right, double bottom)>();
+            for (int i=0; i<count; i++)
             {
                 var left_q31 = br.ReadInt32();
                 var top_q31 = br.ReadInt32();
@@ -97,23 +97,10 @@ namespace QSoft.MediaCapture
                 var right_ = right_q31 / 2147483648.0;
                 var top_ = top_q31 / 2147483648.0;
                 var bottom_ = bottom_q31 / 2147483648.0;
-                //System.Diagnostics.Trace.WriteLine($"face: {left_*1280} {right_*1280}  {level}");
-                System.Diagnostics.Trace.WriteLine($"face: {top_ * 720} {bottom_ * 720}  {level}");
-
-
-                //var left_ = left_q31 / 2147483648.0;
-                //var top_ = top_q31 / 2147483648.0;
-                //var right_ = right_q31 / 2147483648.0;
-                //var bottom_ = bottom_q31 / 2147483648.0;
+                facerects.Add((left_, top_, right_, bottom_));
                 //System.Diagnostics.Trace.WriteLine($"face: {left_} {top_} {right_} {bottom_} {level}");
-
-
-                //2147483648
-
-                //FaceDetectionEvent?.Invoke(this, new FaceDetectionEventArgs { RawData = new List<tagFaceRectInfo> { new tagFaceRectInfo { left = left_, top = top_, right = right_, bottom = bottom_ } } });
             }
-
-
+            this.FaceDetectionEvent?.Invoke(this, new (face, facerects));
         }
     }
 
@@ -130,9 +117,9 @@ namespace QSoft.MediaCapture
 
 
 
-    public class FaceDetectionEventArgs : EventArgs
+    public class FaceDetectionEventArgs(byte[] raw, List<(double left, double top, double right, double bottom)> faces) : EventArgs
     {
-        public byte[] RawData { get; } = [];
-        public List<(double left, double top, double right, double bottom)> FaceRects { get; } = [];
+        public byte[] RawData { get; } = raw;
+        public List<(double left, double top, double right, double bottom)> FaceRects { get; } = [.. faces];
     }
 }
