@@ -13,19 +13,30 @@
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <WindowsFormsHost Background="Black" x:Name="host">
+        <WindowsFormsHost Background="Black" Visibility="Collapsed" x:Name="host">
             <winform:PictureBox SizeChanged="picture_SizeChanged" x:Name="picture"/>
         </WindowsFormsHost>
         <Grid>
             <Image x:Name="image">
             </Image>
-            <ItemsControl ItemsSource="{Binding Faces}">
+            <Path>
+                <Path.Data>
+                    <PathGeometry>
+                        <PathGeometry.Figures>
+                            <PathFigure StartPoint="0,0">
+                                <PolyLineSegment Points="{Binding Path=Faces}" />
+                            </PathFigure>
+                        </PathGeometry.Figures>
+                    </PathGeometry>
+                </Path.Data>
+            </Path>
+            <!--<ItemsControl ItemsSource="{Binding Faces}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Rectangle Stroke="Red" StrokeThickness="2" Width="{Binding Width}" Height="{Binding Height}" Margin="{Binding Margin}"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            </ItemsControl>-->
         </Grid>
         
         <StackPanel Grid.Row="1">

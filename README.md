@@ -104,7 +104,7 @@ if(camera.FlashLight?.IsSupported)
 }
 
 ```
-# Flash and Torch
+# Torch
 first check this device support  this function after Init camera success
 ```c#
 if(camera.TorchLight?.IsSupported)
