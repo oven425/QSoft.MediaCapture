@@ -19,17 +19,13 @@
         <Grid>
             <Image x:Name="image">
             </Image>
-            <Path>
-                <Path.Data>
-                    <PathGeometry>
-                        <PathGeometry.Figures>
-                            <PathFigure StartPoint="0,0">
-                                <PolyLineSegment Points="{Binding Path=Faces}" />
-                            </PathFigure>
-                        </PathGeometry.Figures>
-                    </PathGeometry>
-                </Path.Data>
+
+            <Path Fill="AliceBlue" 
+Stretch="Uniform"
+      Stroke="Black" StrokeThickness="1" 
+      Data="M0.1,0.1 0.5,0.5  L0.1,0.5 z">
             </Path>
+
             <!--<ItemsControl ItemsSource="{Binding Faces}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
