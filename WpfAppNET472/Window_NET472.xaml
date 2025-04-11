@@ -16,14 +16,12 @@
         <WindowsFormsHost Background="Black" Visibility="Collapsed" x:Name="host">
             <winform:PictureBox SizeChanged="picture_SizeChanged" x:Name="picture"/>
         </WindowsFormsHost>
-        <Grid>
+        <Grid VerticalAlignment="Center" Background="Red">
             <Image x:Name="image">
             </Image>
 
-            <Path Fill="AliceBlue" 
-Stretch="Uniform"
-      Stroke="Black" StrokeThickness="1" 
-      Data="M0.1,0.1 0.5,0.5  L0.1,0.5 z">
+            <Path Stretch="Uniform" Stroke="Black" StrokeThickness="1" 
+                    Data="M0.1,0.1 0.5,0.5  L0.1,0.5 z">
             </Path>
 
             <!--<ItemsControl ItemsSource="{Binding Faces}">

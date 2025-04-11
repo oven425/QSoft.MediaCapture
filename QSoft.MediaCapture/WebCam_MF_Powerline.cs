@@ -12,9 +12,10 @@ namespace QSoft.MediaCapture
     {
         public void SetPowerLine()
         {
-            //hr = pSource.GetCaptureDeviceSource(MF_CAPTURE_ENGINE_DEVICE_TYPE.MF_CAPTURE_ENGINE_DEVICE_TYPE_VIDEO, out var mediasource);
-            //var ks = mediasource as IKsControl;
-
+            var hr = m_pEngine.GetSource(out var pSource);
+            hr = pSource.GetCaptureDeviceSource(MF_CAPTURE_ENGINE_DEVICE_TYPE.MF_CAPTURE_ENGINE_DEVICE_TYPE_VIDEO, out var mediasource);
+            var ks = mediasource as IKsControl;
+            ks = null;
 
             //KSIDENTIFIER ss;
             //ss.__union_0 = new __struct_ks_2__union_0()

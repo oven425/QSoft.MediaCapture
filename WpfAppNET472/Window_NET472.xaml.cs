@@ -193,8 +193,8 @@ namespace WpfAppNET472
                 await m_WebCam.SetMediaStreamPropertiesAsync(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT, this.m_MainUI.PhotoDependentFormats.LastOrDefault());
             }
             await m_WebCam.SetMediaStreamPropertiesAsync(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, m_MainUI.VideoCaptureFormats.LastOrDefault());
+            m_WebCam.SetPowerLine();
 
-            
             m_bb = true;
             //await StartPreviewAsync();
 
