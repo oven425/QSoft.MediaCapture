@@ -16,12 +16,11 @@
         <WindowsFormsHost Background="Black" Visibility="Collapsed" x:Name="host">
             <winform:PictureBox SizeChanged="picture_SizeChanged" x:Name="picture"/>
         </WindowsFormsHost>
-        <Grid VerticalAlignment="Center" Background="Red">
-            <Image x:Name="image">
-            </Image>
-
-            <Path Stretch="Uniform" Stroke="Black" StrokeThickness="1" 
-                    Data="M0.1,0.1 0.5,0.5  L0.1,0.5 z">
+        <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Background="Red">
+            <Image x:Name="image"/>
+            
+            <Path x:Name="path_face" Stretch="Uniform" Stroke="Black" StrokeThickness="1" 
+                    Data="M0.1,0.1 0.5,0.5  L0.1,0.5 z" Width="{Binding ActualWidth, ElementName=image, Mode=OneWay}" Height="{Binding ActualHeight, ElementName=image, Mode=OneWay}">
             </Path>
 
             <!--<ItemsControl ItemsSource="{Binding Faces}">

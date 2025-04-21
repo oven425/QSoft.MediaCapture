@@ -124,7 +124,7 @@ namespace WpfAppNET472
             //{
             //    System.Diagnostics.Trace.WriteLine($"FrameArrived:{args.RawData.Length}");
             //};
-            //m_WebCam.
+
             this.m_MainUI.IsSupportTorch = this.m_WebCam.TorchLight?.IsSupported == true;
             this.m_MainUI.Torchs.Clear();
             if (this.m_MainUI.IsSupportTorch)
@@ -152,6 +152,24 @@ namespace WpfAppNET472
                 var ss = m_WebCam.FaceDetectionControl.GetState();
                 m_WebCam.FaceDetectionControl.FaceDetectionEvent += (sender, args) =>
                 {
+
+                    //this.path_face.Data =new PathGeometry()
+                    //{
+                    //    Figures = new PathFigureCollection()
+                    //    {
+                    //        new PathFigure()
+                    //        {
+                    //            StartPoint = new Point(args.FaceRects[0].left, args.FaceRects[0].top),
+                    //            Segments = new PathSegmentCollection()
+                    //            {
+                    //                new LineSegment(new Point(args.FaceRects[0].X + args.FaceRects[0].Width, args.FaceRects[0].Y), true),
+                    //                new LineSegment(new Point(args.FaceRects[0].X + args.FaceRects[0].Width, args.FaceRects[0].Y + args.FaceRects[0].Height), true),
+                    //                new LineSegment(new Point(args.FaceRects[0].X, args.FaceRects[0].Y + args.FaceRects[0].Height), true),
+                    //                new LineSegment(new Point(args.FaceRects[0].X, args.FaceRects[0].Y), true)
+                    //            }
+                    //        }
+                    //    }
+                    //};
                     System.Diagnostics.Trace.WriteLine($"FaceDetectionEvent:{args.FaceRects.Count}");
                 };
             }
