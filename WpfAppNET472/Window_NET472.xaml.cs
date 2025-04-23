@@ -152,7 +152,25 @@ namespace WpfAppNET472
                 var ss = m_WebCam.FaceDetectionControl.GetState();
                 m_WebCam.FaceDetectionControl.FaceDetectionEvent += (sender, args) =>
                 {
-
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        canvas.Children.Clear();
+                        foreach (var oo in args.FaceRects)
+                        {
+                            var rc = new Rect(new Point(oo.left, oo.top), new Point(oo.right, oo.bottom));
+                            var rect = new Rectangle();
+                            rect.Stroke = Brushes.Red;
+                            rect.StrokeThickness = 2;
+                            rect.Width = rc.Width*canvas.ActualWidth; 
+                            rect.Height = rc.Height * canvas.ActualHeight;
+                            canvas.Children.Add(rect);
+                            Canvas.SetLeft(rect, rc.Left * canvas.ActualWidth);
+                            Canvas.SetLeft(rect, rc.Top * canvas.ActualHeight);
+                        }
+                        
+                        
+                    });
+                    
                     //this.path_face.Data =new PathGeometry()
                     //{
                     //    Figures = new PathFigureCollection()
