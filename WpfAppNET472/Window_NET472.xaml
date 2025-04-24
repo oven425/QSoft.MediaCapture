@@ -18,7 +18,8 @@
         </WindowsFormsHost>
         <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
             <Image x:Name="image"/>
-            <Canvas x:Name="canvas"/>
+            <Canvas x:Name="canvas">
+            </Canvas>
             <!--<Path x:Name="path_face" Stretch="Uniform" Stroke="Black" StrokeThickness="1" 
                     Data="M0.1,0.1 0.5,0.5  L0.1,0.5 z" Width="{Binding ActualWidth, ElementName=image, Mode=OneWay}" Height="{Binding ActualHeight, ElementName=image, Mode=OneWay}">
             </Path>-->

@@ -157,37 +157,25 @@ namespace WpfAppNET472
                         canvas.Children.Clear();
                         foreach (var oo in args.FaceRects)
                         {
-                            var rc = new Rect(new Point(oo.left, oo.top), new Point(oo.right, oo.bottom));
+                            var rc = new Rect(new Point(1-oo.left, 1-oo.bottom), new Point(1-oo.left, 1-oo.top));
                             var rect = new Rectangle();
                             rect.Stroke = Brushes.Red;
-                            rect.StrokeThickness = 2;
-                            rect.Width = rc.Width*canvas.ActualWidth; 
+                            rect.StrokeThickness = 1;
+                            rect.Width = rc.Width * canvas.ActualWidth;
                             rect.Height = rc.Height * canvas.ActualHeight;
-                            canvas.Children.Add(rect);
                             Canvas.SetLeft(rect, rc.Left * canvas.ActualWidth);
-                            Canvas.SetLeft(rect, rc.Top * canvas.ActualHeight);
+                            Canvas.SetTop(rect, rc.Top * canvas.ActualHeight);
+                            //rect.Width = rc.Width;
+                            //rect.Height = rc.Height;
+                            //Canvas.SetLeft(rect, canvas.ActualWidth-rc.Left);
+                            //Canvas.SetTop(rect, rc.Top);
+                            canvas.Children.Add(rect);
+                            
                         }
                         
                         
                     });
-                    
-                    //this.path_face.Data =new PathGeometry()
-                    //{
-                    //    Figures = new PathFigureCollection()
-                    //    {
-                    //        new PathFigure()
-                    //        {
-                    //            StartPoint = new Point(args.FaceRects[0].left, args.FaceRects[0].top),
-                    //            Segments = new PathSegmentCollection()
-                    //            {
-                    //                new LineSegment(new Point(args.FaceRects[0].X + args.FaceRects[0].Width, args.FaceRects[0].Y), true),
-                    //                new LineSegment(new Point(args.FaceRects[0].X + args.FaceRects[0].Width, args.FaceRects[0].Y + args.FaceRects[0].Height), true),
-                    //                new LineSegment(new Point(args.FaceRects[0].X, args.FaceRects[0].Y + args.FaceRects[0].Height), true),
-                    //                new LineSegment(new Point(args.FaceRects[0].X, args.FaceRects[0].Y), true)
-                    //            }
-                    //        }
-                    //    }
-                    //};
+
                     System.Diagnostics.Trace.WriteLine($"FaceDetectionEvent:{args.FaceRects.Count}");
                 };
             }
