@@ -157,7 +157,7 @@ namespace WpfAppNET472
                         canvas.Children.Clear();
                         foreach (var oo in args.FaceRects)
                         {
-                            var rc = new Rect(new Point(1-oo.left, 1-oo.bottom), new Point(1-oo.left, 1-oo.top));
+                            var rc = new Rect(new Point(1-oo.right, oo.bottom), new Point(1-oo.left, oo.top));
                             var rect = new Rectangle();
                             rect.Stroke = Brushes.Red;
                             rect.StrokeThickness = 1;
