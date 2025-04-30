@@ -57,9 +57,9 @@ namespace QSoft.MediaCapture
 
         public FaceDetectionState GetState()
         {
-            System.Diagnostics.Debug.WriteLine($"Torch GetState");
+            System.Diagnostics.Debug.WriteLine($"Face GetState");
             var hr = this.Get(out var mode);
-            System.Diagnostics.Debug.WriteLine($"Torch GetState:{mode}");
+            System.Diagnostics.Debug.WriteLine($"Face GetState:{mode}");
             if (hr == HRESULTS.S_OK)
             {
                 //var getv = mode switch
@@ -73,6 +73,13 @@ namespace QSoft.MediaCapture
             }
             return FaceDetectionState.PREVIEW;
 
+        }
+
+        public void SetState(FaceDetectionState state)
+        {
+            System.Diagnostics.Debug.WriteLine($"Face SetState:{state}");
+            var hr = this.Set((uint)state);
+            System.Diagnostics.Debug.WriteLine($"Face SetState:{hr}");
         }
 
         public event EventHandler<FaceDetectionEventArgs>? FaceDetectionEvent;
