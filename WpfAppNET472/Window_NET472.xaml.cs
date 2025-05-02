@@ -149,6 +149,8 @@ namespace WpfAppNET472
             if(this.m_WebCam.FaceDetectionControl.IsSupported)
             {
                 var oi = this.m_WebCam.FaceDetectionControl.SupportStates;
+                
+                m_WebCam.FaceDetectionControl.SetState();
                 var ss = m_WebCam.FaceDetectionControl.GetState();
                 m_WebCam.FaceDetectionControl.FaceDetectionEvent += (sender, args) =>
                 {
