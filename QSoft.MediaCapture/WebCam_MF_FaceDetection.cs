@@ -107,9 +107,20 @@ namespace QSoft.MediaCapture
 
         public void SetState(params FaceDetectionState[] states)
         {
+            if (states.Length == 0) return;
             //System.Diagnostics.Debug.WriteLine($"Face SetState:{state}");
-            var hr = this.Set(0);
-            //System.Diagnostics.Debug.WriteLine($"Face SetState:{hr}");
+            HRESULT hr = HRESULTS.S_OK;
+            if (states.Any(x => x == FaceDetectionState.OFF))
+            {
+                hr = this.Set(0);
+            }
+            else
+            {
+                ulong combinedState = states.Aggregate(0UL, (current, next) => current | (ulong)next);
+                this.Set(combinedState);
+
+            }
+            System.Diagnostics.Debug.WriteLine($"Face SetState:{hr}");
         }
 
         public event EventHandler<FaceDetectionEventArgs>? FaceDetectionEvent;
@@ -118,6 +129,7 @@ namespace QSoft.MediaCapture
         {
             if (this.FaceDetectionEvent is null) return;
             if(!this.IsSupported) return;
+            if(face is null) return;
             using var mem = new System.IO.MemoryStream(face);
             var br = new System.IO.BinaryReader(mem);
             var size = br.ReadUInt32();

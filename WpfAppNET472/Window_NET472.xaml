@@ -52,7 +52,7 @@
                 <Button x:Name="button_startrecord" Click="button_startrecord_Click">Start Record</Button>
                 <Button x:Name="button_stoprecord" Click="button_stoprecord_Click">Stop Record</Button>
 
-                <ComboBox x:Name="combobox_recordformat" SelectionChanged="combobox_recordformat_SelectionChanged" ItemsSource="{Binding VideoCaptureFormats}"/>
+                <ComboBox x:Name="combobox_recordformat" SelectionChanged="combobox_recordformat_SelectionChanged" ItemsSource="{Binding VideoCaptureFormats}" SelectedItem="{Binding RecordFormat}"/>
                 <ComboBox x:Name="combobox_photodepency" SelectedItem="{Binding PhotoDependentFormats}" ItemsSource="{Binding PhotoDependentFormats}"/>
 
                 <ComboBox SelectedItem="{Binding FlashLight}" ItemsSource="{Binding FlashLights}" SelectionChanged="ComboBox_SelectionChanged" IsEnabled="{Binding IsSupportFlash}"/>

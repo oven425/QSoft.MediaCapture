@@ -90,15 +90,21 @@ namespace QSoft.MediaCapture
                 var sw = System.Diagnostics.Stopwatch.StartNew();
                 hr = m_pEngine?.Initialize(this, pAttributes, null, this.CaptureObj?.Object);
                 if (hr != HRESULTS.S_OK) return hr;
-
+                
                 hr = await m_TaskInitialize.Task;
+                
+                //MF_CAPTURE_ENGINE_MEDIASOURCE_CONFIG
                 sw.Stop();
-                this.SupporCategory();
+                //this.SupporCategory();
                 ExtendedCameraControl.TetsALL(m_pEngine);
                 InitFlashLight();
                 InitTorch();
-                //InitFaceDection();
+                //InitBackgroundSegmentation();
+                var bv = this.BackgroundSegmentation;
+                //this.BackgroundSegmentation?.SetState(BackgroundSegmentation.BackgroundSegmentationState.Blur);
 
+                AMCameraControl cc = new AMCameraControl(m_pEngine, tagCameraControlProperty.CameraControl_Zoom);
+                cc.Init();
             }
             finally
             {

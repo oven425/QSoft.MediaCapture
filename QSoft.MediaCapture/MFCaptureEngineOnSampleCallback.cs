@@ -53,7 +53,7 @@ namespace QSoft.MediaCapture
 
 #if DEBUG
         int samplecount = 0;
-        System.Diagnostics.Stopwatch m_StopWatch = new();
+        readonly System.Diagnostics.Stopwatch m_StopWatch = new();
 #endif
         readonly object m_Lock = new();
         public HRESULT OnSample(IMFSample pSample)
@@ -61,70 +61,13 @@ namespace QSoft.MediaCapture
             if (System.Threading.Monitor.TryEnter(this.m_Lock))
             {
 #if DEBUG
-                //this.ParseFace(pSample);
-                var attrs = pSample.GetUnknown<IMFAttributes>(DirectN.MFConstants.MFSampleExtension_CaptureMetadata);
+                using var attrs = pSample.GetUnknown<IMFAttributes>(DirectN.MFConstants.MFSampleExtension_CaptureMetadata);
                 if (attrs is not null)
                 {
                     var face = attrs.Object.GetBlob(DirectN.MFConstants.MF_CAPTURE_METADATA_FACEROIS);
                     this.Parent?.FaceDetectionControl?.ParseFaceDetectionData(face);
-                    //using var mem = new System.IO.MemoryStream(face);
-                    //var br = new System.IO.BinaryReader(mem);
-                    //var size = br.ReadUInt32();
-                    //var count = br.ReadUInt32();
-                    
-                    //if(count > 0)
-                    //{
-                    //    var left_q31 = br.ReadInt32();
-                    //    var top_q31 = br.ReadInt32();
-                    //    var right_q31 = br.ReadInt32();
-                    //    var bottom_q31 = br.ReadInt32();
-                    //    var level = br.ReadInt32();
-                    //    var left_ = left_q31 / 2147483648.0;
-                    //    var right_ = right_q31 / 2147483648.0;
-                    //    var top_ = top_q31 / 2147483648.0;
-                    //    var bottom_ = bottom_q31 / 2147483648.0;
-                    //    //System.Diagnostics.Trace.WriteLine($"face: {left_*1280} {right_*1280}  {level}");
-                    //    System.Diagnostics.Trace.WriteLine($"face: {top_ * 720} {bottom_ * 720}  {level}");
-
-
-                    //    //var left_ = left_q31 / 2147483648.0;
-                    //    //var top_ = top_q31 / 2147483648.0;
-                    //    //var right_ = right_q31 / 2147483648.0;
-                    //    //var bottom_ = bottom_q31 / 2147483648.0;
-                    //    //System.Diagnostics.Trace.WriteLine($"face: {left_} {top_} {right_} {bottom_} {level}");
-
-
-                    //    //2147483648
-
-
-                    //}
                 }
                 
-
-                //System.Diagnostics.Trace.WriteLine($"attrs: {attrs.Count()}");
-                //try
-                //{
-                //    var buf11 = attrs.Object.GetBlobSize(DirectN.MFConstants.MF_CAPTURE_METADATA_FACEROIS, out var len);
-                //    //Infrared
-                //    System.Diagnostics.Trace.WriteLine($"GetBlobSize: {buf11} {len}");
-                //    //var face_ptr = Marshal.AllocHGlobal((int)len);
-                //    //var header = Marshal.PtrToStructure<tagFaceRectInfoBlobHeader>(face_ptr);
-                //    //System.Diagnostics.Trace.WriteLine($"header: Size:{header.Size} Count:{header.Count}");
-                //    //if (len == 28)
-                //    //{
-                //    //    var faceinfo = Marshal.PtrToStructure<tagFaceRectInfo>(IntPtr.Add(face_ptr, 8));
-                //    //    System.Diagnostics.Trace.WriteLine($"faceinfo: Size:{faceinfo.Region} confidenceLevel:{faceinfo.confidenceLevel}");
-                //    //}
-
-
-                //    //Marshal.FreeHGlobal(face_ptr);
-
-                //}
-                //catch (Exception ee)
-                //{
-                //    System.Diagnostics.Trace.WriteLine(ee.Message);
-                //}
-                attrs?.Dispose();
                 if (samplecount == 0)
                 {
                     m_StopWatch.Restart();

@@ -198,6 +198,7 @@ namespace WpfAppNET472
                 this.slider_whitebalance.Maximum = this.m_WebCam.WhiteBalanceControl.Max;
             }
             System.Diagnostics.Trace.WriteLine($"{m_WebCam.FriendName}");
+            m_WebCam.GetMM();
             var capturess = m_WebCam.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
             //System.Diagnostics.Trace.WriteLine($"record types");
 
@@ -218,11 +219,10 @@ namespace WpfAppNET472
             {
                 await m_WebCam.SetMediaStreamPropertiesAsync(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT, this.m_MainUI.PhotoDependentFormats.LastOrDefault());
             }
-            await m_WebCam.SetMediaStreamPropertiesAsync(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, m_MainUI.VideoCaptureFormats.LastOrDefault());
-            m_WebCam.SetPowerLine();
+            var v1 = m_MainUI.VideoCaptureFormats.FirstOrDefault(x => x.Width == 1920 && x.Fps == 30);
+            this.m_MainUI.RecordFormat = m_MainUI.VideoCaptureFormats.FirstOrDefault();
 
             m_bb = true;
-            //await StartPreviewAsync();
 
 
         }
@@ -319,7 +319,6 @@ namespace WpfAppNET472
         async private void combobox_recordformat_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             await this.m_WebCam.SetMediaStreamPropertiesAsync( MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, this.m_MainUI.RecordFormat);
-            var combobox = sender as ComboBox;
         }
 
 

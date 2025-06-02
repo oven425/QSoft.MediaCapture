@@ -8,10 +8,10 @@ namespace QSoft.MediaCapture
     {
         public static IReadOnlyCollection<WebCam_MF> GetAllWebCams()
         {
-            
+         
             var attr = MFFunctions.MFCreateAttributes();
             attr.Set(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
-            return attr.EnumDeviceSources().Select(x =>
+            return [.. attr.EnumDeviceSources().Select(x =>
             {
                 var mf = new WebCam_MF
                 {
@@ -21,11 +21,12 @@ namespace QSoft.MediaCapture
                     CaptureObj = x
                 };
                 return mf;
-            }).ToList();
+            })];
         }
 
         public static WebCam_MF CreateFromSymbollink(string data)
         {
+            
             var attrs = MFFunctions.MFCreateAttributes(2);
             attrs.Set(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
             attrs.Set(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK, data);

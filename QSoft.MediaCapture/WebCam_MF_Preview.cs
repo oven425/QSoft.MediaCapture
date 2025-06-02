@@ -41,7 +41,6 @@ namespace QSoft.MediaCapture
                 if (hr != HRESULTS.S_OK) return hr;
 
 
-
                 // Configure the video format for the preview sink.
                 hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, out pMediaType);
                 if (hr != HRESULTS.S_OK) return hr;
