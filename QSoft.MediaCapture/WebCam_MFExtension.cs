@@ -22,6 +22,9 @@ namespace QSoft.MediaCapture
             else if (src == MFConstants.MFVideoFormat_H264) return "H264";
             else if (src == MFConstants.MFVideoFormat_H265) return "H265";
             else if (src == MFConstants.MFAudioFormat_AAC) return "AAC";
+            else if (src == MFConstants.MFVideoFormat_L8) return "L8";
+            else if (src == MFConstants.MFVideoFormat_L16) return "L16";
+            else if (src == MFConstants.MFAudioFormat_Float) return "Float";
             return src.ToString();
         }
     }

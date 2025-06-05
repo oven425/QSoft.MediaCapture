@@ -93,7 +93,7 @@ namespace QSoft.MediaCapture
             return hr;
         }
 
-        async public Task<HRESULT> StartPreview(MFCaptureEngineOnSampleCallback callback)
+        async public Task<HRESULT> StartPreview(MFCaptureEngineOnSampleCallback callback,bool color = true)
         {
             if (m_pEngine == null) return HRESULTS.MF_E_NOT_INITIALIZED;
             //if (m_IsPreviewing) return HRESULTS.S_OK;
@@ -109,6 +109,7 @@ namespace QSoft.MediaCapture
                 hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_PREVIEW, out pSink);
                 if (hr != HRESULTS.S_OK) return hr;
                 pPreview = pSink as IMFCapturePreviewSink;
+                
                 if (pPreview == null) return HRESULTS.E_NOTIMPL;
 
                 hr = m_pEngine.GetSource(out pSource);
@@ -118,7 +119,7 @@ namespace QSoft.MediaCapture
                 // Configure the video format for the preview sink.
                 hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, out pMediaType);
                 if (hr != HRESULTS.S_OK) return hr;
-
+                hr = pMediaType.GetGUID(MFConstants.MF_MT_SUBTYPE, out var sub);
                 hr = WebCam_MF.CloneVideoMediaType(pMediaType, MFConstants.MFVideoFormat_RGB32, out pMediaType2);
                 if (hr != HRESULTS.S_OK || pMediaType2 == null) return hr;
 
@@ -127,7 +128,14 @@ namespace QSoft.MediaCapture
 
                 // Connect the video stream to the preview sink.
                 using var cm = new ComMemory(Marshal.SizeOf<uint>());
-                hr = pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, pMediaType2, null, cm.Pointer);
+                if(color)
+                {
+                    hr = pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, pMediaType2, null, cm.Pointer);
+                }
+                else
+                {
+                    hr = pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, pMediaType, null, cm.Pointer);
+                }
                 if (hr != HRESULTS.S_OK) return hr;
                 var streamindex = (uint)Marshal.ReadInt32(cm.Pointer);
                 System.Diagnostics.Debug.WriteLine($"AddStream preview{streamindex}");

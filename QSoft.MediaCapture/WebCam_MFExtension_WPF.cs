@@ -98,6 +98,35 @@ namespace QSoft.MediaCapture.WPF
             return hr;
         }
 
+        public static async Task<HRESULT> StartPreviewL8(this QSoft.MediaCapture.WebCam_MF src, Func<Image> action, System.Windows.Threading.DispatcherPriority dispatcherpriority = DispatcherPriority.Background)
+        {
+            var enc = src.GetMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
+            WriteableBitmap? bmp = null;
+            var dispatcher = Dispatcher.FromThread(System.Threading.Thread.CurrentThread);
+            if (dispatcher != null)
+            {
+                bmp = new WriteableBitmap((int)enc.Width, (int)enc.Height, 96, 96, PixelFormats.Gray8, null);
+            }
+            else
+            {
+                await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    bmp = new WriteableBitmap((int)enc.Width, (int)enc.Height, 96, 96, PixelFormats.Gray8, null);
+                });
+            }
+            var mfff = new MFCaptureEngineOnSampleCallback_WriteableBitmap(bmp, dispatcherpriority);
+            mfff.TranseRaw = src;
+            mfff.Parent = src;
+            var hr = await src.StartPreview(mfff, false);
+            if (action?.Invoke() is Image image)
+            {
+                image.Source = bmp;
+                image.LayoutTransform = new RotateTransform((int)src.Setting.Rotate);
+            }
+
+            return hr;
+        }
+
         public static async Task<HRESULT> StartPreview(this QSoft.MediaCapture.WebCam_MF src, Func<Image> action, System.Windows.Threading.DispatcherPriority dispatcherpriority = DispatcherPriority.Background)
         {
             var enc = src.GetMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);

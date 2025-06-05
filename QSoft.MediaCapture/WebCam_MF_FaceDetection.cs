@@ -27,31 +27,6 @@ namespace QSoft.MediaCapture
             if(hr == HRESULTS.S_OK)
             {
                 SupportStates = [.. ParseStates(cap)];
-                //var preview = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_PREVIEW;
-                //if (preview == DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_PREVIEW)
-                //{
-                //    SupportStates.Add(FaceDetectionState.PREVIEW);
-                //}
-                //var video = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_VIDEO;
-                //if (video == DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_VIDEO)
-                //{
-                //    SupportStates.Add(FaceDetectionState.VIDEO);
-                //}
-                //var photo = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_PHOTO;
-                //if (photo == DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_PHOTO)
-                //{
-                //    SupportStates.Add(FaceDetectionState.PHOTO);
-                //}
-                //var blink = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_BLINK;
-                //if (blink == DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_BLINK)
-                //{
-                //    SupportStates.Add(FaceDetectionState.BLINK);
-                //}
-                //var smile = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_SMILE;
-                //if (smile == DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_SMILE)
-                //{
-                //    SupportStates.Add(FaceDetectionState.SMILE);
-                //}
             }
         }
         readonly public List<FaceDetectionState> SupportStates = [];
@@ -63,31 +38,26 @@ namespace QSoft.MediaCapture
             if (preview == DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_PREVIEW)
             {
                 yield return FaceDetectionState.PREVIEW;
-                //SupportStates.Add(FaceDetectionState.PREVIEW);
             }
             var video = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_VIDEO;
             if (video == DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_VIDEO)
             {
                 yield return FaceDetectionState.VIDEO;
-                //SupportStates.Add(FaceDetectionState.VIDEO);
             }
             var photo = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_PHOTO;
             if (photo == DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_PHOTO)
             {
                 yield return FaceDetectionState.PHOTO;
-                //SupportStates.Add(FaceDetectionState.PHOTO);
             }
             var blink = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_BLINK;
             if (blink == DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_BLINK)
             {
                 yield return FaceDetectionState.BLINK;
-                //SupportStates.Add(FaceDetectionState.BLINK);
             }
             var smile = cap & DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_SMILE;
             if (smile == DirectN.Constants.KSCAMERA_EXTENDEDPROP_FACEDETECTION_SMILE)
             {
                 yield return FaceDetectionState.SMILE;
-                //SupportStates.Add(FaceDetectionState.SMILE);
             }
         }
 

@@ -44,6 +44,8 @@ namespace QSoft.MediaCapture.WPF
             }
         }
 
+        
+
         public CameraView()
         {
             InitializeComponent();

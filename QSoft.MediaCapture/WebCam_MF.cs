@@ -26,6 +26,15 @@ namespace QSoft.MediaCapture
         public CameraRotates Rotate { set; get; }
         public bool UseD3D { set; get; }
     }
+
+    //public class KK:IMFCameraOcclusionStateReportCallback
+    //{
+    //    public HRESULT OnOcclusionStateReport(IMFCameraOcclusionStateReport occlusionStateReport)
+    //    {
+    //        var hr = occlusionStateReport.GetOcclusionState(out var state);
+    //        return hr;
+    //    }
+    //}
     public sealed partial class WebCam_MF : IDisposable
     {
         WebCam_MF_Setting m_Setting = new WebCam_MF_Setting();
@@ -52,6 +61,15 @@ namespace QSoft.MediaCapture
         TaskCompletionSource<HRESULT>? m_TaskInitialize;
         async public Task<HRESULT?> InitCaptureEngine(WebCam_MF_Setting setting)
         {
+            //DirectN.MFFunctions.MFStartup();
+            //var hr1 = DirectN.Functions.MFCreateCameraOcclusionStateMonitor(this.SymbolLinkName, new KK(), out var monitor);
+            //var supportstates = monitor.GetSupportedStates();
+
+            //var eeeoo = (MFCameraOcclusionState)supportstates;
+            //monitor.Start();
+
+            //var hr2 = DirectN.Functions.MFCreateSensorGroup(this.SymbolLinkName, out var sensorGroup);
+            //sensorGroup.GetSensorDeviceCount(out var deviceCount);
             m_Setting.IsMirror = setting.IsMirror;
             m_Setting.Rotate = setting.Rotate;
             m_Setting.Shared = setting.Shared;

@@ -28,7 +28,7 @@ namespace QSoft.MediaCapture
 
                     while (true)
                     {
-                        var hr = source.GetAvailableDeviceMediaType(streamindex, index, out var mediatype);
+                        var hr = source.GetAvailableDeviceMediaType(streamindex[0], index, out var mediatype);
                         if (hr != HRESULTS.S_OK) break;
                         var mm = new ImageEncodingProperties(mediatype, mediastreamtype, index);
                         lls.Add(mm);
@@ -43,7 +43,7 @@ namespace QSoft.MediaCapture
             }
             return m_VideoList[mediastreamtype];
         }
-
+        Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, Dictionary<int, List<ImageEncodingProperties>>> m_VideoList2 = [];
         public void GetMM()
         {
             m_VideoList.Clear();
@@ -63,30 +63,43 @@ namespace QSoft.MediaCapture
                     {
                         hr = source.GetAvailableDeviceMediaType((uint)i, index, out var mediatype);
                         if (hr != HRESULTS.S_OK) break;
-                        var mm = new ImageEncodingProperties(mediatype, category, index);
+                        var mm = new ImageEncodingProperties(mediatype, category, (uint)i, index);
                         lls.Add(mm);
                         index++;
                     }
                     
-                    if (m_VideoList.ContainsKey(category))
-                    {
-                        if(lls.Count > m_VideoList[category].Count)
-                        {
-                            m_VideoList[category] = lls;
-                            m_StreamGategory[category] = (uint)i;
-                        }
-                    }
-                    else
-                    {
-                        m_StreamGategory[category] = (uint)i;
-                        m_VideoList[category] = lls;
-                    }
-                    var photo = lls;
-                    var record = lls.Where(x => x.SubType == DirectN.MFConstants.MFVideoFormat_NV12 && x.Fps>=30)
-                        .OrderByDescending(x => x.Width * x.Height)
-                        .ThenBy(x=>x.Fps);
-                    index = 0;
+                    //if (m_VideoList.ContainsKey(category))
+                    //{
+                    //    //if(lls.Count > m_VideoList[category].Count)
+                    //    {
+                    //        m_VideoList[category] = lls;
+                    //        if(m_StreamGategory[category] == null)
+                    //        {
+                    //            m_StreamGategory[category] = [];
+                    //        }
+                    //        m_StreamGategory[category].Add((uint)i);
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    m_StreamGategory[category] = [];
+                    //    m_StreamGategory[category].Add((uint)i);
+                    //    m_VideoList[category] = lls;
+                    //}
+
+                    //var photo = lls;
+                    //var record = lls.Where(x => x.SubType == DirectN.MFConstants.MFVideoFormat_NV12 && x.Fps>=30)
+                    //    .OrderByDescending(x => x.Width * x.Height)
+                    //    .ThenBy(x=>x.Fps);
+                    //index = 0;
                 }
+                var lu = lls.ToLookup(x => x.StreamGategory).ToLookup(x=>x.ToLookup(x=>x.StreamIndex));
+                var groupedResult = lls.GroupBy(x => x.StreamGategory)
+                       .Select(g => new
+                       {
+                           Category = g.Key,
+                           IndexGroups = g.GroupBy(x => x.StreamIndex)
+                       });
             }
             finally
             {
@@ -94,7 +107,7 @@ namespace QSoft.MediaCapture
             }
         }
 
-        readonly Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, uint> m_StreamGategory = [];
+        readonly Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, List<uint>> m_StreamGategory = [];
 
         //void SupporCategory()
         //{
@@ -130,7 +143,7 @@ namespace QSoft.MediaCapture
             if (hr != HRESULTS.S_OK || source == null) return null;
             try
             {
-                source.GetCurrentDeviceMediaType(m_StreamGategory[mediastreamtype], out mediatype);
+                source.GetCurrentDeviceMediaType(m_StreamGategory[mediastreamtype][0], out mediatype);
                 var mm = new ImageEncodingProperties(mediatype, mediastreamtype);
                 var ff = this.GetAvailableMediaStreamProperties(mediastreamtype).FirstOrDefault(x => x.Equals(mm));
                 return ff;
@@ -157,9 +170,18 @@ namespace QSoft.MediaCapture
                 var sss = list.FirstOrDefault(x => x.Equals(type));
                 if (sss != null)
                 {
-                    hr = source.SetCurrentDeviceMediaType(m_StreamGategory[mediastreamtype], sss.MediaType);
+                    hr = source.SetCurrentDeviceMediaType(0, sss.MediaType);
                     if (hr != HRESULTS.S_OK) return;
                     await m_TaskSetCurrentType.Task;
+
+                    //m_TaskSetCurrentType = new TaskCompletionSource<HRESULT>();
+                    //hr = source.SetCurrentDeviceMediaType(1, sss.MediaType);
+                    //await m_TaskSetCurrentType.Task;
+                    //hr = source.GetCurrentDeviceMediaType(0, out var m0);
+                    //var mm0 = new ImageEncodingProperties(m0, MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, 0);
+                    //hr = source.GetCurrentDeviceMediaType(1, out var m1);
+                    //var mm1 = new ImageEncodingProperties(m1, MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, 0);
+                    
                 }
             }
             finally
@@ -179,6 +201,7 @@ namespace QSoft.MediaCapture
     public partial class ImageEncodingProperties:IEquatable<ImageEncodingProperties>
     {
         public uint StreamIndex { private set; get; }
+        public uint MediaTypeIndex { private set; get; }
         public uint Width { set; get; }
         public uint Height { set; get; }
         public Guid SubType { set; get; }
@@ -188,10 +211,11 @@ namespace QSoft.MediaCapture
         readonly uint m_Denominator;
         public float Fps { set; get; }
         public uint ImageSize { get; }   
-        public ImageEncodingProperties(IMFMediaType mediaType, MF_CAPTURE_ENGINE_STREAM_CATEGORY categroy, uint index=uint.MaxValue)
+        public ImageEncodingProperties(IMFMediaType mediaType, MF_CAPTURE_ENGINE_STREAM_CATEGORY categroy, uint streamindex = uint.MaxValue, uint mediatypeindex=uint.MaxValue)
         {
+            StreamIndex = streamindex;
             MediaType = mediaType;
-            this.StreamIndex = index;
+            this.MediaTypeIndex = mediatypeindex;
             this.StreamGategory = categroy;
             if(mediaType.TryGetSize(MFConstants.MF_MT_FRAME_SIZE, out var w, out var h))
             {

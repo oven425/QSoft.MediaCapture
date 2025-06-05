@@ -57,6 +57,9 @@
 
                 <ComboBox SelectedItem="{Binding FlashLight}" ItemsSource="{Binding FlashLights}" SelectionChanged="ComboBox_SelectionChanged" IsEnabled="{Binding IsSupportFlash}"/>
                 <ComboBox SelectedItem="{Binding Torch}" ItemsSource="{Binding Torchs}" x:Name="combobox_torch" SelectionChanged="combobox_torch_SelectionChanged" IsEnabled="{Binding IsSupportTorch}"/>
+                <ComboBox x:Name="combobox_eyegazecorrection" SelectionChanged="combobox_eyegazecorrection_SelectionChanged" ItemsSource="{Binding EyeGazeCorrectionStates}" SelectedItem="{Binding EyeGazeCorrectionState}"/>
+                <ComboBox x:Name="combobox_digitalwindow" ItemsSource="{Binding DigitalWindowStates}" SelectedItem="{Binding DigitalWindowState}" SelectionChanged="combobox_digitalwindow_SelectionChanged"/>
+
             </WrapPanel>
             <Grid>
                 <Grid.ColumnDefinitions>

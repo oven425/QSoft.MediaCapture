@@ -167,10 +167,6 @@ namespace WpfAppNET472
                             rect.Height = rc.Height * canvas.ActualHeight;
                             Canvas.SetLeft(rect, rc.Left * canvas.ActualWidth);
                             Canvas.SetTop(rect, rc.Top * canvas.ActualHeight);
-                            //rect.Width = rc.Width;
-                            //rect.Height = rc.Height;
-                            //Canvas.SetLeft(rect, canvas.ActualWidth-rc.Left);
-                            //Canvas.SetTop(rect, rc.Top);
                             canvas.Children.Add(rect);
                             
                         }
@@ -202,7 +198,7 @@ namespace WpfAppNET472
             var capturess = m_WebCam.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
             //System.Diagnostics.Trace.WriteLine($"record types");
 
-            foreach (var oo in capturess.Where(x => x.SubType == DirectN.MFConstants.MFVideoFormat_NV12)
+            foreach (var oo in capturess.Where(x => x.SubType == DirectN.MFConstants.MFVideoFormat_L8)
                 .OrderBy(x => x.Width * x.Height))
             {
                 this.m_MainUI.VideoCaptureFormats.Add(oo);
@@ -232,9 +228,12 @@ namespace WpfAppNET472
             //this.host.Visibility = Visibility.Visible;
             //await m_WebCam.StartPreview(this.host.Child.Handle);
 
-            this.host.Visibility = Visibility.Collapsed;
+            //this.host.Visibility = Visibility.Collapsed;
+            //await m_WebCam.StartPreview(() => this.image);
 
-            await m_WebCam.StartPreview(() => this.image);
+            this.host.Visibility = Visibility.Collapsed;
+            await m_WebCam.StartPreviewL8(() => this.image);
+
         }
 
         private void Oo_MediaCaptureFailedEventHandler(object sender, MediaCaptureFailedEventArgs e)
@@ -341,6 +340,22 @@ namespace WpfAppNET472
                 await this.OpenCamera(webcam, camera.Item3);
             }
         }
+
+        private void combobox_eyegazecorrection_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if(m_WebCam.EyeGazeCorrection.IsSupported)
+            {
+                m_WebCam.EyeGazeCorrection.SetState(this.m_MainUI.EyeGazeCorrectionState);
+            }
+        }
+
+        private void combobox_digitalwindow_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (m_WebCam.DigitalWindow.IsSupported)
+            {
+                m_WebCam.DigitalWindow.SetState(this.m_MainUI.DigitalWindowState);
+            }
+        }
     }
 
 
@@ -393,12 +408,24 @@ namespace WpfAppNET472
         public ObservableCollection<ImageEncodingProperties> VideoCaptureFormats { set; get; }=new ObservableCollection<ImageEncodingProperties>();
         public ObservableCollection<ImageEncodingProperties> PhotoDependentFormats { set; get; } = new ObservableCollection<ImageEncodingProperties>();
         public ObservableCollection<Tuple<string , string, QSoft.DevCon.CameraPanel>> Cameras { set; get; } = new ObservableCollection<Tuple<string, string, CameraPanel>>();
-        //Tuple<string, string, QSoft.DevCon.CameraPanel> m_Camera;
-        //public Tuple<string, string, QSoft.DevCon.CameraPanel> Camera
-        //{
-        //    set { m_Camera = value; this.Update("Camera"); }
-        //    get => m_Camera;
-        //}
+
+        public List<EyeGazeCorrectionState> EyeGazeCorrectionStates => new List<EyeGazeCorrectionState>() { EyeGazeCorrectionState.OFF, EyeGazeCorrectionState.ON, EyeGazeCorrectionState.STARE };
+        EyeGazeCorrectionState m_EyeGazeCorrectionState;
+        public EyeGazeCorrectionState EyeGazeCorrectionState
+        {
+            set { m_EyeGazeCorrectionState = value; this.Update("EyeGazeCorrectionState"); }
+            get => m_EyeGazeCorrectionState;
+        }
+
+        public List<DigitalWindowState> DigitalWindowStates => new List<DigitalWindowState>() { DigitalWindowState.Manual, DigitalWindowState.AutoFaceFraming};
+        DigitalWindowState m_DigitalWindowState;
+        public DigitalWindowState DigitalWindowState
+        {
+            set { m_DigitalWindowState = value; this.Update("DigitalWindowState"); }
+            get => m_DigitalWindowState;
+        }
+
+
         public event PropertyChangedEventHandler PropertyChanged;
         void Update(string name)=> this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         //public ObservableCollection<WebCam_MF> WebCams { set; get; } = new ObservableCollection<WebCam_MF>();
