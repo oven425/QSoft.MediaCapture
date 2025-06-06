@@ -64,6 +64,12 @@ namespace QSoft.MediaCapture
                 using var attrs = pSample.GetUnknown<IMFAttributes>(DirectN.MFConstants.MFSampleExtension_CaptureMetadata);
                 if (attrs is not null)
                 {
+                    //var cc = attrs.Object.Count();
+                    //for(int i=0; i<cc; i++)
+                    //{
+                    //    PROPVARIANT pv = new PROPVARIANT();
+                    //    attrs.Object.GetItemByIndex((uint)i, out var kk, pv);
+                    //}
                     var face = attrs.Object.GetBlob(DirectN.MFConstants.MF_CAPTURE_METADATA_FACEROIS);
                     this.Parent?.FaceDetectionControl?.ParseFaceDetectionData(face);
                 }

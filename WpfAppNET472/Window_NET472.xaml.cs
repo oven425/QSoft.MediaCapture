@@ -198,8 +198,10 @@ namespace WpfAppNET472
             var capturess = m_WebCam.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
             //System.Diagnostics.Trace.WriteLine($"record types");
 
-            foreach (var oo in capturess.Where(x => x.SubType == DirectN.MFConstants.MFVideoFormat_L8)
-                .OrderBy(x => x.Width * x.Height))
+            foreach (var oo in capturess.Where(x => x.SubType == DirectN.MFConstants.MFVideoFormat_NV12)
+                .OrderByDescending(x => x.ImageSize)
+                .ThenByDescending(x => x.Fps))
+                
             {
                 this.m_MainUI.VideoCaptureFormats.Add(oo);
             }
@@ -213,7 +215,7 @@ namespace WpfAppNET472
             }
             if (photoss.Count > 0)
             {
-                await m_WebCam.SetMediaStreamPropertiesAsync(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT, this.m_MainUI.PhotoDependentFormats.LastOrDefault());
+                await m_WebCam.SetMediaStreamPropertiesAsync(this.m_MainUI.PhotoDependentFormats.LastOrDefault());
             }
             var v1 = m_MainUI.VideoCaptureFormats.FirstOrDefault(x => x.Width == 1920 && x.Fps == 30);
             this.m_MainUI.RecordFormat = m_MainUI.VideoCaptureFormats.FirstOrDefault();
@@ -228,11 +230,11 @@ namespace WpfAppNET472
             //this.host.Visibility = Visibility.Visible;
             //await m_WebCam.StartPreview(this.host.Child.Handle);
 
-            //this.host.Visibility = Visibility.Collapsed;
-            //await m_WebCam.StartPreview(() => this.image);
-
             this.host.Visibility = Visibility.Collapsed;
-            await m_WebCam.StartPreviewL8(() => this.image);
+            await m_WebCam.StartPreview(() => this.image);
+
+            //this.host.Visibility = Visibility.Collapsed;
+            //await m_WebCam.StartPreviewL8(() => this.image);
 
         }
 
@@ -317,7 +319,7 @@ namespace WpfAppNET472
 
         async private void combobox_recordformat_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            await this.m_WebCam.SetMediaStreamPropertiesAsync( MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, this.m_MainUI.RecordFormat);
+            await this.m_WebCam.SetMediaStreamPropertiesAsync(this.m_MainUI.RecordFormat);
         }
 
 

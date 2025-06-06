@@ -15,7 +15,7 @@ namespace QSoft.MediaCapture
         async public Task<HRESULT> StartPreview(IntPtr handle)
         {
             if (m_pEngine == null) return HRESULTS.MF_E_NOT_INITIALIZED;
-
+            if (IsPreviewing) return HRESULTS.S_OK;
             m_TaskStartPreview = new TaskCompletionSource<HRESULT>();
 
 
@@ -96,7 +96,7 @@ namespace QSoft.MediaCapture
         async public Task<HRESULT> StartPreview(MFCaptureEngineOnSampleCallback callback,bool color = true)
         {
             if (m_pEngine == null) return HRESULTS.MF_E_NOT_INITIALIZED;
-            //if (m_IsPreviewing) return HRESULTS.S_OK;
+            if (IsPreviewing) return HRESULTS.S_OK;
             m_TaskStartPreview = new TaskCompletionSource<HRESULT>();
             IMFCaptureSink? pSink = null;
             IMFMediaType? pMediaType = null;
@@ -119,7 +119,6 @@ namespace QSoft.MediaCapture
                 // Configure the video format for the preview sink.
                 hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, out pMediaType);
                 if (hr != HRESULTS.S_OK) return hr;
-                hr = pMediaType.GetGUID(MFConstants.MF_MT_SUBTYPE, out var sub);
                 hr = WebCam_MF.CloneVideoMediaType(pMediaType, MFConstants.MFVideoFormat_RGB32, out pMediaType2);
                 if (hr != HRESULTS.S_OK || pMediaType2 == null) return hr;
 
@@ -168,7 +167,7 @@ namespace QSoft.MediaCapture
         async public Task<HRESULT> StartPreview(IMFCaptureEngineOnSampleCallback samplecallback)
         {
             if (m_pEngine == null) return HRESULTS.MF_E_NOT_INITIALIZED;
-            //if (m_IsPreviewing) return HRESULTS.S_OK;
+            if (IsPreviewing) return HRESULTS.S_OK;
             m_TaskStartPreview = new TaskCompletionSource<HRESULT>();
             IMFCaptureSink? pSink = null;
             IMFMediaType? pMediaType = null;
@@ -229,7 +228,7 @@ namespace QSoft.MediaCapture
 
             return hr;
         }
-
+        public bool IsPreviewing { private set; get; }
 
         TaskCompletionSource<HRESULT>? m_TaskStopPreview;
         async public Task<HRESULT?> StopPreview()
@@ -243,10 +242,10 @@ namespace QSoft.MediaCapture
                 {
                     return HRESULTS.MF_E_NOT_INITIALIZED;
                 }
-                //if (!m_IsPreviewing)
-                //{
-                //    return HRESULTS.S_OK;
-                //}
+                if (!IsPreviewing)
+                {
+                    return HRESULTS.S_OK;
+                }
                 this.m_TaskStopPreview = new();
                 hr = m_pEngine.StopPreview();
                 if (hr.IsError) return hr;

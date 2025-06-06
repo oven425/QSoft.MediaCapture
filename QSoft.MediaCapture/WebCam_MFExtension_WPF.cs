@@ -79,7 +79,7 @@ namespace QSoft.MediaCapture.WPF
 
         public static async Task<HRESULT> StartPreview(this QSoft.MediaCapture.WebCam_MF src, Action<WriteableBitmap?> action, System.Windows.Threading.DispatcherPriority dispatcherpriority = DispatcherPriority.Background)
         {
-            var enc = src.GetMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
+            var enc = src.GetMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, 0);
             WriteableBitmap? bmp = null;
             var dispatcher = Dispatcher.FromThread(System.Threading.Thread.CurrentThread);
             if(dispatcher != null)
@@ -98,9 +98,9 @@ namespace QSoft.MediaCapture.WPF
             return hr;
         }
 
-        public static async Task<HRESULT> StartPreviewL8(this QSoft.MediaCapture.WebCam_MF src, Func<Image> action, System.Windows.Threading.DispatcherPriority dispatcherpriority = DispatcherPriority.Background)
+        public static async Task<HRESULT> StartPreviewL8(this QSoft.MediaCapture.WebCam_MF src, Func<Image> action, uint streamindex = 1, System.Windows.Threading.DispatcherPriority dispatcherpriority = DispatcherPriority.Background)
         {
-            var enc = src.GetMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
+            var enc = src.GetMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, streamindex);
             WriteableBitmap? bmp = null;
             var dispatcher = Dispatcher.FromThread(System.Threading.Thread.CurrentThread);
             if (dispatcher != null)
@@ -127,9 +127,9 @@ namespace QSoft.MediaCapture.WPF
             return hr;
         }
 
-        public static async Task<HRESULT> StartPreview(this QSoft.MediaCapture.WebCam_MF src, Func<Image> action, System.Windows.Threading.DispatcherPriority dispatcherpriority = DispatcherPriority.Background)
+        public static async Task<HRESULT> StartPreview(this QSoft.MediaCapture.WebCam_MF src, Func<Image> action, uint streamindex = 0, System.Windows.Threading.DispatcherPriority dispatcherpriority = DispatcherPriority.Background)
         {
-            var enc = src.GetMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
+            var enc = src.GetMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, streamindex);
             WriteableBitmap? bmp = null;
             var dispatcher = Dispatcher.FromThread(System.Threading.Thread.CurrentThread);
             if (dispatcher != null)

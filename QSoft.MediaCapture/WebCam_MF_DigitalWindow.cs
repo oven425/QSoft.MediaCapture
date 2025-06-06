@@ -28,32 +28,32 @@ namespace QSoft.MediaCapture
                 SupportStates = [.. ParseState(cap)];
             }
             var hdr = new ExtendedCameraControl(engine, KSPROPERTY_CAMERACONTROL_EXTENDED.KSPROPERTY_CAMERACONTROL_EXTENDED_VIDEOHDR);
-            var dic = new ExtendedCameraControl(engine, KSPROPERTY_CAMERACONTROL_EXTENDED.KSPROPERTY_CAMERACONTROL_EXTENDED_DIGITALWINDOW_CONFIGCAPS);
-            if(dic.IsSupported)
-            {
-                dic.GetPayload(out var buf);
-                var s1 = Marshal.SizeOf<tagKSCAMERA_EXTENDEDPROP_HEADER>();
-                var s2 = Marshal.SizeOf<tagKSCAMERA_EXTENDEDPROP_DIGITALWINDOW_CONFIGCAPSHEADER>();
-                var s3 = Marshal.SizeOf<tagKSCAMERA_EXTENDEDPROP_DIGITALWINDOW_CONFIGCAPS>();
-                var s4 = buf.Length - s2;
-                BinaryReader br = new BinaryReader(new MemoryStream(buf));
-                var size = br.ReadInt32();
-                var count = br.ReadInt32();
-                for (int i = 0; i < count; i++)
-                {
-                    var resolutionx = br.ReadInt32();
-                    var resolutiony = br.ReadInt32();
-                    var porchtop = br.ReadInt32();
-                    var porchleft = br.ReadInt32();
-                    var porchbottom = br.ReadInt32();
-                    var porchright = br.ReadInt32();
-                    var NonUpscalingWindowSize = br.ReadInt32();
-                    var MinWindowSize = br.ReadInt32();
-                    var MaxWindowSize = br.ReadInt32();
-                    var Reserved = br.ReadInt32();
-                    System.Diagnostics.Trace.WriteLine($"{resolutionx}x{resolutiony}");
-                }
-            }
+            //var dic = new ExtendedCameraControl(engine, KSPROPERTY_CAMERACONTROL_EXTENDED.KSPROPERTY_CAMERACONTROL_EXTENDED_DIGITALWINDOW_CONFIGCAPS);
+            //if(dic.IsSupported)
+            //{
+            //    dic.GetPayload(out var buf);
+            //    var s1 = Marshal.SizeOf<tagKSCAMERA_EXTENDEDPROP_HEADER>();
+            //    var s2 = Marshal.SizeOf<tagKSCAMERA_EXTENDEDPROP_DIGITALWINDOW_CONFIGCAPSHEADER>();
+            //    var s3 = Marshal.SizeOf<tagKSCAMERA_EXTENDEDPROP_DIGITALWINDOW_CONFIGCAPS>();
+            //    var s4 = buf.Length - s2;
+            //    BinaryReader br = new BinaryReader(new MemoryStream(buf));
+            //    var size = br.ReadInt32();
+            //    var count = br.ReadInt32();
+            //    for (int i = 0; i < count; i++)
+            //    {
+            //        var resolutionx = br.ReadInt32();
+            //        var resolutiony = br.ReadInt32();
+            //        var porchtop = br.ReadInt32();
+            //        var porchleft = br.ReadInt32();
+            //        var porchbottom = br.ReadInt32();
+            //        var porchright = br.ReadInt32();
+            //        var NonUpscalingWindowSize = br.ReadInt32();
+            //        var MinWindowSize = br.ReadInt32();
+            //        var MaxWindowSize = br.ReadInt32();
+            //        var Reserved = br.ReadInt32();
+            //        System.Diagnostics.Trace.WriteLine($"{resolutionx}x{resolutiony}");
+            //    }
+            //}
             
             
         }

@@ -37,10 +37,18 @@ namespace QSoft.MediaCapture
                 else if (guidType == MFConstants.MF_CAPTURE_ENGINE_PREVIEW_STARTED)
                 {
                     m_TaskStartPreview?.SetResult(hrStatus);
+                    if (hrStatus == HRESULTS.S_OK)
+                    {
+                        this.IsPreviewing = true;
+                    }
                 }
                 else if (guidType == MFConstants.MF_CAPTURE_ENGINE_PREVIEW_STOPPED)
                 {
                     m_TaskStopPreview?.SetResult(hrStatus);
+                    if (hrStatus == HRESULTS.S_OK)
+                    {
+                        this.IsPreviewing = false;
+                    }
                 }
                 else if (guidType == MFConstants.MF_CAPTURE_ENGINE_RECORD_STARTED)
                 {
