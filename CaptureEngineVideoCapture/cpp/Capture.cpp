@@ -154,9 +154,15 @@ HRESULT CreateD3DManager()
     return hr;
 }
 
+struct KSPROPERTY {
+    GUID Set;
+    ULONG Id;
+    ULONG Flags;
+};
 HRESULT
 CaptureManager::InitializeCaptureManager(HWND hwndPreview, IUnknown* pUnk)
 {
+	auto sss = sizeof(KSPROPERTY);
     HRESULT                         hr = S_OK;
     IMFAttributes*                  pAttributes = NULL;
     IMFCaptureEngineClassFactory*   pFactory = NULL;

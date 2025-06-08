@@ -31,7 +31,7 @@ namespace QSoft.MediaCapture.WPF
         }
         static async void PreviewSourcePropertyChange(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if(d is CameraView view)
+            if (d is CameraView)
             {
                 if(e.NewValue is null && e.OldValue is QSoft.MediaCapture.WebCam_MF oldcam)
                 {
@@ -43,8 +43,6 @@ namespace QSoft.MediaCapture.WPF
                 }
             }
         }
-
-        
 
         public CameraView()
         {

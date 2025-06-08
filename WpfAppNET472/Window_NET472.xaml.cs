@@ -220,9 +220,14 @@ namespace WpfAppNET472
             var v1 = m_MainUI.VideoCaptureFormats.FirstOrDefault(x => x.Width == 1920 && x.Fps == 30);
             this.m_MainUI.RecordFormat = m_MainUI.VideoCaptureFormats.FirstOrDefault();
 
-            m_bb = true;
-
-
+            foreach(var oo in this.m_WebCam.VideoProcAmps)
+            {
+                System.Diagnostics.Trace.WriteLine($"VideoProcAmp:{oo.Key} IsSupport:{oo.Value.IsSupport} IsAuto:{oo.Value.IsAuto} Value:{oo.Value.Value} Min:{oo.Value.Min} Max:{oo.Value.Max} Step:{oo.Value.Step}");
+            }
+            foreach (var oo in this.m_WebCam.CameraControls)
+            {
+                System.Diagnostics.Trace.WriteLine($"CameraControl:{oo.Key} IsSupport:{oo.Value.IsSupport} IsAuto:{oo.Value.IsAuto} Value:{oo.Value.Value} Min:{oo.Value.Min} Max:{oo.Value.Max} Step:{oo.Value.Step}");
+            }
         }
 
         async Task StartPreviewAsync()

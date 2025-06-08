@@ -1,13 +1,15 @@
 ﻿using DirectN;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-
-namespace QSoft.MediaCapture
+namespace QSoft.MediaCapture.Legacy
 {
-    public class AMVideoProcAmp(IMFCaptureEngine? engine, DirectN.tagVideoProcAmpProperty property)
+    public class AMVideoProcAmp(IMFCaptureEngine? engine, DirectN.tagVideoProcAmpProperty property) : INotifyPropertyChanged
     {
         internal void Init()
         {
@@ -33,30 +35,38 @@ namespace QSoft.MediaCapture
         public bool IsSupport { get; private set; }
         public long Value
         {
-            //set
-            //{
-            //    this.SetValue((int)value, this.m_IsAuto);
-            //}
+            set
+            {
+                if (this.m_Value != value)
+                {
+                    this.m_Value = value;
+                    this.SetValue((int)value, this.m_IsAuto);
+                    this.Updae();
+                }
+            }
             get
             {
                 var hr = GetValue();
                 return m_Value;
             }
         }
-        //protected AMVideoProcAmpRange Range => m_Range ??= GetRange();
+
         internal void GetRange()
         {
             IMFCaptureSource? capturesource = null;
             IMFMediaSource? mediasource = null;
             try
             {
+
                 if (engine is null) return;
                 var hr = engine?.GetSource(out capturesource);
-                if(hr != HRESULTS.S_OK || capturesource is null) return;
+                if (hr != HRESULTS.S_OK || capturesource is null) return;
                 hr = capturesource.GetCaptureDeviceSource(MF_CAPTURE_ENGINE_DEVICE_TYPE.MF_CAPTURE_ENGINE_DEVICE_TYPE_VIDEO, out mediasource);
                 if (hr != HRESULTS.S_OK) return;
+
                 if (mediasource is IAMVideoProcAmp videoprocamp)
                 {
+                    //IVideoProcAmp
                     hr = videoprocamp.GetRange((int)property, out var min, out var max, out var step, out var dd, out var caps);
                     if (hr == HRESULTS.S_OK)
                     {
@@ -65,8 +75,9 @@ namespace QSoft.MediaCapture
                         this.Min = min;
                         this.Step = step;
                     }
+                    WebCam_MF.SafeRelease(videoprocamp);
                 }
-                 
+
             }
             finally
             {
@@ -77,6 +88,12 @@ namespace QSoft.MediaCapture
 
         long m_Value;
         bool m_IsAuto;
+        protected void Updae([CallerMemberName] string? name = null)
+        {
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
+
         internal HRESULT GetValue()
         {
             if (engine is null) return HRESULTS.MF_E_NOT_INITIALIZED;
@@ -87,12 +104,12 @@ namespace QSoft.MediaCapture
                 var hr = engine.GetSource(out capturesource);
                 if (hr != HRESULTS.S_OK || capturesource == null) return HRESULTS.S_FALSE;
                 capturesource.GetCaptureDeviceSource(MF_CAPTURE_ENGINE_DEVICE_TYPE.MF_CAPTURE_ENGINE_DEVICE_TYPE_VIDEO, out mediasource);
-                var videoprocamp = mediasource as IAMVideoProcAmp;
-                if (videoprocamp != null)
+                if (mediasource is IAMVideoProcAmp videoprocamp)
                 {
                     videoprocamp.Get((int)property, out m_Value, out var flags);
                     var ff = (DirectN.tagVideoProcAmpFlags)flags;
                     this.m_IsAuto = ff == tagVideoProcAmpFlags.VideoProcAmp_Flags_Auto;
+                    WebCam_MF.SafeRelease(videoprocamp);
                 }
             }
             finally
@@ -102,8 +119,6 @@ namespace QSoft.MediaCapture
             }
             return HRESULTS.S_OK;
         }
-
-
 
         internal HRESULT SetValue(int value, bool auto)
         {
@@ -123,8 +138,7 @@ namespace QSoft.MediaCapture
                 var hr = engine.GetSource(out capturesource);
                 if (hr != HRESULTS.S_OK || capturesource == null) return HRESULTS.S_FALSE;
                 capturesource.GetCaptureDeviceSource(MF_CAPTURE_ENGINE_DEVICE_TYPE.MF_CAPTURE_ENGINE_DEVICE_TYPE_VIDEO, out mediasource);
-                var videoprocamp = mediasource as IAMVideoProcAmp;
-                if (videoprocamp != null)
+                if (mediasource is IAMVideoProcAmp videoprocamp)
                 {
                     hr = videoprocamp.Set((int)property, (int)aa, (int)flag);
                     if (hr == HRESULTS.S_OK)
@@ -141,6 +155,27 @@ namespace QSoft.MediaCapture
             }
             return HRESULTS.S_OK;
         }
+    }
+
+}
+namespace QSoft.MediaCapture
+{
+    public partial class WebCam_MF
+    {
+        Dictionary<DirectN.tagVideoProcAmpProperty, Legacy.AMVideoProcAmp>? m_VideoProcAmps;
+        Dictionary<DirectN.tagVideoProcAmpProperty, Legacy.AMVideoProcAmp> InitVideoProcAmps()
+        {
+            if (m_VideoProcAmps is not null) return m_VideoProcAmps;
+            m_VideoProcAmps = [];
+            foreach (var property in Enum.GetValues(typeof(DirectN.tagVideoProcAmpProperty)).Cast<DirectN.tagVideoProcAmpProperty>())
+            {
+                var amp = new Legacy.AMVideoProcAmp(m_pEngine, property);
+                amp.Init();
+                m_VideoProcAmps.Add(property, amp);
+            }
+            return VideoProcAmps;
+        }
+        public Dictionary<DirectN.tagVideoProcAmpProperty, Legacy.AMVideoProcAmp> VideoProcAmps => InitVideoProcAmps();
     }
 
 }

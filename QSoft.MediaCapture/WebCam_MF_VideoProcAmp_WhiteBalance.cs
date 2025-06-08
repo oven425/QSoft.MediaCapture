@@ -1,10 +1,13 @@
 ﻿using DirectN;
+using System;
 
 namespace QSoft.MediaCapture
 {
     public partial class WebCam_MF
     {
+        [Obsolete]
         WhiteBalanceControl? m_WhiteBalanceControl;
+        [Obsolete]
         public WhiteBalanceControl WhiteBalanceControl
         {
             get
@@ -18,7 +21,7 @@ namespace QSoft.MediaCapture
             }
         }
     }
-
+    [Obsolete]
     public enum ColorTemperaturePreset
     {
         Auto,
@@ -30,9 +33,9 @@ namespace QSoft.MediaCapture
         Tungsten,
         Candlelight
     }
-
+    [Obsolete]
     public class WhiteBalanceControl(IMFCaptureEngine? engine)
-        : AMVideoProcAmp(engine, tagVideoProcAmpProperty.VideoProcAmp_WhiteBalance)
+        : Legacy.AMVideoProcAmp(engine, tagVideoProcAmpProperty.VideoProcAmp_WhiteBalance)
     {
         public ColorTemperaturePreset Preset
         {

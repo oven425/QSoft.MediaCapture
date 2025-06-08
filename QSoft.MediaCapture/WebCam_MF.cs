@@ -52,7 +52,7 @@ namespace QSoft.MediaCapture
             SafeRelease(g_pDX11Device);
             SafeRelease(g_pDXGIMan);
 
-            m_WhiteBalanceControl = null;
+            //m_WhiteBalanceControl = null;
         }
 
         IMFCaptureEngine? m_pEngine;
@@ -121,8 +121,8 @@ namespace QSoft.MediaCapture
                 var bv = this.BackgroundSegmentation;
                 //this.BackgroundSegmentation?.SetState(BackgroundSegmentation.BackgroundSegmentationState.Blur);
 
-                AMCameraControl cc = new AMCameraControl(m_pEngine, tagCameraControlProperty.CameraControl_Zoom);
-                cc.Init();
+                KsMedia.KsControl ks = new KsMedia.KsControl(m_pEngine);
+                //this.SetPowerLine();
             }
             finally
             {

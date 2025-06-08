@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QSoft.MediaCapture
+namespace QSoft.MediaCapture.Legacy
 {
     public class AMCameraControl(IMFCaptureEngine? engine, DirectN.tagCameraControlProperty property)
     {
@@ -55,7 +55,7 @@ namespace QSoft.MediaCapture
                 if (hr != HRESULTS.S_OK || capturesource is null) return;
                 hr = capturesource.GetCaptureDeviceSource(MF_CAPTURE_ENGINE_DEVICE_TYPE.MF_CAPTURE_ENGINE_DEVICE_TYPE_VIDEO, out mediasource);
                 if (hr != HRESULTS.S_OK) return;
-                if (mediasource is IAMVideoProcAmp videoprocamp)
+                if (mediasource is IAMCameraControl videoprocamp)
                 {
                     hr = videoprocamp.GetRange((int)property, out var min, out var max, out var step, out var dd, out var caps);
                     if (hr == HRESULTS.S_OK)
@@ -65,6 +65,7 @@ namespace QSoft.MediaCapture
                         this.Min = min;
                         this.Step = step;
                     }
+                    WebCam_MF.SafeRelease(videoprocamp);
                 }
 
             }
@@ -87,12 +88,13 @@ namespace QSoft.MediaCapture
                 var hr = engine.GetSource(out capturesource);
                 if (hr != HRESULTS.S_OK || capturesource == null) return HRESULTS.S_FALSE;
                 capturesource.GetCaptureDeviceSource(MF_CAPTURE_ENGINE_DEVICE_TYPE.MF_CAPTURE_ENGINE_DEVICE_TYPE_VIDEO, out mediasource);
-                var videoprocamp = mediasource as IAMVideoProcAmp;
+                var videoprocamp = mediasource as IAMCameraControl;
                 if (videoprocamp != null)
                 {
                     videoprocamp.Get((int)property, out m_Value, out var flags);
                     var ff = (DirectN.tagVideoProcAmpFlags)flags;
                     this.m_IsAuto = ff == tagVideoProcAmpFlags.VideoProcAmp_Flags_Auto;
+                    WebCam_MF.SafeRelease(videoprocamp);
                 }
             }
             finally
@@ -123,7 +125,7 @@ namespace QSoft.MediaCapture
                 var hr = engine.GetSource(out capturesource);
                 if (hr != HRESULTS.S_OK || capturesource == null) return HRESULTS.S_FALSE;
                 capturesource.GetCaptureDeviceSource(MF_CAPTURE_ENGINE_DEVICE_TYPE.MF_CAPTURE_ENGINE_DEVICE_TYPE_VIDEO, out mediasource);
-                var videoprocamp = mediasource as IAMVideoProcAmp;
+                var videoprocamp = mediasource as IAMCameraControl;
                 if (videoprocamp != null)
                 {
                     hr = videoprocamp.Set((int)property, (int)aa, (int)flag);
@@ -132,6 +134,7 @@ namespace QSoft.MediaCapture
                         this.m_Value = aa;
                         this.m_IsAuto = auto;
                     }
+                    WebCam_MF.SafeRelease(videoprocamp);
                 }
             }
             finally
@@ -142,6 +145,28 @@ namespace QSoft.MediaCapture
             return HRESULTS.S_OK;
         }
 
+    }
+
+}
+
+namespace QSoft.MediaCapture
+{
+    public partial class WebCam_MF
+    {
+        Dictionary<DirectN.tagCameraControlProperty, Legacy.AMCameraControl>? m_AMCameraControls;
+        Dictionary<DirectN.tagCameraControlProperty, Legacy.AMCameraControl> InitCameraControls()
+        {
+            if (m_AMCameraControls is not null) return m_AMCameraControls;
+            m_AMCameraControls = [];
+            foreach (var property in Enum.GetValues(typeof(DirectN.tagCameraControlProperty)).Cast<DirectN.tagCameraControlProperty>())
+            {
+                var amp = new Legacy.AMCameraControl(m_pEngine, property);
+                amp.Init();
+                m_AMCameraControls.Add(property, amp);
+            }
+            return m_AMCameraControls;
+        }
+        public Dictionary<DirectN.tagCameraControlProperty, Legacy.AMCameraControl> CameraControls => InitCameraControls();
     }
 
 
