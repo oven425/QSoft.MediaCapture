@@ -6,10 +6,9 @@ namespace QSoft.MediaCapture
 {
     public partial class WebCam_MF
     {
-        public static IReadOnlyCollection<WebCam_MF> GetAllWebCams()
+        public static IReadOnlyList<WebCam_MF> GetAllWebCams()
         {
-         
-            var attr = MFFunctions.MFCreateAttributes();
+            using var attr = MFFunctions.MFCreateAttributes();
             attr.Set(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
             return [.. attr.EnumDeviceSources().Select(x =>
             {
@@ -24,10 +23,24 @@ namespace QSoft.MediaCapture
             })];
         }
 
+        public static IReadOnlyList<(string symboliclink, string friendlyname)> EnumAudioCapture()
+        {
+            using var attr = MFFunctions.MFCreateAttributes();
+            attr.Set(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_AUDCAP_GUID);
+            List<(string symboliclink, string friendlyname)> lls = [];
+
+            foreach(var oo in attr.EnumDeviceSources())
+            {
+                lls.Add((oo.GetString(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_AUDCAP_SYMBOLIC_LINK), oo.GetString(MFConstants.MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME)));
+                oo.Dispose();
+            }
+            
+            return lls;
+        }
+
         public static WebCam_MF CreateFromSymbollink(string data)
         {
-            
-            var attrs = MFFunctions.MFCreateAttributes(2);
+            using var attrs = MFFunctions.MFCreateAttributes(2);
             attrs.Set(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
             attrs.Set(MFConstants.MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK, data);
             IMFActivate act;

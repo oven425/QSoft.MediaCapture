@@ -9,6 +9,14 @@ namespace QSoft.MediaCapture
 {
     public static class WebCam_MFExtension
     {
+        public static float Fps(this IMFMediaType src)
+        {
+            if (src.TryGetRatio(MFConstants.MF_MT_FRAME_RATE, out var m_Numerator, out var m_Denominator))
+            {
+                return (float)m_Numerator / m_Denominator;
+            }
+            return 0;
+        }
         public static string FormatToString(this Guid src)
         {
             if (src == MFConstants.MFVideoFormat_MJPG) return "MJPG";

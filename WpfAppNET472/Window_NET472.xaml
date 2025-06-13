@@ -17,24 +17,16 @@
             <winform:PictureBox SizeChanged="picture_SizeChanged" x:Name="picture"/>
         </WindowsFormsHost>
         <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
-            <Image x:Name="image"/>
-            <Canvas x:Name="canvas">
-            </Canvas>
-            <!--<Path x:Name="path_face" Stretch="Uniform" Stroke="Black" StrokeThickness="1" 
-                    Data="M0.1,0.1 0.5,0.5  L0.1,0.5 z" Width="{Binding ActualWidth, ElementName=image, Mode=OneWay}" Height="{Binding ActualHeight, ElementName=image, Mode=OneWay}">
-            </Path>-->
-
-            <!--<ItemsControl ItemsSource="{Binding Faces}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Rectangle Stroke="Red" StrokeThickness="2" Width="{Binding Width}" Height="{Binding Height}" Margin="{Binding Margin}"/>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>-->
+            <Grid Background="Green">
+                <Image x:Name="image"/>
+                <!--<TextBlock Text="AAAAA" VerticalAlignment="Top" HorizontalAlignment="Left"/>-->
+                <Canvas x:Name="canvas">
+                </Canvas>
+            </Grid>
         </Grid>
         
         <StackPanel Grid.Row="1">
-            <WrapPanel  ItemWidth="100">
+            <WrapPanel ItemWidth="150">
                 <ComboBox SelectedItem="{Binding Camrea}" x:Name="combobox_cameras" SelectionChanged="combobox_cameras_SelectionChanged" ItemsSource="{Binding Cameras}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
@@ -61,7 +53,43 @@
                 <ComboBox x:Name="combobox_digitalwindow" ItemsSource="{Binding DigitalWindowStates}" SelectedItem="{Binding DigitalWindowState}" SelectionChanged="combobox_digitalwindow_SelectionChanged"/>
 
             </WrapPanel>
-            <Grid>
+            <Expander Header="Camera control">
+                <ItemsControl ItemsSource="{Binding CameraControls}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid IsEnabled="{Binding IsSupport}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding Name}" HorizontalAlignment="Right"/>
+                                <Slider Value="{Binding Value}" Minimum="{Binding Min}" Grid.Column="1" Maximum="{Binding Max}" LargeChange="{Binding Step}" SmallChange="{Binding Step}" IsSnapToTickEnabled="True" />
+                                <CheckBox IsChecked="{Binding IsAuto}" Grid.Column="2"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Expander>
+            <Expander Header="Video proc amp">
+                <ItemsControl ItemsSource="{Binding VideoProcAmps}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid IsEnabled="{Binding IsSupport}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding Name}" HorizontalAlignment="Right"/>
+                                <Slider Value="{Binding Value}" Minimum="{Binding Min}" Grid.Column="1" Maximum="{Binding Max}" LargeChange="{Binding Step}" SmallChange="{Binding Step}" IsSnapToTickEnabled="True" />
+                                <CheckBox IsChecked="{Binding IsAuto}" Grid.Column="2"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Expander>
+            <!--<Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition/>
@@ -69,11 +97,11 @@
                 <ComboBox x:Name="combobox_colortempature" SelectionChanged="combobox_colortempature_SelectionChanged"  SelectedItem="{Binding ColorTemperaturePreset}" ItemsSource="{Binding ColorTemperaturePresets}">
                     
                 </ComboBox>
-                <!--<CheckBox IsChecked="{Binding WhiteBalance.IsAuto}" x:Name="checkbox_wh_auto" Click="checkbox_wh_auto_Click"/>-->
+                --><!--<CheckBox IsChecked="{Binding WhiteBalance.IsAuto}" x:Name="checkbox_wh_auto" Click="checkbox_wh_auto_Click"/>--><!--
                 <Slider Grid.Column="1" Value="{Binding WhiteBalance.Value}" x:Name="slider_whitebalance" ValueChanged="slider_whitebalance_ValueChanged"  IsMoveToPointEnabled="True"/>
 
-            </Grid>
-
+            </Grid>-->
+            
         </StackPanel>
 
     </Grid>

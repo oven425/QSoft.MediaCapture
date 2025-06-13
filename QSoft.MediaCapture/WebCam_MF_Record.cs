@@ -30,6 +30,7 @@ namespace QSoft.MediaCapture
             return m_TaskStopRecord.Task;
         }
 
+
         TaskCompletionSource<HRESULT>? m_TaskStartRecord;
         async public Task<HRESULT> StartRecord(string pszDestinationFile)
         {

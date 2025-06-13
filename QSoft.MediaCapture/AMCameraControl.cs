@@ -1,13 +1,15 @@
 ﻿using DirectN;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace QSoft.MediaCapture.Legacy
 {
-    public class AMCameraControl(IMFCaptureEngine? engine, DirectN.tagCameraControlProperty property)
+    public class AMCameraControl(IMFCaptureEngine? engine, DirectN.tagCameraControlProperty property):INotifyPropertyChanged
     {
         internal void Init()
         {
@@ -15,13 +17,26 @@ namespace QSoft.MediaCapture.Legacy
             this.GetValue();
         }
 
+        public string Name => property switch
+        {
+            DirectN.tagCameraControlProperty.CameraControl_Pan=>"Pan",
+            DirectN.tagCameraControlProperty.CameraControl_Tilt => "Tilt",
+            DirectN.tagCameraControlProperty.CameraControl_Zoom =>"Zoom",
+            DirectN.tagCameraControlProperty.CameraControl_Roll =>"Roll",
+            DirectN.tagCameraControlProperty.CameraControl_Iris=>"Iris",
+            DirectN.tagCameraControlProperty.CameraControl_Focus=>"Focus",
+            DirectN.tagCameraControlProperty.CameraControl_Exposure =>"Exposure",
+            _ =>""
+
+        };
+
         public long Max { get; private set; }
         public long Min { get; private set; }
         public long Step { get; private set; }
 
         public bool IsAuto
         {
-            //set => this.SetValue((int)this.m_Value, value);
+            set => this.SetValue((int)this.m_Value, value);
             get
             {
                 var hr = GetValue();
@@ -33,10 +48,10 @@ namespace QSoft.MediaCapture.Legacy
         public bool IsSupport { get; private set; }
         public long Value
         {
-            //set
-            //{
-            //    this.SetValue((int)value, this.m_IsAuto);
-            //}
+            set
+            {
+                this.SetValue((int)value, this.m_IsAuto);
+            }
             get
             {
                 var hr = GetValue();
@@ -61,13 +76,12 @@ namespace QSoft.MediaCapture.Legacy
                     if (hr == HRESULTS.S_OK)
                     {
                         this.IsSupport = true;
-                        this.Max = max;
-                        this.Min = min;
+                        this.Max = (int)max;
+                        this.Min = (int)min;
                         this.Step = step;
                     }
                     WebCam_MF.SafeRelease(videoprocamp);
                 }
-
             }
             finally
             {
@@ -78,6 +92,13 @@ namespace QSoft.MediaCapture.Legacy
 
         long m_Value;
         bool m_IsAuto;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        void Update([CallerMemberName] string? name = null)
+        {
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
         internal HRESULT GetValue()
         {
             if (engine is null) return HRESULTS.MF_E_NOT_INITIALIZED;

@@ -186,7 +186,7 @@ namespace QSoft.MediaCapture
                 SafeRelease(source);
             }
         }
-
+        TaskCompletionSource<HRESULT>? m_TaskSetCurrentTypeDynamic;
         public async Task SetMediaStreamPropertiesAsync(ImageEncodingProperties? type)
         {
             if (type == null) return;
@@ -196,18 +196,25 @@ namespace QSoft.MediaCapture
             if (hr != HRESULTS.S_OK || source == null) return;
             try
             {
-                if(this.IsPreviewing == true)
+                if (this.IsPreviewing == true)
                 {
-                    //hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_PREVIEW, out var pSink);
-                    //if (hr != HRESULTS.S_OK) return;
-                    //var sink2 = pSink as IMFCaptureSink2;
-                    //sink2.SetOutputMediaType();
+                    hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_PREVIEW, out var pSink);
+                    if (hr != HRESULTS.S_OK) return;
+                    if(pSink is IMFCaptureSink2 sink2)
+                    {
+                        m_TaskSetCurrentTypeDynamic = new();
+                        hr = sink2.SetOutputMediaType(type.StreamIndex, type.MediaType, null);
+                        await m_TaskSetCurrentTypeDynamic.Task;
+                        WebCam_MF.SafeRelease(sink2);
+                    }
                 }
-
-                m_TaskSetCurrentType = new TaskCompletionSource<HRESULT>();
-                hr = source.SetCurrentDeviceMediaType(type.StreamIndex, type.MediaType);
-                if (hr != HRESULTS.S_OK) return;
-                await m_TaskSetCurrentType.Task;
+                else
+                {
+                    m_TaskSetCurrentType = new TaskCompletionSource<HRESULT>();
+                    hr = source.SetCurrentDeviceMediaType(type.StreamIndex, type.MediaType);
+                    if (hr != HRESULTS.S_OK) return;
+                    await m_TaskSetCurrentType.Task;
+                }
             }
             finally
             {
@@ -264,7 +271,6 @@ namespace QSoft.MediaCapture
             {
                 this.ImageSize = imagesize;
             }
-            //MFCalculateImageSize
         }
 
         public override string ToString()

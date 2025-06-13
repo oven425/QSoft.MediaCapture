@@ -96,6 +96,7 @@ namespace QSoft.MediaCapture
                 {
                     pAttributes.SetUINT32(MFConstants.MF_DEVSOURCE_ATTRIBUTE_FRAMESERVER_SHARE_MODE, 1);
                 }
+                pAttributes.SetUINT32(MFConstants.MF_LOW_LATENCY, 1);
                 if (hr != HRESULTS.S_OK) return hr;
                 var tty = Type.GetTypeFromCLSID(DirectN.MFConstants.CLSID_MFCaptureEngineClassFactory, true);
                 if (tty == null) return hr;
@@ -104,7 +105,7 @@ namespace QSoft.MediaCapture
                 hr = pFactory?.CreateInstance(DirectN.MFConstants.CLSID_MFCaptureEngine, typeof(IMFCaptureEngine).GUID, out o);
                 if (hr != HRESULTS.S_OK) return hr;
                 m_pEngine = o as IMFCaptureEngine;
-                System.Diagnostics.Trace.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")}");
+
                 var sw = System.Diagnostics.Stopwatch.StartNew();
                 hr = m_pEngine?.Initialize(this, pAttributes, null, this.CaptureObj?.Object);
                 if (hr != HRESULTS.S_OK) return hr;
@@ -118,10 +119,10 @@ namespace QSoft.MediaCapture
                 InitFlashLight();
                 InitTorch();
                 //InitBackgroundSegmentation();
-                var bv = this.BackgroundSegmentation;
+                //var bv = this.BackgroundSegmentation;
                 //this.BackgroundSegmentation?.SetState(BackgroundSegmentation.BackgroundSegmentationState.Blur);
 
-                KsMedia.KsControl ks = new KsMedia.KsControl(m_pEngine);
+                //KsMedia.KsControl ks = new KsMedia.KsControl(m_pEngine);
                 //this.SetPowerLine();
             }
             finally

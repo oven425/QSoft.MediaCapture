@@ -118,6 +118,7 @@ namespace QSoft.MediaCapture
 
                 // Configure the video format for the preview sink.
                 hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, out pMediaType);
+                var fps = pMediaType.Fps();
                 if (hr != HRESULTS.S_OK) return hr;
                 hr = WebCam_MF.CloneVideoMediaType(pMediaType, MFConstants.MFVideoFormat_RGB32, out pMediaType2);
                 if (hr != HRESULTS.S_OK || pMediaType2 == null) return hr;

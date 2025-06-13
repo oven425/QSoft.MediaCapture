@@ -50,7 +50,7 @@ namespace WpfAppNET472
         {
 
 
-
+            WebCam_MF.EnumAudioCapture();
 
             var orientation = System.Windows.Forms.SystemInformation.ScreenOrientation;
             System.Diagnostics.Trace.WriteLine($"orientation:{orientation}");
@@ -65,6 +65,14 @@ namespace WpfAppNET472
                     System.Diagnostics.Trace.WriteLine($"SymbolLinkName:{oo.SymbolLinkName}");
                     m_WebCams[oo.FriendName] = oo;
                 }
+
+                var audio = new Guid("{FBF6F530-07B9-11D2-A71E-0000F8004788}").DevicesFromInterface()
+                    .Select(x => new
+                    {
+                        symbollink = x.DevicePath(),
+                        friendname = x.As().GetFriendName(),
+                        desc = x.As().GetDeviceDesc(),
+                    }).ToList();
 
                 var cccs = QSoft.DevCon.DevConExtension.KSCATEGORY_VIDEO_CAMERA.DevicesFromInterface()
                     .Select(x => new
@@ -179,26 +187,26 @@ namespace WpfAppNET472
             }
 
             this.m_MainUI.ColorTemperaturePresets.Clear();
-            if (this.m_WebCam.WhiteBalanceControl.IsSupport)
-            {
-                foreach (var oo in typeof(ColorTemperaturePreset).GetEnumValues().Cast<ColorTemperaturePreset>())
-                {
-                    this.m_MainUI.ColorTemperaturePresets.Add(oo);
-                }
-                this.m_MainUI.ColorTemperaturePreset = this.m_WebCam.WhiteBalanceControl.Preset;
-                this.m_MainUI.WhiteBalance.Value = (int)m_WebCam.WhiteBalanceControl.Value;
-                this.m_MainUI.WhiteBalance.IsAuto = m_WebCam.WhiteBalanceControl.IsAuto;
-                this.slider_whitebalance.SmallChange = this.m_WebCam.WhiteBalanceControl.Step;
-                this.slider_whitebalance.Minimum = this.m_WebCam.WhiteBalanceControl.Min;
+            //if (this.m_WebCam.WhiteBalanceControl.IsSupport)
+            //{
+            //    foreach (var oo in typeof(ColorTemperaturePreset).GetEnumValues().Cast<ColorTemperaturePreset>())
+            //    {
+            //        this.m_MainUI.ColorTemperaturePresets.Add(oo);
+            //    }
+            //    this.m_MainUI.ColorTemperaturePreset = this.m_WebCam.WhiteBalanceControl.Preset;
+            //    this.m_MainUI.WhiteBalance.Value = (int)m_WebCam.WhiteBalanceControl.Value;
+            //    this.m_MainUI.WhiteBalance.IsAuto = m_WebCam.WhiteBalanceControl.IsAuto;
+            //    this.slider_whitebalance.SmallChange = this.m_WebCam.WhiteBalanceControl.Step;
+            //    this.slider_whitebalance.Minimum = this.m_WebCam.WhiteBalanceControl.Min;
 
-                this.slider_whitebalance.Maximum = this.m_WebCam.WhiteBalanceControl.Max;
-            }
+            //    this.slider_whitebalance.Maximum = this.m_WebCam.WhiteBalanceControl.Max;
+            //}
             System.Diagnostics.Trace.WriteLine($"{m_WebCam.FriendName}");
             m_WebCam.GetMM();
             var capturess = m_WebCam.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
             //System.Diagnostics.Trace.WriteLine($"record types");
-
-            foreach (var oo in capturess.Where(x => x.SubType == DirectN.MFConstants.MFVideoFormat_NV12)
+            var gg = capturess.GroupBy(x => x.SubType);
+            foreach (var oo in capturess.Where(x => x.SubType != DirectN.MFConstants.MFVideoFormat_L8)
                 .OrderByDescending(x => x.ImageSize)
                 .ThenByDescending(x => x.Fps))
                 
@@ -217,17 +225,21 @@ namespace WpfAppNET472
             {
                 await m_WebCam.SetMediaStreamPropertiesAsync(this.m_MainUI.PhotoDependentFormats.LastOrDefault());
             }
-            var v1 = m_MainUI.VideoCaptureFormats.FirstOrDefault(x => x.Width == 1920 && x.Fps == 30);
-            this.m_MainUI.RecordFormat = m_MainUI.VideoCaptureFormats.FirstOrDefault();
+            //var v1 = m_MainUI.VideoCaptureFormats.FirstOrDefault(x => x.Width == 1920 && x.Fps == 30);
+            //this.m_MainUI.RecordFormat = m_MainUI.VideoCaptureFormats.FirstOrDefault();
 
-            foreach(var oo in this.m_WebCam.VideoProcAmps)
-            {
-                System.Diagnostics.Trace.WriteLine($"VideoProcAmp:{oo.Key} IsSupport:{oo.Value.IsSupport} IsAuto:{oo.Value.IsAuto} Value:{oo.Value.Value} Min:{oo.Value.Min} Max:{oo.Value.Max} Step:{oo.Value.Step}");
-            }
-            foreach (var oo in this.m_WebCam.CameraControls)
-            {
-                System.Diagnostics.Trace.WriteLine($"CameraControl:{oo.Key} IsSupport:{oo.Value.IsSupport} IsAuto:{oo.Value.IsAuto} Value:{oo.Value.Value} Min:{oo.Value.Min} Max:{oo.Value.Max} Step:{oo.Value.Step}");
-            }
+            //foreach(var oo in this.m_WebCam.VideoProcAmps)
+            //{
+            //    this.m_MainUI.VideoProcAmps.Add(oo.Value);
+            //    System.Diagnostics.Trace.WriteLine($"VideoProcAmp:{oo.Key} IsSupport:{oo.Value.IsSupport} IsAuto:{oo.Value.IsAuto} Value:{oo.Value.Value} Min:{oo.Value.Min} Max:{oo.Value.Max} Step:{oo.Value.Step}");
+            //}
+
+            //this.m_MainUI.CameraControls.Clear();
+            //foreach (var oo in this.m_WebCam.CameraControls)
+            //{
+            //    this.m_MainUI.CameraControls.Add(oo.Value);
+            //    System.Diagnostics.Trace.WriteLine($"CameraControl:{oo.Key} IsSupport:{oo.Value.IsSupport} IsAuto:{oo.Value.IsAuto} Value:{oo.Value.Value} Min:{oo.Value.Min} Max:{oo.Value.Max} Step:{oo.Value.Step}");
+            //}
         }
 
         async Task StartPreviewAsync()
@@ -432,6 +444,8 @@ namespace WpfAppNET472
             get => m_DigitalWindowState;
         }
 
+        public ObservableCollection<QSoft.MediaCapture.Legacy.AMCameraControl> CameraControls { set; get; } =  new ObservableCollection<QSoft.MediaCapture.Legacy.AMCameraControl>();
+        public ObservableCollection<QSoft.MediaCapture.Legacy.AMVideoProcAmp> VideoProcAmps { set; get; } = new ObservableCollection<QSoft.MediaCapture.Legacy.AMVideoProcAmp>();
 
         public event PropertyChangedEventHandler PropertyChanged;
         void Update(string name)=> this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
@@ -476,6 +490,7 @@ namespace WpfAppNET472
             get => m_IsAuto;
             set { m_IsAuto = value; this.Update("IsAuto"); }
         }
+
         
         public event PropertyChangedEventHandler PropertyChanged;
         void Update(string name) => this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

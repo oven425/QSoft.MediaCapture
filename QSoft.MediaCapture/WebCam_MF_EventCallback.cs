@@ -75,6 +75,10 @@ namespace QSoft.MediaCapture
                     m_TaskSetCurrentType?.SetResult(hrStatus);
                     //MediaTypeChangeEventHandler?.Invoke(this, new EventArgs());
                 }
+                else if(guidType == MFConstants.MF_CAPTURE_ENGINE_OUTPUT_MEDIA_TYPE_SET)
+                {
+                    m_TaskSetCurrentTypeDynamic?.SetResult(hrStatus);
+                }
                 else if (guidType == MFConstants.MF_CAPTURE_ENGINE_ERROR)
                 {
                     MediaCaptureFailedEventHandler?.Invoke(this, new MediaCaptureFailedEventArgs()

@@ -17,13 +17,29 @@ namespace QSoft.MediaCapture.Legacy
             this.GetValue();
         }
 
+        public string Name => property switch
+        {
+            DirectN.tagVideoProcAmpProperty.VideoProcAmp_Brightness => "Brightness",
+            DirectN.tagVideoProcAmpProperty.VideoProcAmp_Contrast => "Contrast",
+            DirectN.tagVideoProcAmpProperty.VideoProcAmp_Hue => "Hue",
+            DirectN.tagVideoProcAmpProperty.VideoProcAmp_Saturation => "Saturation",
+            DirectN.tagVideoProcAmpProperty.VideoProcAmp_Sharpness => "Sharpness",
+            DirectN.tagVideoProcAmpProperty.VideoProcAmp_Gamma => "Gamma",
+            DirectN.tagVideoProcAmpProperty.VideoProcAmp_ColorEnable => "ColorEnable",
+            DirectN.tagVideoProcAmpProperty.VideoProcAmp_WhiteBalance => "WhiteBalance",
+            DirectN.tagVideoProcAmpProperty.VideoProcAmp_BacklightCompensation => "BacklightCompensation",
+            DirectN.tagVideoProcAmpProperty.VideoProcAmp_Gain => "Gain",
+            _ => ""
+
+        };
+
         public long Max { get; private set; }
         public long Min { get; private set; }
         public long Step { get; private set; }
 
         public bool IsAuto
         {
-            //set => this.SetValue((int)this.m_Value, value);
+            set => this.SetValue((int)this.m_Value, value);
             get
             {
                 var hr = GetValue();
