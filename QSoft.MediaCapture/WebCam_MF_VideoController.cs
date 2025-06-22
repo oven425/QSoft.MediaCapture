@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -196,19 +197,23 @@ namespace QSoft.MediaCapture
             if (hr != HRESULTS.S_OK || source == null) return;
             try
             {
-                if (this.IsPreviewing == true)
-                {
-                    hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_PREVIEW, out var pSink);
-                    if (hr != HRESULTS.S_OK) return;
-                    if(pSink is IMFCaptureSink2 sink2)
-                    {
-                        m_TaskSetCurrentTypeDynamic = new();
-                        hr = sink2.SetOutputMediaType(type.StreamIndex, type.MediaType, null);
-                        await m_TaskSetCurrentTypeDynamic.Task;
-                        WebCam_MF.SafeRelease(sink2);
-                    }
-                }
-                else
+                //if (this.IsPreviewing)
+                //{
+                //    hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_PREVIEW, out var pSink);
+                //    if (hr != HRESULTS.S_OK) return;
+                //    if(pSink is IMFCaptureSink2 sink2)
+                //    {
+                //        m_TaskSetCurrentTypeDynamic = new();
+                //        hr = sink2.SetOutputMediaType(type.StreamIndex, type.MediaType, null);
+                //        if(hr == HRESULTS.S_OK)
+                //        {
+                //            await m_TaskSetCurrentTypeDynamic.Task;
+                //        }
+                        
+                //        WebCam_MF.SafeRelease(sink2);
+                //    }
+                //}
+                //else
                 {
                     m_TaskSetCurrentType = new TaskCompletionSource<HRESULT>();
                     hr = source.SetCurrentDeviceMediaType(type.StreamIndex, type.MediaType);

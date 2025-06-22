@@ -182,7 +182,7 @@ namespace WpfAppNET472
                         
                     });
 
-                    System.Diagnostics.Trace.WriteLine($"FaceDetectionEvent:{args.FaceRects.Count}");
+                    //System.Diagnostics.Trace.WriteLine($"FaceDetectionEvent:{args.FaceRects.Count}");
                 };
             }
 
