@@ -9,8 +9,8 @@ namespace QSoft.MediaCapture
 {
     public partial class WebCam_MF
     {
-        readonly BackgroundSegmentation? m_BackgroundSegmentation;
-        public BackgroundSegmentation BackgroundSegmentation => m_BackgroundSegmentation ?? new(this.m_pEngine);
+        BackgroundSegmentation? m_BackgroundSegmentation;
+        public BackgroundSegmentation BackgroundSegmentation => m_BackgroundSegmentation ??= new(this.m_pEngine);
     }
 
     public class BackgroundSegmentation : ExtendedCameraControl
@@ -63,14 +63,16 @@ namespace QSoft.MediaCapture
             this.Set(combinedState);
         }
 
-        [Flags]
-        public enum BackgroundSegmentationState
-        {
-            OFF = 0x0000000000000000,
-            Blur = 0x0000000000000001,
-            Mask = 0x0000000000000002,
-            ShallowFocus = 0x0000000000000004
-        }
+        
+        
     }
 
+    [Flags]
+    public enum BackgroundSegmentationState
+    {
+        OFF = 0x0000000000000000,
+        Blur = 0x0000000000000001,
+        Mask = 0x0000000000000002,
+        ShallowFocus = 0x0000000000000004
+    }
 }

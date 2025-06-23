@@ -115,4 +115,44 @@ if(camera.TorchLight?.IsSupported)
     camera.TorchLight.SetState(FlashState.OFF);
     camera.TorchLight.SetState(FlashState.ON);
 }
+```
+
+# EyeGazeCorrection
+first check this device support  this function after Init camera success
+```c#
+if(camera.EyeGazeCorrection?.IsSupported)
+{
+    //Flash support function
+    var supportfunc = camera.TorchLight.SupportStates;
+    //below usually use state if camera supports torch light
+    camera.EyeGazeCorrection.SetState(EyeGazeCorrectionState.OFF);
+    camera.EyeGazeCorrection.SetState(EyeGazeCorrectionState.ON);
+}
+```
+
+# BackgroundSegmentation
+first check this device support  this function after Init camera success
+```c#
+if(camera.BackgroundSegmentation?.IsSupported)
+{
+    //Flash support function
+    var supportfunc = camera.TorchLight.SupportStates;
+    //below usually use state if camera supports torch light
+    camera.BackgroundSegmentation.SetState(BackgroundSegmentationState.OFF);
+    camera.BackgroundSegmentation.SetState(BackgroundSegmentationState.Blur);
+}
+```
+
+# DigitalWindow
+first check this device support  this function after Init camera success
+```c#
+if(camera.DigitalWindow?.IsSupported)
+{
+    //Flash support function
+    var supportfunc = camera.TorchLight.SupportStates;
+    //below usually use state if camera supports torch light
+    camera.DigitalWindow.SetState(DigitalWindowState.Manual);
+    camera.DigitalWindow.SetState(DigitalWindowState.AutoFaceFraming);
+}
+```
 

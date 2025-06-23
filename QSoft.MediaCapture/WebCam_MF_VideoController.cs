@@ -61,7 +61,7 @@ namespace QSoft.MediaCapture
 
 
 
-        List<ImageEncodingProperties> m_Streams = [];
+        readonly List<ImageEncodingProperties> m_Streams = [];
         public void GetMM()
         {
             m_Streams.Clear();
@@ -233,6 +233,10 @@ namespace QSoft.MediaCapture
     partial class ImageEncodingProperties
     {
         internal IMFMediaType MediaType { get; set; }
+        internal void Dispose()
+        {
+            WebCam_MF.SafeRelease(this.MediaType);
+        }
     }
 
     public partial class ImageEncodingProperties:IEquatable<ImageEncodingProperties>

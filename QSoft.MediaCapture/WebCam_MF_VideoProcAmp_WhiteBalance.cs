@@ -5,7 +5,7 @@ namespace QSoft.MediaCapture
 {
     public partial class WebCam_MF
     {
-        [Obsolete]
+        [Obsolete("please use VideoProcAmps[DirectN.tagVideoProcAmpProperty.VideoProcAmp_WhiteBalance]")]
         WhiteBalanceControl? m_WhiteBalanceControl;
         [Obsolete]
         public WhiteBalanceControl WhiteBalanceControl
@@ -21,7 +21,7 @@ namespace QSoft.MediaCapture
             }
         }
     }
-    [Obsolete]
+
     public enum ColorTemperaturePreset
     {
         Auto,

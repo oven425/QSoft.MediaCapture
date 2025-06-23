@@ -9,8 +9,8 @@ namespace QSoft.MediaCapture
 {
     public partial class WebCam_MF
     {
-        readonly EyeGazeCorrection? m_EyeGazeCorrection;
-        public EyeGazeCorrection EyeGazeCorrection => m_EyeGazeCorrection ?? new EyeGazeCorrection(m_pEngine);
+        EyeGazeCorrection? m_EyeGazeCorrection;
+        public EyeGazeCorrection EyeGazeCorrection => m_EyeGazeCorrection ??= new EyeGazeCorrection(m_pEngine);
     }
 
     public class EyeGazeCorrection : ExtendedCameraControl

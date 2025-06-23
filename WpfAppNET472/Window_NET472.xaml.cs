@@ -128,10 +128,37 @@ namespace WpfAppNET472
                 IsMirror = panel == CameraPanel.Front,
                 UseD3D = this.m_MainUI.UseD3D
             });
-            //m_WebCam.FrameArrived += (sender, args) =>
-            //{
-            //    System.Diagnostics.Trace.WriteLine($"FrameArrived:{args.RawData.Length}");
-            //};
+
+            this.m_MainUI.EyeGazeCorrectionStates.Clear();
+            if(this.m_WebCam.EyeGazeCorrection.IsSupported)
+            {
+                foreach(var oo in this.m_WebCam.EyeGazeCorrection.SupportStates)
+                {
+                    this.m_MainUI.EyeGazeCorrectionStates.Add(oo);
+                }
+                this.m_MainUI.EyeGazeCorrectionState = this.m_WebCam.EyeGazeCorrection.GetState().First();
+            }
+
+            this.m_MainUI.DigitalWindowStates.Clear();
+            if(this.m_WebCam.DigitalWindow.IsSupported)
+            {
+                foreach(var oo in this.m_WebCam.DigitalWindow.SupportStates)
+                {
+                    this.m_MainUI.DigitalWindowStates.Add(oo);
+                }
+                this.m_MainUI.DigitalWindowState = this.m_WebCam.DigitalWindow.GetState();
+            }
+
+            this.m_MainUI.BackgroundSegmentations.Clear();
+            if(this.m_WebCam.BackgroundSegmentation.IsSupported)
+            {
+                foreach(var oo in this.m_WebCam.BackgroundSegmentation.SupportStates)
+                {
+                    this.m_MainUI.BackgroundSegmentations.Add(oo);
+                }
+                this.m_MainUI.BackgroundSegmentation = this.m_WebCam.BackgroundSegmentation.GetState().First();
+            }
+
 
             this.m_MainUI.IsSupportTorch = this.m_WebCam.TorchLight?.IsSupported == true;
             this.m_MainUI.Torchs.Clear();
@@ -227,19 +254,19 @@ namespace WpfAppNET472
             }
             //var v1 = m_MainUI.VideoCaptureFormats.FirstOrDefault(x => x.Width == 1920 && x.Fps == 30);
             //this.m_MainUI.RecordFormat = m_MainUI.VideoCaptureFormats.FirstOrDefault();
+            this.m_MainUI.VideoProcAmps.Clear();
+            foreach (var oo in this.m_WebCam.VideoProcAmps)
+            {
+                this.m_MainUI.VideoProcAmps.Add(oo.Value);
+                System.Diagnostics.Trace.WriteLine($"VideoProcAmp:{oo.Key} IsSupport:{oo.Value.IsSupport} IsAuto:{oo.Value.IsAuto} Value:{oo.Value.Value} Min:{oo.Value.Min} Max:{oo.Value.Max} Step:{oo.Value.Step}");
+            }
 
-            //foreach(var oo in this.m_WebCam.VideoProcAmps)
-            //{
-            //    this.m_MainUI.VideoProcAmps.Add(oo.Value);
-            //    System.Diagnostics.Trace.WriteLine($"VideoProcAmp:{oo.Key} IsSupport:{oo.Value.IsSupport} IsAuto:{oo.Value.IsAuto} Value:{oo.Value.Value} Min:{oo.Value.Min} Max:{oo.Value.Max} Step:{oo.Value.Step}");
-            //}
-
-            //this.m_MainUI.CameraControls.Clear();
-            //foreach (var oo in this.m_WebCam.CameraControls)
-            //{
-            //    this.m_MainUI.CameraControls.Add(oo.Value);
-            //    System.Diagnostics.Trace.WriteLine($"CameraControl:{oo.Key} IsSupport:{oo.Value.IsSupport} IsAuto:{oo.Value.IsAuto} Value:{oo.Value.Value} Min:{oo.Value.Min} Max:{oo.Value.Max} Step:{oo.Value.Step}");
-            //}
+            this.m_MainUI.CameraControls.Clear();
+            foreach (var oo in this.m_WebCam.CameraControls)
+            {
+                this.m_MainUI.CameraControls.Add(oo.Value);
+                System.Diagnostics.Trace.WriteLine($"CameraControl:{oo.Key} IsSupport:{oo.Value.IsSupport} IsAuto:{oo.Value.IsAuto} Value:{oo.Value.Value} Min:{oo.Value.Min} Max:{oo.Value.Max} Step:{oo.Value.Step}");
+            }
         }
 
         async Task StartPreviewAsync()
@@ -375,6 +402,14 @@ namespace WpfAppNET472
                 m_WebCam.DigitalWindow.SetState(this.m_MainUI.DigitalWindowState);
             }
         }
+
+        private void combobox_backgroundsegmentation_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if(this.m_WebCam.BackgroundSegmentation.IsSupported)
+            {
+                this.m_WebCam.BackgroundSegmentation.SetState(this.m_MainUI.BackgroundSegmentation);
+            }
+        }
     }
 
 
@@ -428,7 +463,7 @@ namespace WpfAppNET472
         public ObservableCollection<ImageEncodingProperties> PhotoDependentFormats { set; get; } = new ObservableCollection<ImageEncodingProperties>();
         public ObservableCollection<Tuple<string , string, QSoft.DevCon.CameraPanel>> Cameras { set; get; } = new ObservableCollection<Tuple<string, string, CameraPanel>>();
 
-        public List<EyeGazeCorrectionState> EyeGazeCorrectionStates => new List<EyeGazeCorrectionState>() { EyeGazeCorrectionState.OFF, EyeGazeCorrectionState.ON, EyeGazeCorrectionState.STARE };
+        public ObservableCollection<EyeGazeCorrectionState> EyeGazeCorrectionStates { set; get; } = new ObservableCollection<EyeGazeCorrectionState>();
         EyeGazeCorrectionState m_EyeGazeCorrectionState;
         public EyeGazeCorrectionState EyeGazeCorrectionState
         {
@@ -436,12 +471,20 @@ namespace WpfAppNET472
             get => m_EyeGazeCorrectionState;
         }
 
-        public List<DigitalWindowState> DigitalWindowStates => new List<DigitalWindowState>() { DigitalWindowState.Manual, DigitalWindowState.AutoFaceFraming};
+        public ObservableCollection<DigitalWindowState> DigitalWindowStates { set; get; } = new ObservableCollection<DigitalWindowState>();
         DigitalWindowState m_DigitalWindowState;
         public DigitalWindowState DigitalWindowState
         {
             set { m_DigitalWindowState = value; this.Update("DigitalWindowState"); }
             get => m_DigitalWindowState;
+        }
+
+        public ObservableCollection<BackgroundSegmentationState> BackgroundSegmentations { set; get; } = new ObservableCollection<BackgroundSegmentationState>();
+        BackgroundSegmentationState m_BackgroundSegmentation;
+        public BackgroundSegmentationState BackgroundSegmentation
+        {
+            set { m_BackgroundSegmentation = value; this.Update("BackgroundSegmentation"); }
+            get => m_BackgroundSegmentation;
         }
 
         public ObservableCollection<QSoft.MediaCapture.Legacy.AMCameraControl> CameraControls { set; get; } =  new ObservableCollection<QSoft.MediaCapture.Legacy.AMCameraControl>();

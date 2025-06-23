@@ -11,8 +11,8 @@ namespace QSoft.MediaCapture
 {
     public partial class WebCam_MF
     {
-        readonly DigitalWindow? m_DigitalWindow;
-        public DigitalWindow DigitalWindow => m_DigitalWindow ?? new DigitalWindow(m_pEngine);
+        DigitalWindow? m_DigitalWindow;
+        public DigitalWindow DigitalWindow => m_DigitalWindow ??= new DigitalWindow(m_pEngine);
     }
 
     public class DigitalWindow : ExtendedCameraControl

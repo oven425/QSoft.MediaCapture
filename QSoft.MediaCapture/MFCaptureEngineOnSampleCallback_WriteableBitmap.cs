@@ -18,17 +18,22 @@ namespace QSoft.MediaCapture.WPF
             this.m_Bmp = data;
         }
 
-        
-
         protected override void OnSample(nint data, uint len)
         {
-            m_Bmp?.Dispatcher.Invoke(() =>
+            try
             {
-                m_Bmp.Lock();
-                CopyMemory(m_Bmp.BackBuffer, data, len);
-                m_Bmp.AddDirtyRect(new System.Windows.Int32Rect(0, 0, m_Bmp.PixelWidth, m_Bmp.PixelHeight));
-                m_Bmp.Unlock();
-            }, m_DispatcherPriority);
+                m_Bmp?.Dispatcher.Invoke(() =>
+                {
+                    m_Bmp.Lock();
+                    CopyMemory(m_Bmp.BackBuffer, data, len);
+                    m_Bmp.AddDirtyRect(new System.Windows.Int32Rect(0, 0, m_Bmp.PixelWidth, m_Bmp.PixelHeight));
+                    m_Bmp.Unlock();
+                }, m_DispatcherPriority);
+            }
+            catch (Exception e)
+            {
+
+            }
         }
     }
 
