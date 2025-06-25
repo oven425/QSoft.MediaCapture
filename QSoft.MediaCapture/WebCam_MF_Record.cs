@@ -10,21 +10,22 @@ namespace QSoft.MediaCapture
 {
     public partial class WebCam_MF
     {
-        bool m_bRecording = false;
+        public bool IsRecording { private set; get; }
+
         TaskCompletionSource<HRESULT>? m_TaskStopRecord;
         public Task<HRESULT> StopRecord()
         {
             m_TaskStopRecord = new TaskCompletionSource<HRESULT>();
             HRESULT hr = HRESULTS.S_OK;
 
-            if (m_bRecording)
+            if (IsRecording)
             {
                 if (m_pEngine != null)
                 {
                     hr = m_pEngine.StopRecord(true, false);
                 }
 
-                m_bRecording = false;
+                IsRecording = false;
             }
 
             return m_TaskStopRecord.Task;
@@ -120,7 +121,7 @@ namespace QSoft.MediaCapture
         {
             if (m_pEngine == null) return HRESULTS.MF_E_NOT_INITIALIZED;
 
-            if (m_bRecording) return HRESULTS.MF_E_INVALIDREQUEST;
+            if (IsRecording) return HRESULTS.MF_E_INVALIDREQUEST;
             IMFCaptureSink? pSink = null;
             IMFCaptureSource? pSource = null;
             HRESULT hr = HRESULTS.S_OK;
@@ -181,8 +182,9 @@ namespace QSoft.MediaCapture
                 hr = m_pEngine.StartRecord();
                 if (hr.IsError) return hr;
 
-                m_bRecording = true;
                 hr = await m_TaskStartRecord.Task;
+                this.IsRecording = true;
+
             }
             finally
             {

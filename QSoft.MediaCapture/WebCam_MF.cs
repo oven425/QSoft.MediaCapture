@@ -215,6 +215,11 @@ namespace QSoft.MediaCapture
             await this.StopPreview();
             await this.StopRecord();
             this.DestroyCaptureEngine();
+            foreach(var oo in this.m_VideoList.SelectMany(x=>x.Value))
+            {
+                oo?.Dispose();
+            }
+            this.m_VideoList.Clear();
         }
     }
 

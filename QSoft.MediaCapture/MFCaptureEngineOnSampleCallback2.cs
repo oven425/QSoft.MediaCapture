@@ -32,32 +32,6 @@ namespace QSoft.MediaCapture
             if (System.Threading.Monitor.TryEnter(this.m_Lock))
             {
 #if DEBUG
-
-                //var attrs = pSample.GetUnknown<IMFAttributes>(DirectN.MFConstants.MFSampleExtension_CaptureMetadata);
-                //System.Diagnostics.Trace.WriteLine($"attrs: {attrs.Count()}");
-                //try
-                //{
-                //    var buf11 = attrs.Object.GetBlobSize(DirectN.MFConstants.MF_CAPTURE_METADATA_FACEROIS, out var len);
-                //    //Infrared
-                //    System.Diagnostics.Trace.WriteLine($"GetBlobSize: {buf11} {len}");
-                //    var face_ptr = Marshal.AllocHGlobal((int)len);
-                //    var header = Marshal.PtrToStructure<tagFaceRectInfoBlobHeader>(face_ptr);
-                //    System.Diagnostics.Trace.WriteLine($"header: Size:{header.Size} Count:{header.Count}");
-                //    if(len == 28)
-                //    {
-                //        var faceinfo = Marshal.PtrToStructure<tagFaceRectInfo>(IntPtr.Add(face_ptr, 8));
-                //        System.Diagnostics.Trace.WriteLine($"faceinfo: Size:{faceinfo.Region} confidenceLevel:{faceinfo.confidenceLevel}");
-                //    }
-
-
-                //    Marshal.FreeHGlobal( face_ptr );
-
-                //}
-                //catch (Exception ee)
-                //{
-                //    System.Diagnostics.Trace.WriteLine(ee.Message);
-                //}
-                //attrs?.Dispose();
                 if (samplecount == 0)
                 {
                     m_StopWatch.Restart();
@@ -98,17 +72,10 @@ namespace QSoft.MediaCapture
 
         public HRESULT OnSynchronizedEvent(IMFMediaEvent pEvent)
         {
-            
             System.Diagnostics.Trace.WriteLine($"Synchronized event: {pEvent}");
-            HRESULT hr = pEvent.GetStatus(out HRESULT hrStatus);
-            if (hr != HRESULTS.S_OK)
-            {
-                hrStatus = hr;
-            }
-            var streamindex = pEvent.GetInt32(MFConstants.MF_CAPTURE_ENGINE_EVENT_STREAM_INDEX);
-            hr = pEvent.GetExtendedType(out Guid guidType);
             return HRESULTS.S_OK;
         }
+
 
     }
 }

@@ -197,22 +197,22 @@ namespace QSoft.MediaCapture
             if (hr != HRESULTS.S_OK || source == null) return;
             try
             {
-                //if (this.IsPreviewing)
-                //{
-                //    hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_PREVIEW, out var pSink);
-                //    if (hr != HRESULTS.S_OK) return;
-                //    if(pSink is IMFCaptureSink2 sink2)
-                //    {
-                //        m_TaskSetCurrentTypeDynamic = new();
-                //        hr = sink2.SetOutputMediaType(type.StreamIndex, type.MediaType, null);
-                //        if(hr == HRESULTS.S_OK)
-                //        {
-                //            await m_TaskSetCurrentTypeDynamic.Task;
-                //        }
-                        
-                //        WebCam_MF.SafeRelease(sink2);
-                //    }
-                //}
+                if (this.IsPreviewing||this.IsRecording)
+                {
+                    hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_PREVIEW, out var pSink);
+                    if (hr != HRESULTS.S_OK) return;
+                    if (pSink is IMFCaptureSink2 sink2)
+                    {
+                        m_TaskSetCurrentTypeDynamic = new();
+                        hr = sink2.SetOutputMediaType(type.StreamIndex, type.MediaType, null);
+                        if (hr == HRESULTS.S_OK)
+                        {
+                            await m_TaskSetCurrentTypeDynamic.Task;
+                        }
+
+                        WebCam_MF.SafeRelease(sink2);
+                    }
+                }
                 //else
                 {
                     m_TaskSetCurrentType = new TaskCompletionSource<HRESULT>();
