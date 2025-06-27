@@ -229,7 +229,7 @@ namespace WpfAppNET472
             //    this.slider_whitebalance.Maximum = this.m_WebCam.WhiteBalanceControl.Max;
             //}
             System.Diagnostics.Trace.WriteLine($"{m_WebCam.FriendName}");
-            m_WebCam.GetMM();
+            //m_WebCam.GetMM();
             var capturess = m_WebCam.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
             //System.Diagnostics.Trace.WriteLine($"record types");
             var gg = capturess.GroupBy(x => x.SubType);
@@ -240,6 +240,9 @@ namespace WpfAppNET472
             {
                 this.m_MainUI.VideoCaptureFormats.Add(oo);
             }
+            this.m_MainUI.RecordFormat = this.m_MainUI.VideoCaptureFormats[0];
+            //await m_WebCam.SetMediaStreamPropertiesAsync(this.m_MainUI.VideoCaptureFormats[0]);
+
             var photoss = m_WebCam.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT);
             //System.Diagnostics.Trace.WriteLine($"photo types");
 

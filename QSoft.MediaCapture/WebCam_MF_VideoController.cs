@@ -62,7 +62,7 @@ namespace QSoft.MediaCapture
 
 
         readonly List<ImageEncodingProperties> m_Streams = [];
-        public void GetMM()
+        internal void GetMM()
         {
             m_Streams.Clear();
             m_VideoList.Clear();
