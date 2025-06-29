@@ -19,6 +19,7 @@ using System.Windows.Shapes;
 using DirectN;
 using QSoft.DevCon;
 using QSoft.MediaCapture;
+using QSoft.MediaCapture.Sensor;
 using QSoft.MediaCapture.WPF;
 
 namespace WpfAppNET472
@@ -84,6 +85,7 @@ namespace WpfAppNET472
                     });
                 foreach(var oo in cccs)
                 {
+                    SensorGroup sg = new SensorGroup(oo.symbollink);
                     var nn = oo.friendname;
                     if(string.IsNullOrEmpty(nn))
                     {
@@ -233,7 +235,7 @@ namespace WpfAppNET472
             var capturess = m_WebCam.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
             //System.Diagnostics.Trace.WriteLine($"record types");
             var gg = capturess.GroupBy(x => x.SubType);
-            foreach (var oo in capturess.Where(x => x.SubType != DirectN.MFConstants.MFVideoFormat_L8)
+            foreach (var oo in capturess.Where(x => x.SubType != DirectN.MFConstants.MFVideoFormat_YUY2)
                 .OrderByDescending(x => x.ImageSize)
                 .ThenByDescending(x => x.Fps))
                 
@@ -316,8 +318,8 @@ namespace WpfAppNET472
 
         private async void button_startrecord_Click(object sender, RoutedEventArgs e)
         {
-            var hr = await m_WebCam.StartRecord($"{DateTime.Now:yyyyMMdd_HHmmss}.mp4");
-
+            //var hr = await m_WebCam.StartRecord($"{DateTime.Now:yyyyMMdd_HHmmss}.mp4");
+            var hr = await m_WebCam.StartRecord1($"aa.mp4");
         }
 
         private async void button_stoprecord_Click(object sender, RoutedEventArgs e)

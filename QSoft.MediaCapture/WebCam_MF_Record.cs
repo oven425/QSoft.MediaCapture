@@ -31,88 +31,91 @@ namespace QSoft.MediaCapture
             return m_TaskStopRecord.Task;
         }
 
-        //async public Task<HRESULT> StartRecord1(string pszDestinationFile)
-        //{
-        //    if (m_pEngine == null) return HRESULTS.MF_E_NOT_INITIALIZED;
+        async public Task<HRESULT> StartRecord1(string pszDestinationFile)
+        {
+            if (m_pEngine == null) return HRESULTS.MF_E_NOT_INITIALIZED;
 
-        //    if (m_bRecording) return HRESULTS.MF_E_INVALIDREQUEST;
-        //    IMFCaptureSink? pSink = null;
-        //    IMFCaptureSource? pSource = null;
-        //    HRESULT hr = HRESULTS.S_OK;
-        //    try
-        //    {
+            if (IsRecording) return HRESULTS.MF_E_INVALIDREQUEST;
+            IMFCaptureSink? pSink = null;
+            IMFCaptureSource? pSource = null;
+            HRESULT hr = HRESULTS.S_OK;
+            try
+            {
 
-        //        m_TaskStartRecord = new TaskCompletionSource<HRESULT>();
+                m_TaskStartRecord = new TaskCompletionSource<HRESULT>();
 
-        //        var ext = System.IO.Path.GetExtension(pszDestinationFile);
-        //        var guidVideoEncoding = ext switch
-        //        {
-        //            ".mp4" => MFConstants.MFVideoFormat_H264,
-        //            ".wmv" => MFConstants.MFVideoFormat_H264,
-        //            _ => Guid.Empty
-        //        };
-        //        var guidAudioEncoding = ext switch
-        //        {
-        //            ".mp4" => MFConstants.MFAudioFormat_AAC,
-        //            ".wmv" => MFConstants.MFAudioFormat_AAC,
-        //            ".wma" => MFConstants.MFAudioFormat_WMAudioV9,
-        //            _ => Guid.Empty
-        //        };
-        //        if (guidAudioEncoding == Guid.Empty && guidVideoEncoding == Guid.Empty)
-        //        {
-        //            return HRESULTS.MF_E_INVALIDMEDIATYPE;
-        //        }
-
-
-        //        hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_RECORD, out pSink);
-        //        if (hr.IsError) return hr;
-        //        var pRecord = pSink as IMFCaptureRecordSink;
+                var ext = System.IO.Path.GetExtension(pszDestinationFile);
+                var guidVideoEncoding = ext switch
+                {
+                    ".mp4" => MFConstants.MFVideoFormat_H264,
+                    ".wmv" => MFConstants.MFVideoFormat_H264,
+                    _ => Guid.Empty
+                };
+                var guidAudioEncoding = ext switch
+                {
+                    ".mp4" => MFConstants.MFAudioFormat_AAC,
+                    ".wmv" => MFConstants.MFAudioFormat_AAC,
+                    ".wma" => MFConstants.MFAudioFormat_WMAudioV9,
+                    _ => Guid.Empty
+                };
+                if (guidAudioEncoding == Guid.Empty && guidVideoEncoding == Guid.Empty)
+                {
+                    return HRESULTS.MF_E_INVALIDMEDIATYPE;
+                }
 
 
-        //        hr = m_pEngine.GetSource(out pSource);
-        //        if (hr.IsError) return hr;
-
-        //        // Clear any existing streams from previous recordings.
-        //        if (pRecord == null) return hr;
-        //        hr = pRecord.RemoveAllStreams();
-        //        if (hr.IsError) return hr;
-
-        //        //hr = pRecord.SetOutputFileName(pszDestinationFile);
-        //        var f = pszDestinationFile;
-        //        hr = DirectN.Functions.MFCreateFile(__MIDL___MIDL_itf_mfobjects_0000_0018_0001.MF_ACCESSMODE_READWRITE, __MIDL___MIDL_itf_mfobjects_0000_0018_0002.MF_OPENMODE_APPEND_IF_EXIST, __MIDL___MIDL_itf_mfobjects_0000_0018_0003.MF_FILEFLAGS_NONE, f, out var pFile);
-        //        var MFTranscodeContainerType_MPEG4 = new Guid(0xdc6cd05d, 0xb9d0, 0x40ef, 0xbd, 0x35, 0xfa, 0x62, 0x2c, 0x1a, 0xb2, 0x8a);
-        //        hr = pRecord.SetOutputByteStream(pFile, MFTranscodeContainerType_MPEG4);
+                hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_RECORD, out pSink);
+                if (hr.IsError) return hr;
+                var pRecord = pSink as IMFCaptureRecordSink;
 
 
-        //        if (hr.IsError) return hr;
+                hr = m_pEngine.GetSource(out pSource);
+                if (hr.IsError) return hr;
 
-        //        // Configure the video and audio streams.
-        //        if (guidVideoEncoding != Guid.Empty)
-        //        {
-        //            hr = await ConfigureVideoEncoding(pSource, pRecord, guidVideoEncoding);
-        //            if (hr.IsError) return hr;
-        //        }
+                // Clear any existing streams from previous recordings.
+                if (pRecord == null) return hr;
+                hr = pRecord.RemoveAllStreams();
+                if (hr.IsError) return hr;
 
-        //        if (guidAudioEncoding != Guid.Empty)
-        //        {
-        //            hr = ConfigureAudioEncoding(pSource, pRecord, guidAudioEncoding);
-        //            if (hr.IsError) return hr;
-        //        }
+                //hr = pRecord.SetOutputFileName(pszDestinationFile);
+                var f = pszDestinationFile;
+                hr = DirectN.Functions.MFCreateFile(__MIDL___MIDL_itf_mfobjects_0000_0018_0001.MF_ACCESSMODE_READWRITE, __MIDL___MIDL_itf_mfobjects_0000_0018_0002.MF_OPENMODE_APPEND_IF_EXIST, __MIDL___MIDL_itf_mfobjects_0000_0018_0003.MF_FILEFLAGS_NONE, f, out var pFile);
+                var MFTranscodeContainerType_MPEG4 = new Guid(0xdc6cd05d, 0xb9d0, 0x40ef, 0xbd, 0x35, 0xfa, 0x62, 0x2c, 0x1a, 0xb2, 0x8a);
+                hr = pRecord.SetOutputByteStream(pFile, MFTranscodeContainerType_MPEG4);
 
-        //        hr = m_pEngine.StartRecord();
-        //        if (hr.IsError) return hr;
 
-        //        m_bRecording = true;
-        //        hr = await m_TaskStartRecord.Task;
-        //    }
-        //    finally
-        //    {
-        //        SafeRelease(pSink);
-        //        SafeRelease(pSource);
-        //    }
+                if (hr.IsError) return hr;
 
-        //    return hr;
-        //}
+                // Configure the video and audio streams.
+                if (guidVideoEncoding != Guid.Empty)
+                {
+                    hr = await ConfigureVideoEncoding(pSource, pRecord, guidVideoEncoding);
+                    if (hr.IsError) return hr;
+                }
+
+                if (guidAudioEncoding != Guid.Empty)
+                {
+                    hr = ConfigureAudioEncoding(pSource, pRecord, guidAudioEncoding);
+                    if (hr.IsError) return hr;
+                }
+
+                hr = m_pEngine.StartRecord();
+                if (hr.IsError) return hr;
+
+                hr = await m_TaskStartRecord.Task;
+                if(hr == HRESULTS.S_OK)
+                {
+                    IsRecording = true;
+                }
+            }
+            finally
+            {
+                SafeRelease(pSink);
+                SafeRelease(pSource);
+            }
+
+            return hr;
+        }
 
 
 

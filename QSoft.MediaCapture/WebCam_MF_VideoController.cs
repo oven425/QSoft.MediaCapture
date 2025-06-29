@@ -12,39 +12,7 @@ namespace QSoft.MediaCapture
     public partial class WebCam_MF
     {
         readonly Dictionary<MF_CAPTURE_ENGINE_STREAM_CATEGORY, IReadOnlyList<ImageEncodingProperties>> m_VideoList = [];
-        //public IReadOnlyList<ImageEncodingProperties> GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY mediastreamtype)
-        //{
-        //    if (!m_VideoList.ContainsKey(mediastreamtype)) m_VideoList[mediastreamtype] = [];
-        //    if (m_VideoList[mediastreamtype].Count > 0) return m_VideoList[mediastreamtype];
-        //    if (this.m_pEngine == null) return [];
-        //    IMFCaptureSource? source = null;
-        //    try
-        //    {
-        //        m_pEngine.GetSource(out source);
-        //        if (source == null) return [];
-        //        if (m_StreamGategory.TryGetValue(mediastreamtype, out var streamindex))
-        //        {
-        //            var lls = new List<ImageEncodingProperties>();
-        //            uint index = 0;
-
-        //            while (true)
-        //            {
-        //                var hr = source.GetAvailableDeviceMediaType(streamindex[0], index, out var mediatype);
-        //                if (hr != HRESULTS.S_OK) break;
-        //                var mm = new ImageEncodingProperties(mediatype, mediastreamtype, index);
-        //                lls.Add(mm);
-        //                index++;
-        //            }
-        //            m_VideoList[mediastreamtype] = [.. lls];
-        //        }
-        //    }
-        //    finally
-        //    {
-        //        SafeRelease(source);
-        //    }
-        //    return m_VideoList[mediastreamtype];
-        //}
-
+        readonly List<ImageEncodingProperties> m_Streams = [];
         public IReadOnlyList<ImageEncodingProperties> GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY streamcategory, int? streamindex=null)
         {
             if(m_Streams.Count ==0)
@@ -58,10 +26,6 @@ namespace QSoft.MediaCapture
             return [.. m_Streams.Where(x => x.StreamGategory == streamcategory && x.StreamIndex==streamindex)];
         }
 
-
-
-
-        readonly List<ImageEncodingProperties> m_Streams = [];
         internal void GetMM()
         {
             m_Streams.Clear();
@@ -139,7 +103,7 @@ namespace QSoft.MediaCapture
                         .GroupBy(x => x.StreamIndex).FirstOrDefault().Key;
                 }
 
-                source.GetCurrentDeviceMediaType(streamindex_, out mediatype);
+                hr = source.GetCurrentDeviceMediaType(streamindex_, out mediatype);
 
                 var mm = new ImageEncodingProperties(mediatype, streamcatgory, streamindex_);
                 var ff1 = this.GetAvailableMediaStreamProperties(streamcatgory, (int)streamindex_).FirstOrDefault(x => x.Equals(mm));
@@ -213,12 +177,20 @@ namespace QSoft.MediaCapture
                         WebCam_MF.SafeRelease(sink2);
                     }
                 }
+                if(this.IsPreviewing)
+                {
+                    await this.RemoveVideoProcessorMFT(source, type.StreamIndex);
+                }
                 //else
                 {
                     m_TaskSetCurrentType = new TaskCompletionSource<HRESULT>();
                     hr = source.SetCurrentDeviceMediaType(type.StreamIndex, type.MediaType);
                     if (hr != HRESULTS.S_OK) return;
                     await m_TaskSetCurrentType.Task;
+                }
+                if (this.IsPreviewing)
+                {
+                    await this.AddVideoProcessorMFT(source, type.StreamIndex);
                 }
             }
             finally

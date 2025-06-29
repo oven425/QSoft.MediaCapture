@@ -73,6 +73,18 @@ namespace QSoft.MediaCapture
         public HRESULT OnSynchronizedEvent(IMFMediaEvent pEvent)
         {
             System.Diagnostics.Trace.WriteLine($"Synchronized event: {pEvent}");
+            var hr = pEvent.GetExtendedType(out var eventType);
+            PROPVARIANT p = new PROPVARIANT();
+            hr = pEvent.GetValue(p);
+            var t = p.VarType;
+            var mediaType = p.Value as IMFMediaType;
+            var fps = mediaType.Fps();
+            if (mediaType.TryGetSize(MFConstants.MF_MT_FRAME_SIZE, out var w, out var h))
+            {
+            }
+            //Task.Delay(2000).Wait(); // Simulate some processing delay
+            //System.Diagnostics.Trace.WriteLine($"Synchronized event1: {pEvent}");
+            Marshal.ReleaseComObject(pEvent);
             return HRESULTS.S_OK;
         }
 

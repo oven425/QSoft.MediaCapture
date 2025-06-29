@@ -9,22 +9,25 @@ namespace QSoft.MediaCapture
 {
     public partial class WebCam_MF
     {
-        //uint m_VideoProcessMFT_Index = 0;
         TaskCompletionSource<HRESULT>? m_TaskAddEffect;
-        //IMFVideoProcessorControl? m_VideoProcessor;
-        //IMFVideoProcessorControl2? m_VideoProcessor2;
-        Dictionary<uint, IMFVideoProcessorControl> m_VideoProcessors = [];
+        readonly Dictionary<uint, IMFVideoProcessorControl> m_VideoProcessors = [];
+        //no support yuy2 foramt
         async Task<HRESULT> AddVideoProcessorMFT(IMFCaptureSource source, uint streamindex)
         {
-            if (m_VideoProcessors.ContainsKey(streamindex)) return HRESULTS.S_OK;
-            //m_VideoProcessMFT_Index = streamindex;
-            IMFMediaType? pMediaType=null;
+            IMFVideoProcessorControl? videoprocessmft;
+            if (m_VideoProcessors.TryGetValue(streamindex, out IMFVideoProcessorControl? value))
+            {
+                videoprocessmft = value;
+            }
+            else
+            {
+                var videoprocesstype = Type.GetTypeFromCLSID(DirectN.MFConstants.CLSID_VideoProcessorMFT);
+                videoprocessmft = Activator.CreateInstance(videoprocesstype) as IMFVideoProcessorControl;
+            }
+            IMFMediaType? pMediaType = null;
             try
             {
                 source.GetCurrentDeviceMediaType(streamindex, out pMediaType);
-                var videoprocesstype = Type.GetTypeFromCLSID(DirectN.MFConstants.CLSID_VideoProcessorMFT);
-
-                var videoprocessmft = Activator.CreateInstance(videoprocesstype) as IMFVideoProcessorControl;
                 //this.m_VideoProcessor2 = this.m_VideoProcessor as IMFVideoProcessorControl2;
                 HRESULT hr;
                 if (this.m_Setting.IsMirror && videoprocessmft != null)
@@ -32,9 +35,8 @@ namespace QSoft.MediaCapture
                     hr = videoprocessmft.SetMirror(_MF_VIDEO_PROCESSOR_MIRROR.MIRROR_HORIZONTAL);
                     //m_VideoProcessor.SetRotation(_MF_VIDEO_PROCESSOR_ROTATION.ROTATION_NONE);
                     //m_VideoProcessor2.SetRotationOverride(90);
-                    //if (hr != HRESULTS.S_OK) return Task.FromResult(hr);
                 }
-                
+
 
                 if (videoprocessmft is IMFTransform mft)
                 {
@@ -61,6 +63,15 @@ namespace QSoft.MediaCapture
             }
         }
 
+        async Task<HRESULT> RemoveVideoProcessorMFT(IMFCaptureSource source, uint streamindex)
+        {
+            m_TaskRemoveAllEffect = new();
+            source.RemoveAllEffects(streamindex);
+            var hr = await m_TaskRemoveAllEffect.Task;
+            return hr;
+
+        }
+
         TaskCompletionSource<HRESULT>? m_TaskRemoveAllEffect;
         async Task<HRESULT> RemoveAllVideoProcessorMFT(IMFCaptureSource source)
         {
@@ -77,17 +88,7 @@ namespace QSoft.MediaCapture
             }
             m_VideoProcessors.Clear();
             return HRESULTS.S_OK;
-            
-            ////source.RemoveAllEffects(m_VideoProcessMFT_Index);
-            //var hr = await m_TaskRemoveAllEffect.Task;
-            //if(hr == HRESULTS.S_OK)
-            //{
-            //    ClearVideoProcessorMFT();
-            //    //SafeRelease(m_VideoProcessor);
-            //    //m_VideoProcessor = null;
-            //    //m_VideoProcessor2 = null;
-            //}
-            //return hr;
+
         }
     }
 }

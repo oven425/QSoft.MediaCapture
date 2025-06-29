@@ -119,6 +119,8 @@ namespace QSoft.MediaCapture
                 // Configure the video format for the preview sink.
                 hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, out pMediaType);
                 var fps = pMediaType.Fps();
+                pMediaType.GetGUID(MFConstants.MF_MT_SUBTYPE, out var subtype);
+
                 if (hr != HRESULTS.S_OK) return hr;
                 hr = WebCam_MF.CloneVideoMediaType(pMediaType, MFConstants.MFVideoFormat_RGB32, out pMediaType2);
                 if (hr != HRESULTS.S_OK || pMediaType2 == null) return hr;
@@ -169,7 +171,7 @@ namespace QSoft.MediaCapture
         {
             if (m_pEngine == null) return HRESULTS.MF_E_NOT_INITIALIZED;
             if (IsPreviewing) return HRESULTS.S_OK;
-            m_TaskStartPreview = new TaskCompletionSource<HRESULT>();
+            
             IMFCaptureSink? pSink = null;
             IMFMediaType? pMediaType = null;
             IMFMediaType? pMediaType2 = null;
@@ -210,12 +212,12 @@ namespace QSoft.MediaCapture
                     await this.AddVideoProcessorMFT(pSource, streamindex);
                 }
 
-
+                m_TaskStartPreview = new TaskCompletionSource<HRESULT>();
                 hr = m_pEngine.StartPreview();
                 if (hr != HRESULTS.S_OK) return hr;
                 hr = await m_TaskStartPreview.Task;
                 m_TaskStartPreview = null;
-                //m_IsPreviewing = true;
+                this.IsPreviewing = true;
             }
             finally
             {
@@ -260,8 +262,8 @@ namespace QSoft.MediaCapture
                     preview.RemoveAllStreams();
                     SafeRelease(preview);
                 }
-                hr = m_pEngine.GetSource(out pSource);
-                if (hr != HRESULTS.S_OK) return hr;
+                //hr = m_pEngine.GetSource(out pSource);
+                //if (hr != HRESULTS.S_OK) return hr;
                 //await RemoveAllVideoProcessorMFT(pSource);
                 //m_IsPreviewing = false;
             }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace QSoft.MediaCapture
 {
-    internal class MFCaptureEngineOnSampleCallback2_WriteableBitmap(Func<System.Windows.Controls.Image> func):MFCaptureEngineOnSampleCallback2
+    internal class MFCaptureEngineOnSampleCallback2_WriteableBitmap(Func<System.Windows.Media.ImageSource> func, QSoft.MediaCapture.WebCam_MF webcam):MFCaptureEngineOnSampleCallback2
     {
 
     }

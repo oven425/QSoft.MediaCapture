@@ -73,11 +73,12 @@ namespace QSoft.MediaCapture
                 else if (guidType == MFConstants.MF_CAPTURE_SOURCE_CURRENT_DEVICE_MEDIA_TYPE_SET)
                 {
                     m_TaskSetCurrentType?.SetResult(hrStatus);
-                    //MediaTypeChangeEventHandler?.Invoke(this, new EventArgs());
+                    System.Diagnostics.Debug.WriteLine("MF_CAPTURE_SOURCE_CURRENT_DEVICE_MEDIA_TYPE_SET");
                 }
                 else if(guidType == MFConstants.MF_CAPTURE_ENGINE_OUTPUT_MEDIA_TYPE_SET)
                 {
                     m_TaskSetCurrentTypeDynamic?.SetResult(hrStatus);
+                    System.Diagnostics.Debug.WriteLine("MF_CAPTURE_ENGINE_OUTPUT_MEDIA_TYPE_SET");
                 }
                 else if (guidType == MFConstants.MF_CAPTURE_ENGINE_ERROR)
                 {
