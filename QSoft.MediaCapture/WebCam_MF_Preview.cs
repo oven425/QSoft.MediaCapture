@@ -93,7 +93,7 @@ namespace QSoft.MediaCapture
             return hr;
         }
 
-        async public Task<HRESULT> StartPreview(MFCaptureEngineOnSampleCallback callback,bool color = true)
+        async public Task<HRESULT> StartPreview(IMFCaptureEngineOnSampleCallback callback,bool color = true)
         {
             if (m_pEngine == null) return HRESULTS.MF_E_NOT_INITIALIZED;
             if (IsPreviewing) return HRESULTS.S_OK;
@@ -167,70 +167,70 @@ namespace QSoft.MediaCapture
             return hr;
         }
 
-        async public Task<HRESULT> StartPreview(IMFCaptureEngineOnSampleCallback samplecallback)
-        {
-            if (m_pEngine == null) return HRESULTS.MF_E_NOT_INITIALIZED;
-            if (IsPreviewing) return HRESULTS.S_OK;
+        //async public Task<HRESULT> StartPreview(IMFCaptureEngineOnSampleCallback samplecallback)
+        //{
+        //    if (m_pEngine == null) return HRESULTS.MF_E_NOT_INITIALIZED;
+        //    if (IsPreviewing) return HRESULTS.S_OK;
             
-            IMFCaptureSink? pSink = null;
-            IMFMediaType? pMediaType = null;
-            IMFMediaType? pMediaType2 = null;
-            IMFCaptureSource? pSource = null;
-            IMFCapturePreviewSink? pPreview = null;
-            HRESULT hr = HRESULTS.S_OK;
-            try
-            {
-                hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_PREVIEW, out pSink);
-                if (hr != HRESULTS.S_OK) return hr;
-                pPreview = pSink as IMFCapturePreviewSink;
-                if (pPreview == null) return HRESULTS.E_NOTIMPL;
+        //    IMFCaptureSink? pSink = null;
+        //    IMFMediaType? pMediaType = null;
+        //    IMFMediaType? pMediaType2 = null;
+        //    IMFCaptureSource? pSource = null;
+        //    IMFCapturePreviewSink? pPreview = null;
+        //    HRESULT hr = HRESULTS.S_OK;
+        //    try
+        //    {
+        //        hr = m_pEngine.GetSink(MF_CAPTURE_ENGINE_SINK_TYPE.MF_CAPTURE_ENGINE_SINK_TYPE_PREVIEW, out pSink);
+        //        if (hr != HRESULTS.S_OK) return hr;
+        //        pPreview = pSink as IMFCapturePreviewSink;
+        //        if (pPreview == null) return HRESULTS.E_NOTIMPL;
 
-                hr = m_pEngine.GetSource(out pSource);
-                if (hr != HRESULTS.S_OK) return hr;
-
-
-                // Configure the video format for the preview sink.
-                hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, out pMediaType);
-                if (hr != HRESULTS.S_OK) return hr;
-
-                hr = WebCam_MF.CloneVideoMediaType(pMediaType, MFConstants.MFVideoFormat_RGB32, out pMediaType2);
-                if (hr != HRESULTS.S_OK || pMediaType2 == null) return hr;
-
-                hr = pMediaType2.SetUINT32(MFConstants.MF_MT_ALL_SAMPLES_INDEPENDENT, 1);
-                if (hr != HRESULTS.S_OK) return hr;
-
-                // Connect the video stream to the preview sink.
-                using var cm = new ComMemory(Marshal.SizeOf<uint>());
-                hr = pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, pMediaType, null, cm.Pointer);
-                if (hr != HRESULTS.S_OK) return hr;
-                var streamindex = (uint)Marshal.ReadInt32(cm.Pointer);
-                System.Diagnostics.Debug.WriteLine($"AddStream preview{streamindex}");
-                hr = pPreview.SetSampleCallback(streamindex, samplecallback);
-                if (hr != HRESULTS.S_OK) return hr;
-                if (this.m_Setting.IsMirror)
-                {
-                    await this.AddVideoProcessorMFT(pSource, streamindex);
-                }
-
-                m_TaskStartPreview = new TaskCompletionSource<HRESULT>();
-                hr = m_pEngine.StartPreview();
-                if (hr != HRESULTS.S_OK) return hr;
-                hr = await m_TaskStartPreview.Task;
-                m_TaskStartPreview = null;
-                this.IsPreviewing = true;
-            }
-            finally
-            {
-                SafeRelease(pPreview);
-                SafeRelease(pSink);
-                SafeRelease(pMediaType);
-                SafeRelease(pMediaType2);
-                SafeRelease(pSource);
-            }
+        //        hr = m_pEngine.GetSource(out pSource);
+        //        if (hr != HRESULTS.S_OK) return hr;
 
 
-            return hr;
-        }
+        //        // Configure the video format for the preview sink.
+        //        hr = pSource.GetCurrentDeviceMediaType((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, out pMediaType);
+        //        if (hr != HRESULTS.S_OK) return hr;
+
+        //        hr = WebCam_MF.CloneVideoMediaType(pMediaType, MFConstants.MFVideoFormat_RGB32, out pMediaType2);
+        //        if (hr != HRESULTS.S_OK || pMediaType2 == null) return hr;
+
+        //        hr = pMediaType2.SetUINT32(MFConstants.MF_MT_ALL_SAMPLES_INDEPENDENT, 1);
+        //        if (hr != HRESULTS.S_OK) return hr;
+
+        //        // Connect the video stream to the preview sink.
+        //        using var cm = new ComMemory(Marshal.SizeOf<uint>());
+        //        hr = pPreview.AddStream((uint)MF_CAPTURE_ENGINE_PREFERRED_SOURCE_STREAM.FOR_VIDEO_PREVIEW, pMediaType, null, cm.Pointer);
+        //        if (hr != HRESULTS.S_OK) return hr;
+        //        var streamindex = (uint)Marshal.ReadInt32(cm.Pointer);
+        //        System.Diagnostics.Debug.WriteLine($"AddStream preview{streamindex}");
+        //        hr = pPreview.SetSampleCallback(streamindex, samplecallback);
+        //        if (hr != HRESULTS.S_OK) return hr;
+        //        if (this.m_Setting.IsMirror)
+        //        {
+        //            await this.AddVideoProcessorMFT(pSource, streamindex);
+        //        }
+
+        //        m_TaskStartPreview = new TaskCompletionSource<HRESULT>();
+        //        hr = m_pEngine.StartPreview();
+        //        if (hr != HRESULTS.S_OK) return hr;
+        //        hr = await m_TaskStartPreview.Task;
+        //        m_TaskStartPreview = null;
+        //        this.IsPreviewing = true;
+        //    }
+        //    finally
+        //    {
+        //        SafeRelease(pPreview);
+        //        SafeRelease(pSink);
+        //        SafeRelease(pMediaType);
+        //        SafeRelease(pMediaType2);
+        //        SafeRelease(pSource);
+        //    }
+
+
+        //    return hr;
+        //}
         public bool IsPreviewing { private set; get; }
 
         TaskCompletionSource<HRESULT>? m_TaskStopPreview;

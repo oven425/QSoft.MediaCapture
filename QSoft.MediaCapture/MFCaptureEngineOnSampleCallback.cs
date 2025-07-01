@@ -41,14 +41,14 @@ namespace QSoft.MediaCapture
     }
     public partial class MFCaptureEngineOnSampleCallback : IMFCaptureEngineOnSampleCallback
     {
-#if NET8_0_OR_GREATER
-        [LibraryImport("kernel32.dll", EntryPoint = "RtlCopyMemory", SetLastError = false)]
-        internal static partial void CopyMemory(IntPtr dest, IntPtr src, uint count);
+//#if NET8_0_OR_GREATER
+//        [LibraryImport("kernel32.dll", EntryPoint = "RtlCopyMemory", SetLastError = false)]
+//        internal static partial void CopyMemory(IntPtr dest, IntPtr src, uint count);
 
-#else
-        [DllImport("kernel32.dll", EntryPoint = "CopyMemory", SetLastError = false)]
-        internal static extern void CopyMemory(IntPtr dest, IntPtr src, uint count);
-#endif
+//#else
+//        [DllImport("kernel32.dll", EntryPoint = "CopyMemory", SetLastError = false)]
+//        internal static extern void CopyMemory(IntPtr dest, IntPtr src, uint count);
+//#endif
 
 
 #if DEBUG

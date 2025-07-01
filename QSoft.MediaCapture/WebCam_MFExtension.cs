@@ -2,13 +2,22 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace QSoft.MediaCapture
 {
-    public static class WebCam_MFExtension
+    public static partial  class WebCam_MFExtension
     {
+#if NET8_0_OR_GREATER
+        [LibraryImport("kernel32.dll", EntryPoint = "RtlCopyMemory", SetLastError = false)]
+        internal static partial void CopyMemory(IntPtr dest, IntPtr src, uint count);
+
+#else
+        [DllImport("kernel32.dll", EntryPoint = "CopyMemory", SetLastError = false)]
+        internal static extern void CopyMemory(IntPtr dest, IntPtr src, uint count);
+#endif
         public static float Fps(this IMFMediaType src)
         {
             if (src.TryGetRatio(MFConstants.MF_MT_FRAME_RATE, out var m_Numerator, out var m_Denominator))

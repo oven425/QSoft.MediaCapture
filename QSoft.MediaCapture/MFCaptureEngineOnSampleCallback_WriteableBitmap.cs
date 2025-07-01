@@ -25,7 +25,7 @@ namespace QSoft.MediaCapture.WPF
                 m_Bmp?.Dispatcher.Invoke(() =>
                 {
                     m_Bmp.Lock();
-                    CopyMemory(m_Bmp.BackBuffer, data, len);
+                    WebCam_MFExtension.CopyMemory(m_Bmp.BackBuffer, data, len);
                     m_Bmp.AddDirtyRect(new System.Windows.Int32Rect(0, 0, m_Bmp.PixelWidth, m_Bmp.PixelHeight));
                     m_Bmp.Unlock();
                 }, m_DispatcherPriority);

@@ -280,7 +280,7 @@ namespace WpfAppNET472
             //await m_WebCam.StartPreview(this.host.Child.Handle);
 
             this.host.Visibility = Visibility.Collapsed;
-            await m_WebCam.StartPreview(() => this.image);
+            await m_WebCam.StartPreview2(() => this.image);
 
             //this.host.Visibility = Visibility.Collapsed;
             //await m_WebCam.StartPreviewL8(() => this.image);

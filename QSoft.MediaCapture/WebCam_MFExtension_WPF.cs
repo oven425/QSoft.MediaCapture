@@ -10,6 +10,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using static DirectN.ID3D11DeviceContextExtensions;
 
 namespace QSoft.MediaCapture.WPF
 {
@@ -99,32 +100,61 @@ namespace QSoft.MediaCapture.WPF
         }
 
 
-        public static async Task<HRESULT> StartPreview(this QSoft.MediaCapture.WebCam_MF src, Func<Image> action, uint streamindex = 0, System.Windows.Threading.DispatcherPriority dispatcherpriority = DispatcherPriority.Background)
+        static WriteableBitmap CreateWriteableBitmap(uint width, uint height)
         {
-            var enc = src.GetMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, streamindex);
-            WriteableBitmap? bmp = null;
             var dispatcher = Dispatcher.FromThread(System.Threading.Thread.CurrentThread);
             if (dispatcher != null)
             {
-                bmp = new WriteableBitmap((int)enc.Width, (int)enc.Height, 96, 96, PixelFormats.Bgra32, null);
+                return new WriteableBitmap((int)width, (int)height, 96, 96, PixelFormats.Bgra32, null);
             }
             else
             {
-                await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
-                {
-                    bmp = new WriteableBitmap((int)enc.Width, (int)enc.Height, 96, 96, PixelFormats.Bgra32, null);
-                });
+                return System.Windows.Application.Current.Dispatcher.Invoke(() => new WriteableBitmap((int)width, (int)height, 96, 96, PixelFormats.Bgra32, null));
             }
+        }
+
+
+        public static async Task<HRESULT> StartPreview(this QSoft.MediaCapture.WebCam_MF src, Func<Image> action, uint streamindex = 0, System.Windows.Threading.DispatcherPriority dispatcherpriority = DispatcherPriority.Background)
+        {
+            var enc = src.GetMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, streamindex);
+            WriteableBitmap? bmp = CreateWriteableBitmap(enc.Width, enc.Height);
+            //var dispatcher = Dispatcher.FromThread(System.Threading.Thread.CurrentThread);
+            //if (dispatcher != null)
+            //{
+            //    bmp = new WriteableBitmap((int)enc.Width, (int)enc.Height, 96, 96, PixelFormats.Bgra32, null);
+            //}
+            //else
+            //{
+            //    await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+            //    {
+            //        bmp = new WriteableBitmap((int)enc.Width, (int)enc.Height, 96, 96, PixelFormats.Bgra32, null);
+            //    });
+            //}
             var mfff = new MFCaptureEngineOnSampleCallback_WriteableBitmap(bmp, dispatcherpriority);
             mfff.TranseRaw = src;
             mfff.Parent = src;
-            var hr = await src.StartPreview(new MFCaptureEngineOnSampleCallback2());
+            var hr = await src.StartPreview(mfff);
             if(action?.Invoke() is Image image)
             {
                 image.Source = bmp;
                 image.LayoutTransform = new RotateTransform((int)src.Setting.Rotate);
             }
             
+            return hr;
+        }
+
+        public static async Task<HRESULT> StartPreview2(this QSoft.MediaCapture.WebCam_MF src, Func<Image> action, uint streamindex = 0, System.Windows.Threading.DispatcherPriority dispatcherpriority = DispatcherPriority.Background)
+        {
+            var enc = src.GetMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE, streamindex);
+            WriteableBitmap? bmp = CreateWriteableBitmap(enc.Width, enc.Height);
+            var mfff = new MFCaptureEngineOnSampleCallback2_WriteableBitmap(bmp, action, dispatcherpriority);
+            var hr = await src.StartPreview(mfff);
+            if (action?.Invoke() is Image image)
+            {
+                image.Source = bmp;
+                image.LayoutTransform = new RotateTransform((int)src.Setting.Rotate);
+            }
+
             return hr;
         }
 
