@@ -48,8 +48,8 @@ namespace QSoft.MediaCapture
 #endif
                 pSample.ConvertToContiguousBuffer(out var buf);
                 var ptr = buf.Lock(out var max, out var cur);
-
-                OnSample(ptr, cur);
+                System.Diagnostics.Trace.WriteLine($"OnSample len: {cur}");
+                //OnSample(ptr, cur);
 
                 buf.Unlock();
                 Marshal.ReleaseComObject(buf);
@@ -66,7 +66,7 @@ namespace QSoft.MediaCapture
 
         virtual protected void OnSample(IntPtr data, uint len) 
         {
-            System.Diagnostics.Trace.WriteLine($"OnSample len: {len}");
+            
         }
 
 

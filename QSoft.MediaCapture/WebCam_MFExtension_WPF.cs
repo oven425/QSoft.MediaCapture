@@ -100,7 +100,7 @@ namespace QSoft.MediaCapture.WPF
         }
 
 
-        static WriteableBitmap CreateWriteableBitmap(uint width, uint height)
+        internal static WriteableBitmap CreateWriteableBitmap(uint width, uint height)
         {
             var dispatcher = Dispatcher.FromThread(System.Threading.Thread.CurrentThread);
             if (dispatcher != null)
