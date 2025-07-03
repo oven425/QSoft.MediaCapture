@@ -179,18 +179,16 @@ namespace QSoft.MediaCapture
                 }
                 if(this.IsPreviewing)
                 {
-                    await this.RemoveVideoProcessorMFT(source, type.StreamIndex);
+                    //await this.RemoveVideoProcessorMFT(source, type.StreamIndex);
                 }
-                //else
-                {
-                    m_TaskSetCurrentType = new TaskCompletionSource<HRESULT>();
-                    hr = source.SetCurrentDeviceMediaType(type.StreamIndex, type.MediaType);
-                    if (hr != HRESULTS.S_OK) return;
-                    await m_TaskSetCurrentType.Task;
-                }
+                m_TaskSetCurrentType = new TaskCompletionSource<HRESULT>();
+                hr = source.SetCurrentDeviceMediaType(type.StreamIndex, type.MediaType);
+                if (hr != HRESULTS.S_OK) return;
+                await m_TaskSetCurrentType.Task;
+
                 if (this.IsPreviewing)
                 {
-                    await this.AddVideoProcessorMFT(source, type.StreamIndex);
+                    //await this.AddVideoProcessorMFT(source, type.StreamIndex);
                 }
             }
             finally
