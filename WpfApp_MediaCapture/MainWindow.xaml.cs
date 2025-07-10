@@ -46,11 +46,7 @@ namespace WpfApp_MediaCapture
             var aaa = m_MediaCapture.VideoDeviceController.GetAvailableMediaStreamProperties(Windows.Media.Capture.MediaStreamType.VideoPreview);
             var mmm = aaa.OfType<VideoEncodingProperties>().Where(x=>x.Subtype=="NV12").MaxBy(x=>x.Width*x.Height);
             await m_MediaCapture.VideoDeviceController.SetMediaStreamPropertiesAsync(MediaStreamType.VideoRecord, mmm);
-            var myVideos = await Windows.Storage.StorageLibrary.GetLibraryAsync(Windows.Storage.KnownLibraryId.Videos);
-            StorageFile file = await myVideos.SaveFolder.CreateFileAsync("video.mp4", CreationCollisionOption.GenerateUniqueName);
-            //await this.m_MediaCapture.StartRecordToStorageFileAsync(
-            //    Windows.Media.MediaProperties.MediaEncodingProfile.CreateMp4(Windows.Media.MediaProperties.VideoEncodingQuality.HD720p), file
-            //);
+
 
             var source = this.m_MediaCapture.FrameSources.MaxBy(x => x.Value.SupportedFormats.Count);
             this.m_MediaFrameReader = await this.m_MediaCapture.CreateFrameReaderAsync(source.Value, MediaEncodingSubtypes.Argb32);
@@ -128,5 +124,24 @@ namespace WpfApp_MediaCapture
             return cameras.Count > 0 ? cameras[0] : null;
         }
 
+        private async void button_startrecord_Click(object sender, RoutedEventArgs e)
+        {
+            var profile = Windows.Media.MediaProperties.MediaEncodingProfile.CreateMp4(Windows.Media.MediaProperties.VideoEncodingQuality.Auto);
+            var myVideos = await Windows.Storage.StorageLibrary.GetLibraryAsync(Windows.Storage.KnownLibraryId.Videos);
+            StorageFile file = await myVideos.SaveFolder.CreateFileAsync("video.mp4", CreationCollisionOption.GenerateUniqueName);
+            //await this.m_MediaCapture.StartRecordToStorageFileAsync(profile, file);
+
+            m_LowLagRecord  = await this.m_MediaCapture.PrepareLowLagRecordToStorageFileAsync(profile, file);
+        }
+        LowLagMediaRecording m_LowLagRecord;
+        async private void button_stoprecord_Click(object sender, RoutedEventArgs e)
+        {
+            if(m_LowLagRecord != null)
+            {
+                await m_LowLagRecord.StopAsync();
+                await m_LowLagRecord.FinishAsync();
+            }
+            //await this.m_MediaCapture.StopRecordAsync();
+        }
     }
 }

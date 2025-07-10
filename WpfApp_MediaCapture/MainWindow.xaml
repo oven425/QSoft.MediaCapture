@@ -13,5 +13,9 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Image x:Name="image"/>
+        <StackPanel Grid.Row="1" Orientation="Horizontal">
+            <Button x:Name="button_startrecord" Click="button_startrecord_Click">Start record</Button>
+            <Button x:Name="button_stoprecord" Click="button_stoprecord_Click">Stop record</Button>
+        </StackPanel>
     </Grid>
 </Window>

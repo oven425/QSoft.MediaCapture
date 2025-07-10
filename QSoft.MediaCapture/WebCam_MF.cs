@@ -122,7 +122,7 @@ namespace QSoft.MediaCapture
                 //var bv = this.BackgroundSegmentation;
                 //this.BackgroundSegmentation?.SetState(BackgroundSegmentation.BackgroundSegmentationState.Blur);
 
-                //KsMedia.KsControl ks = new KsMedia.KsControl(m_pEngine);
+                KsMedia.KsControl ks = new KsMedia.KsControl(m_pEngine);
                 //this.SetPowerLine();
             }
             finally
@@ -154,7 +154,12 @@ namespace QSoft.MediaCapture
             if (hr.IsError) return hr;
             hr = pNewMediaType.SetGUID(MFConstants.MF_MT_MAJOR_TYPE, MFConstants.MFMediaType_Video);
             if (hr.IsError) return hr;
-
+            hr = pSrcMediaType.GetGUID(MFConstants.MF_MT_SUBTYPE, out var subtype);
+            if(subtype == MFConstants.MFVideoFormat_H264_ES)
+            {
+                hr = pNewMediaType.SetGUID(MFConstants.MF_MT_SUBTYPE, subtype);
+                if (hr.IsError) return hr;
+            }
             hr = pNewMediaType.SetGUID(MFConstants.MF_MT_SUBTYPE, guidSubType);
             if (hr.IsError) return hr;
 

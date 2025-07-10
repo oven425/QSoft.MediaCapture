@@ -276,11 +276,11 @@ namespace WpfAppNET472
 
         async Task StartPreviewAsync()
         {
-            //this.host.Visibility = Visibility.Visible;
-            //await m_WebCam.StartPreview(this.host.Child.Handle);
+            this.host.Visibility = Visibility.Visible;
+            await m_WebCam.StartPreview(this.host.Child.Handle);
 
-            this.host.Visibility = Visibility.Collapsed;
-            await m_WebCam.StartPreview2(() => this.image);
+            //this.host.Visibility = Visibility.Collapsed;
+            //await m_WebCam.StartPreview(() => this.image);
 
             //this.host.Visibility = Visibility.Collapsed;
             //await m_WebCam.StartPreviewL8(() => this.image);
@@ -318,8 +318,8 @@ namespace WpfAppNET472
 
         private async void button_startrecord_Click(object sender, RoutedEventArgs e)
         {
-            //var hr = await m_WebCam.StartRecord($"{DateTime.Now:yyyyMMdd_HHmmss}.mp4");
-            var hr = await m_WebCam.StartRecord1($"aa.mp4");
+            var hr = await m_WebCam.StartRecord($"{DateTime.Now:yyyyMMdd_HHmmss}.mp4");
+            //var hr = await m_WebCam.StartRecord1($"aa.mp4");
         }
 
         private async void button_stoprecord_Click(object sender, RoutedEventArgs e)
