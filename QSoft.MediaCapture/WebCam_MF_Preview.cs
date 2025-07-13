@@ -254,10 +254,10 @@ namespace QSoft.MediaCapture
                     preview.RemoveAllStreams();
                     SafeRelease(preview);
                 }
-                //hr = m_pEngine.GetSource(out pSource);
-                //if (hr != HRESULTS.S_OK) return hr;
-                //await RemoveAllVideoProcessorMFT(pSource);
-                //m_IsPreviewing = false;
+                hr = m_pEngine.GetSource(out pSource);
+                if (hr != HRESULTS.S_OK) return hr;
+                await RemoveAllVideoProcessorMFT(pSource);
+
             }
             finally
             {

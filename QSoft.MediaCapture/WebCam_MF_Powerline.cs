@@ -1,10 +1,12 @@
 ﻿using DirectN;
+using QSoft.MediaCapture;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 namespace QSoft.MediaCapture.KsMedia
 {
     public class KsControl
@@ -13,11 +15,66 @@ namespace QSoft.MediaCapture.KsMedia
         public KsControl(IMFCaptureEngine? engine)
         {
             this.m_pEngine = engine;
+            for(uint i=0; i<32; i++)
+            {
+                for(uint j=0; j<32; j++)
+                {
+                    Get1(i, j);
+                }
+            }
             //SetBB();
-            GetLen(0);
+            //KsTopologyInfo();
             //this.GetRange();
             //this.Set();
             //this.Get();
+        }
+
+        void Get1(uint id, uint modeid)
+        {
+            if (m_pEngine == null) return;
+            HRESULT hr = HRESULTS.S_OK;
+            IKsControl? ks = null;
+            IMFCaptureSource? pSource = null;
+            try
+            {
+                hr = m_pEngine.GetSource(out pSource);
+                if (hr != HRESULTS.S_OK || pSource == null) return;
+                hr = pSource.GetCaptureDeviceSource(MF_CAPTURE_ENGINE_DEVICE_TYPE.MF_CAPTURE_ENGINE_DEVICE_TYPE_VIDEO, out var mediasource);
+                if (hr != HRESULTS.S_OK || mediasource == null) return;
+                var set = mediasource as IKsPropertySet;
+                ks = mediasource as IKsControl;
+                if (ks == null) return;
+                KSIDENTIFIER ss;
+                ss.__union_0 = new __struct_ks_2__union_0()
+                {
+                    __field_0 = new()
+                    {
+                        Set = new Guid("{26B8105A-0713-4870-979D-DA79444BB68E}"),
+                        Id = id,
+                        Flags = DirectN.Constants.KSPROPERTY_TYPE_GET
+
+                    }
+                };
+                DirectN.KSP_NODE node = new DirectN.KSP_NODE
+                {
+                    Property = ss,
+                    NodeId = modeid
+                };
+
+
+                using var mem = new ComMemory(40);
+                Marshal.StructureToPtr(node, mem.Pointer, false);
+                hr = ks.KsProperty(ref node.Property, 40, mem.Pointer, 40, out var retr);
+                //var sssm = Marshal.PtrToStructure<KSPROPERTY_VIDEOPROCAMP_S>(mem.Pointer);
+                System.Diagnostics.Trace.WriteLine($"KsControl id:{id} modeid:{modeid} hr={hr}");
+                if (hr == HRESULTS.S_OK) { }
+
+            }
+            finally
+            {
+                WebCam_MF.SafeRelease(pSource);
+                WebCam_MF.SafeRelease(ks);
+            }
         }
 
         void SetBB()
@@ -66,84 +123,70 @@ namespace QSoft.MediaCapture.KsMedia
                 WebCam_MF.SafeRelease(pSource);
                 WebCam_MF.SafeRelease(ks);
             }
-
         }
 
         //https://github.com/3dtof/DemoApplications/blob/master/Calculus/tv_auto_on_off/voxel-sdk/libvoxel/Voxel/UVCXU.cpp
-        public void GetLen(int id)
+        public void KsTopologyInfo()
         {
             if (m_pEngine == null) return;
             HRESULT hr = HRESULTS.S_OK;
             IKsControl? ks = null;
             IMFCaptureSource? pSource = null;
-            try
+            hr = m_pEngine.GetSource(out pSource);
+            if (hr != HRESULTS.S_OK || pSource == null) return;
+            hr = pSource.GetCaptureDeviceSource(MF_CAPTURE_ENGINE_DEVICE_TYPE.MF_CAPTURE_ENGINE_DEVICE_TYPE_VIDEO, out var mediasource);
+            if (hr != HRESULTS.S_OK || mediasource == null) return;
+
+
+            IKsTopologyInfo pKsTopologyInfo = mediasource as IKsTopologyInfo;
+
+
+            pKsTopologyInfo.get_NumNodes(out var numNodes);
+            System.Diagnostics.Trace.WriteLine("========== Device Topology ==========");
+            System.Diagnostics.Trace.WriteLine($"Total Nodes:  {numNodes}");
+
+            // 1. 先列出所有節點
+            System.Diagnostics.Trace.WriteLine("--- Nodes ---");
+            for (uint i = 0; i < numNodes; ++i)
             {
-                hr = m_pEngine.GetSource(out pSource);
-                if (hr != HRESULTS.S_OK || pSource == null) return;
-                hr = pSource.GetCaptureDeviceSource(MF_CAPTURE_ENGINE_DEVICE_TYPE.MF_CAPTURE_ENGINE_DEVICE_TYPE_VIDEO, out var mediasource);
-                if (hr != HRESULTS.S_OK || mediasource == null) return;
-                var set = mediasource as IKsPropertySet;
-                ks = mediasource as IKsControl;
-                
-                if (ks == null) return;
-                KSIDENTIFIER ss;
-                ss.__union_0 = new __struct_ks_2__union_0()
-                {
-                    __field_0 = new()
-                    {
-                        Set = DirectN.KSMedia.KSPROPERTYSETID_ExtendedCameraControl,
-                        Id = 0,
-                        Flags = DirectN.Constants.KSPROPERTY_TYPE_SETSUPPORT | DirectN.Constants.KSPROPERTY_TYPE_TOPOLOGY
+                pKsTopologyInfo.get_NodeType(i, out var nodeType);
 
-                    }
-                };
-                DirectN.KSP_NODE node = new DirectN.KSP_NODE();
-                
-                node.Property = ss;
+                //WCHAR nodeName[128] = { 0 };
+                //DWORD nameLen = 0;
+                //pKsTopologyInfo->get_NodeName(i, nodeName, 128, &nameLen);
 
-                var ti = mediasource as IKsTopologyInfo;
-                ti.get_NumNodes(out var n);
-                for (uint i = 0; i < n; i++)
-                {
-                    ti.get_NodeType(i, out var type);
-                    string sb = new StringBuilder(2048).ToString();
-                     
-                    ti.get_Category(i, out var category);
-                    System.Diagnostics.Trace.WriteLine(category);
-                    //System.Diagnostics.Trace.WriteLine(type);
-                    //if (type == Guid.Parse("941c7ac0-c559-11d0-8a2b-00a0c9255ac1"))
-                    {
-                        Guid iksControlGuid = typeof(IKsControl).GUID;
-                        hr = ti.CreateNodeInstance(i, iksControlGuid, out var obj);
-                        ks = obj as IKsControl;
-                        node.NodeId = i;
-                        var sss = Marshal.SizeOf<KSP_NODE>();
-                        hr = ks.KsProperty(ref node.Property, 32, IntPtr.Zero, 0, out var retr);
-                        
-                    }
+                //std::wcout << L"Node " << i << L": "
+                //           << NodeTypeToString(nodeType).c_str()
+                //           << L" (" << (nameLen > 0 ? nodeName : L"No Name") << L")"
+                //           << std::endl;
+
+            //System.Diagnostics.Trace.WriteLine($"Node {i}: {NodeTypeToString(nodeType)} ({(nameLen > 0 ? nodeName : "No Name")})");
+        }
+
+            // 2. 再列出所有連接
+            System.Diagnostics.Trace.WriteLine("--- Connections (Data Flow) ---");
+    for (uint i = 0; i<numNodes; ++i)
+    {
+        hr = pKsTopologyInfo.get_ConnectionInfo(i, out var connection);
+        if (hr.IsSuccess)
+        {
+            //// FromNodePin 和 ToNodePin 指的是節點上的針腳編號
+            //std::wcout << L"Node " << connection.FromNode
+            //           << L" (Pin " << connection.FromNodePin << L")"
+            //           << L"  --->  "
+            //           << L"Node " << connection.ToNode
+            //           << L" (Pin " << connection.ToNodePin << L")"
+            //           << std::endl;
+                    System.Diagnostics.Trace.WriteLine($"Node {connection.FromNode} (Pin {connection.FromNodePin}) ---> Node {connection.ToNode} (Pin {connection.ToNodePin})");
                 }
-                //KSPROPSETID_ExtensionUnit
+}
 
+System.Diagnostics.Trace.WriteLine("=====================================");
 
-                using var mem = new ComMemory(40);
-                //Marshal.StructureToPtr(pp, mem.Pointer, false);
-                //hr = ks.KsProperty(ref ss, 32, IntPtr.Zero, 0, out var retr);
-                if(hr != HRESULTS.S_OK)
-                {
-
-                }
-
-
-
-            }
-            finally
-            {
-                WebCam_MF.SafeRelease(pSource);
-                WebCam_MF.SafeRelease(ks);
-            }
-
+WebCam_MF.SafeRelease(pKsTopologyInfo);
 
         }
+
 
         public void Set()
         {

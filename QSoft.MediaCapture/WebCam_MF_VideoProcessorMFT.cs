@@ -75,7 +75,8 @@ namespace QSoft.MediaCapture
         TaskCompletionSource<HRESULT>? m_TaskRemoveAllEffect;
         async Task<HRESULT> RemoveAllVideoProcessorMFT(IMFCaptureSource source)
         {
-            foreach(var oo in this.m_VideoProcessors)
+
+            foreach (var oo in this.m_VideoProcessors)
             {
                 m_TaskRemoveAllEffect = new();
                 source.RemoveAllEffects(oo.Key);
@@ -87,6 +88,10 @@ namespace QSoft.MediaCapture
                 SafeRelease(oo.Value);
             }
             m_VideoProcessors.Clear();
+
+
+
+
             return HRESULTS.S_OK;
 
         }
