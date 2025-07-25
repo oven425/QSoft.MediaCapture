@@ -122,7 +122,8 @@ namespace QSoft.MediaCapture
                 //var bv = this.BackgroundSegmentation;
                 //this.BackgroundSegmentation?.SetState(BackgroundSegmentation.BackgroundSegmentationState.Blur);
 
-                KsMedia.KsControl ks = new KsMedia.KsControl(m_pEngine);
+                //KsMedia.KsControl ks = new KsMedia.KsControl(m_pEngine);
+                KsMedia.ExtensionUnit xu = new KsMedia.ExtensionUnit(m_pEngine);
                 //this.SetPowerLine();
             }
             finally

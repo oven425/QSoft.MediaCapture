@@ -45,39 +45,42 @@ namespace WpfApp_MediaCapture
             await this.m_MediaCapture.InitializeAsync(new()
             {
                 VideoDeviceId = videoSource.Id,
+                SharingMode = MediaCaptureSharingMode.ExclusiveControl,
                 StreamingCaptureMode = StreamingCaptureMode.AudioAndVideo,
-                MemoryPreference = MediaCaptureMemoryPreference.Cpu
+                MemoryPreference = MediaCaptureMemoryPreference.Auto
             });
             var aaa = m_MediaCapture.VideoDeviceController.GetAvailableMediaStreamProperties(Windows.Media.Capture.MediaStreamType.VideoPreview)
                 .OfType<VideoEncodingProperties>()
-                .Where(x => x.Subtype == "NV12")
+                //.Where(x => x.Subtype == "NV12")
                 .OrderByDescending(x => x.Width * x.Height)
                 .ThenByDescending(x => x.FrameRate.Numerator / x.FrameRate.Denominator);
             foreach (var oo in aaa)
             {
                 this.m_MainUI.Previews.Add(oo);
             }
-            this.m_MainUI.Preview = this.m_MainUI.Previews[1];
+            //this.m_MainUI.Preview = this.m_MainUI.Previews.FirstOrDefault();
             var rrs = this.m_MediaCapture.VideoDeviceController.GetAvailableMediaStreamProperties(MediaStreamType.VideoRecord)
-                .OfType<VideoEncodingProperties>();
+                .OfType<VideoEncodingProperties>()
+                .OrderByDescending(x => x.Width * x.Height)
+                .ThenByDescending(x => x.FrameRate.Numerator / x.FrameRate.Denominator);
+            foreach(var oo in rrs)
+            {
+                this.m_MainUI.Records.Add(oo);
+            }
         }
-
-        bool isrun = false;
+        readonly SemaphoreSlim m_Lock = new(1, 1);
         private async void M_MediaFrameReader_FrameArrived(MediaFrameReader sender, MediaFrameArrivedEventArgs args)
         {
-            if (isrun) return;
-            isrun = true;
             try
             {
+                if (!m_Lock.Wait(0)) return;
                 using var latestFrame = sender.TryAcquireLatestFrame();
                 //using var softwareBitmap = latestFrame?.VideoMediaFrame?.SoftwareBitmap;
                 using var d3d = latestFrame?.VideoMediaFrame?.Direct3DSurface;
                 using var softwareBitmap = d3d == null ? latestFrame?.VideoMediaFrame?.SoftwareBitmap : await SoftwareBitmap.CreateCopyFromSurfaceAsync(d3d);
                 if (softwareBitmap == null) return;
-                this.Dispatcher.Invoke(() =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
-
-
                     using var m = softwareBitmap.LockBuffer(BitmapBufferAccessMode.Read);
                     using var reference = m.CreateReference();
 
@@ -97,7 +100,7 @@ namespace WpfApp_MediaCapture
             }
             finally
             {
-                isrun = false;
+                m_Lock.Release();
             }
 
         }
@@ -112,12 +115,16 @@ namespace WpfApp_MediaCapture
 
         WriteableBitmap? m_WriteableBitmap;
 
-        MediaFrameReader m_MediaFrameReader;
+        MediaFrameReader? m_MediaFrameReader;
 
         async Task<MediaFrameSourceGroup?> GetVideoSource()
         {
             var cameras = await MediaFrameSourceGroup.FindAllAsync();
-            return cameras.Count > 0 ? cameras[1] : null;
+            foreach (var oo in cameras)
+            {
+                System.Diagnostics.Trace.WriteLine(oo.DisplayName);
+            }
+            return cameras.Count > 0 ? cameras[0] : null;
         }
 
         private async void button_startrecord_Click(object sender, RoutedEventArgs e)

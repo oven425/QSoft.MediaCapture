@@ -16,6 +16,28 @@
         <StackPanel Grid.Row="1" Orientation="Horizontal">
             <Button x:Name="button_startrecord" Click="button_startrecord_Click">Start record</Button>
             <Button x:Name="button_stoprecord" Click="button_stoprecord_Click">Stop record</Button>
+            <ComboBox ItemsSource="{Binding Previews}" SelectedItem="{Binding Preview}" SelectionChanged="combobox_preview_SelectionChanged">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock>
+                            <Run Text="{Binding Subtype}"/>
+                            <Run Text="{Binding Width}"/>x<Run Text="{Binding Height}"/>
+                            <Run Text="{Binding FrameRate.Numerator}"/>fps
+                        </TextBlock>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <ComboBox ItemsSource="{Binding Records}" SelectedItem="{Binding Preview}" SelectionChanged="combobox_preview_SelectionChanged">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock>
+                <Run Text="{Binding Subtype}"/>
+                <Run Text="{Binding Width}"/>x<Run Text="{Binding Height}"/>
+                <Run Text="{Binding FrameRate.Numerator}"/>fps
+                        </TextBlock>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
         </StackPanel>
     </Grid>
 </Window>
