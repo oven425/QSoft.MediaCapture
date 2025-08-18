@@ -54,49 +54,82 @@ namespace WpfApp_MediaCapture
                 //.Where(x => x.Subtype == "NV12")
                 .OrderByDescending(x => x.Width * x.Height)
                 .ThenByDescending(x => x.FrameRate.Numerator / x.FrameRate.Denominator);
+            System.Diagnostics.Trace.WriteLine("Available Video Preview Formats:");
             foreach (var oo in aaa)
             {
+                System.Diagnostics.Trace.WriteLine(ToString(oo));
                 this.m_MainUI.Previews.Add(oo);
             }
-            //this.m_MainUI.Preview = this.m_MainUI.Previews.FirstOrDefault();
+
             var rrs = this.m_MediaCapture.VideoDeviceController.GetAvailableMediaStreamProperties(MediaStreamType.VideoRecord)
                 .OfType<VideoEncodingProperties>()
                 .OrderByDescending(x => x.Width * x.Height)
                 .ThenByDescending(x => x.FrameRate.Numerator / x.FrameRate.Denominator);
-            foreach(var oo in rrs)
+            System.Diagnostics.Trace.WriteLine("Available Video Record Formats:");
+            foreach (var oo in rrs)
             {
+                System.Diagnostics.Trace.WriteLine(ToString(oo));
                 this.m_MainUI.Records.Add(oo);
             }
+            var rr = this.m_MediaCapture.VideoDeviceController.GetMediaStreamProperties(MediaStreamType.VideoRecord) as VideoEncodingProperties;
+            this.m_MainUI.Record = this.m_MainUI.Records.FirstOrDefault(x=>x.Subtype == rr.Subtype&&x.Width==rr.Width&&x.Height==rr.Height &&x.FrameRate.Denominator==rr.FrameRate.Denominator&&x.FrameRate.Denominator==rr.FrameRate.Denominator);
         }
+
+        string ToString(VideoEncodingProperties prop)
+        {
+            var sb = new StringBuilder();
+            sb.Append(prop.Subtype);
+            sb.Append(" ");
+            sb.Append(prop.Width);
+            sb.Append("x");
+            sb.Append(prop.Height);
+            if (prop.FrameRate.Numerator > 0 && prop.FrameRate.Denominator > 0)
+            {
+                sb.Append(" ");
+                sb.Append(prop.FrameRate.Numerator / prop.FrameRate.Denominator);
+                sb.Append("fps");
+            }
+            return sb.ToString();
+        }
+
         readonly SemaphoreSlim m_Lock = new(1, 1);
         private async void M_MediaFrameReader_FrameArrived(MediaFrameReader sender, MediaFrameArrivedEventArgs args)
         {
+            if (!await m_Lock.WaitAsync(0)) return;
             try
             {
-                if (!m_Lock.Wait(0)) return;
+
+                
                 using var latestFrame = sender.TryAcquireLatestFrame();
-                //using var softwareBitmap = latestFrame?.VideoMediaFrame?.SoftwareBitmap;
+                if (latestFrame is null) return;
+                if(latestFrame.VideoMediaFrame is null) return;
                 using var d3d = latestFrame?.VideoMediaFrame?.Direct3DSurface;
+
                 using var softwareBitmap = d3d == null ? latestFrame?.VideoMediaFrame?.SoftwareBitmap : await SoftwareBitmap.CreateCopyFromSurfaceAsync(d3d);
-                if (softwareBitmap == null) return;
-                await this.Dispatcher.InvokeAsync(() =>
+                if (softwareBitmap is not null)
                 {
-                    using var m = softwareBitmap.LockBuffer(BitmapBufferAccessMode.Read);
-                    using var reference = m.CreateReference();
-
-                    m_WriteableBitmap.Lock();
-
-                    unsafe
+                    await this.Dispatcher.InvokeAsync(() =>
                     {
-                        (reference.As<IMemoryBufferByteAccess>()).GetBuffer(out var ptr, out var capacity);
+                        using var m = softwareBitmap.LockBuffer(BitmapBufferAccessMode.Read);
+                        using var reference = m.CreateReference();
 
-                        NativeMemory.Copy(ptr, (void*)m_WriteableBitmap.BackBuffer, capacity);
-                        m_WriteableBitmap.AddDirtyRect(new Int32Rect(0, 0, m_WriteableBitmap.PixelWidth, m_WriteableBitmap.PixelHeight));
-                    }
-                    m_WriteableBitmap.Unlock();
+                        m_WriteableBitmap.Lock();
 
-                });
+                        unsafe
+                        {
+                            (reference.As<IMemoryBufferByteAccess>()).GetBuffer(out var ptr, out var capacity);
 
+                            NativeMemory.Copy(ptr, (void*)m_WriteableBitmap.BackBuffer, capacity);
+                            m_WriteableBitmap.AddDirtyRect(new Int32Rect(0, 0, m_WriteableBitmap.PixelWidth, m_WriteableBitmap.PixelHeight));
+                        }
+                        m_WriteableBitmap.Unlock();
+
+                    });
+                }
+            }
+            catch(Exception ex)
+            {
+                System.Diagnostics.Trace.WriteLine(ex);
             }
             finally
             {
@@ -136,6 +169,7 @@ namespace WpfApp_MediaCapture
             m_LowLagRecord = await this.m_MediaCapture.PrepareLowLagRecordToStorageFileAsync(profile, file);
             await m_LowLagRecord.StartAsync();
         }
+
         LowLagMediaRecording? m_LowLagRecord;
         async private void button_stoprecord_Click(object sender, RoutedEventArgs e)
         {
@@ -161,7 +195,7 @@ namespace WpfApp_MediaCapture
                 await this.m_LowLagRecord.FinishAsync();
                 this.m_LowLagRecord = null;
             }
-            var rr = m_MediaCapture.VideoDeviceController.SetMediaStreamPropertiesAsync(MediaStreamType.VideoRecord, this.m_MainUI.Preview);
+            await  m_MediaCapture.VideoDeviceController.SetMediaStreamPropertiesAsync(MediaStreamType.VideoPreview, this.m_MainUI.Preview);
 
             var source = this.m_MediaCapture.FrameSources.MaxBy(x => x.Value.SupportedFormats.Count);
             this.m_MediaFrameReader = await this.m_MediaCapture.CreateFrameReaderAsync(source.Value, MediaEncodingSubtypes.Argb32);
@@ -171,12 +205,22 @@ namespace WpfApp_MediaCapture
             await this.m_MediaFrameReader.StartAsync();
 
         }
+
+        async private void combobox_record_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if(e.AddedItems.Count>0)
+            {
+                var rr = e.AddedItems[0] as VideoEncodingProperties;
+                await this.m_MediaCapture.VideoDeviceController.SetMediaStreamPropertiesAsync(MediaStreamType.VideoRecord, rr);
+            }
+            
+        }
     }
 
 
     public class MainUI : INotifyPropertyChanged
     {
-        public VideoEncodingProperties m_Preview;
+        VideoEncodingProperties m_Preview;
         public VideoEncodingProperties Preview
         {
             set
@@ -184,7 +228,18 @@ namespace WpfApp_MediaCapture
                 m_Preview = value;
                 this.Update("Preview");
             }
-            get { return m_Preview; }
+            get => m_Preview;
+        }
+
+        VideoEncodingProperties m_Record;
+        public VideoEncodingProperties Record
+        {
+            set
+            {
+                m_Record = value;
+                this.Update("Record");
+            }
+            get => m_Record;
         }
         public ObservableCollection<VideoEncodingProperties> Previews { set; get; } = new ObservableCollection<VideoEncodingProperties>();
 
