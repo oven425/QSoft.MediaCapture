@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -39,40 +40,66 @@ namespace WpfApp_MediaCapture
         MediaCapture m_MediaCapture;
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            this.m_MediaCapture = new MediaCapture();
-            var videoSource = await GetVideoSource();
-            if (videoSource is null) return;
-            await this.m_MediaCapture.InitializeAsync(new()
+            try
             {
-                VideoDeviceId = videoSource.Id,
-                SharingMode = MediaCaptureSharingMode.ExclusiveControl,
-                StreamingCaptureMode = StreamingCaptureMode.AudioAndVideo,
-                MemoryPreference = MediaCaptureMemoryPreference.Auto
-            });
-            var aaa = m_MediaCapture.VideoDeviceController.GetAvailableMediaStreamProperties(Windows.Media.Capture.MediaStreamType.VideoPreview)
-                .OfType<VideoEncodingProperties>()
-                //.Where(x => x.Subtype == "NV12")
-                .OrderByDescending(x => x.Width * x.Height)
-                .ThenByDescending(x => x.FrameRate.Numerator / x.FrameRate.Denominator);
-            System.Diagnostics.Trace.WriteLine("Available Video Preview Formats:");
-            foreach (var oo in aaa)
-            {
-                System.Diagnostics.Trace.WriteLine(ToString(oo));
-                this.m_MainUI.Previews.Add(oo);
-            }
+                var videoSource = await GetVideoSource();
+                if (videoSource is null) return;
+                var audiosource = await GetAudioSource();
+                var mediacapturesetting = new MediaCaptureInitializationSettings()
+                {
+                    VideoDeviceId = videoSource.Id,
+                    SharingMode = MediaCaptureSharingMode.ExclusiveControl,
+                    StreamingCaptureMode = StreamingCaptureMode.Video,
+                    MemoryPreference = MediaCaptureMemoryPreference.Auto,
+                };
+                if(audiosource is not null)
+                {
+                    mediacapturesetting.StreamingCaptureMode = StreamingCaptureMode.AudioAndVideo;
+                    mediacapturesetting.AudioDeviceId = audiosource.Id;
+                }
+                this.m_MediaCapture = new MediaCapture();
 
-            var rrs = this.m_MediaCapture.VideoDeviceController.GetAvailableMediaStreamProperties(MediaStreamType.VideoRecord)
-                .OfType<VideoEncodingProperties>()
-                .OrderByDescending(x => x.Width * x.Height)
-                .ThenByDescending(x => x.FrameRate.Numerator / x.FrameRate.Denominator);
-            System.Diagnostics.Trace.WriteLine("Available Video Record Formats:");
-            foreach (var oo in rrs)
-            {
-                System.Diagnostics.Trace.WriteLine(ToString(oo));
-                this.m_MainUI.Records.Add(oo);
+                await this.m_MediaCapture.InitializeAsync(mediacapturesetting);
+                var aaa = m_MediaCapture.VideoDeviceController.GetAvailableMediaStreamProperties(Windows.Media.Capture.MediaStreamType.VideoPreview)
+                    .OfType<VideoEncodingProperties>()
+                    //.Where(x => x.Subtype == "NV12")
+                    .OrderByDescending(x => x.Width * x.Height)
+                    .ThenByDescending(x => x.FrameRate.Numerator / x.FrameRate.Denominator);
+                System.Diagnostics.Trace.WriteLine("Available Video Preview Formats:");
+                foreach (var oo in aaa)
+                {
+                    System.Diagnostics.Trace.WriteLine(ToString(oo));
+                    this.m_MainUI.Previews.Add(oo);
+                }
+
+                var rrs = this.m_MediaCapture.VideoDeviceController.GetAvailableMediaStreamProperties(MediaStreamType.VideoRecord)
+                    .OfType<VideoEncodingProperties>()
+                    .OrderByDescending(x => x.Width * x.Height)
+                    .ThenByDescending(x => x.FrameRate.Numerator / x.FrameRate.Denominator);
+                System.Diagnostics.Trace.WriteLine("Available Video Record Formats:");
+                foreach (var oo in rrs)
+                {
+                    System.Diagnostics.Trace.WriteLine(ToString(oo));
+                    this.m_MainUI.Records.Add(oo);
+                }
+                var rr = this.m_MediaCapture.VideoDeviceController.GetMediaStreamProperties(MediaStreamType.VideoRecord) as VideoEncodingProperties;
+                this.m_MainUI.Record = this.m_MainUI.Records.FirstOrDefault(x => x.Subtype == rr.Subtype && x.Width == rr.Width && x.Height == rr.Height && x.FrameRate.Denominator == rr.FrameRate.Denominator && x.FrameRate.Denominator == rr.FrameRate.Denominator);
+
+
+                var audio_preview = m_MediaCapture.AudioDeviceController.GetAvailableMediaStreamProperties(Windows.Media.Capture.MediaStreamType.Audio)
+                    .OfType<AudioEncodingProperties>();
+                System.Diagnostics.Trace.WriteLine("Available Audio Preview Formats:");
+                foreach (var oo in audio_preview)
+                {
+                    System.Diagnostics.Trace.WriteLine($"{oo.Subtype} {oo.Bitrate} {oo.SampleRate}");
+                }
             }
-            var rr = this.m_MediaCapture.VideoDeviceController.GetMediaStreamProperties(MediaStreamType.VideoRecord) as VideoEncodingProperties;
-            this.m_MainUI.Record = this.m_MainUI.Records.FirstOrDefault(x=>x.Subtype == rr.Subtype&&x.Width==rr.Width&&x.Height==rr.Height &&x.FrameRate.Denominator==rr.FrameRate.Denominator&&x.FrameRate.Denominator==rr.FrameRate.Denominator);
+            catch(Exception ee)
+            {
+                System.Diagnostics.Debug.WriteLine(ee.Message);
+                System.Diagnostics.Trace.WriteLine(ee.StackTrace);
+            }
+           
         }
 
         string ToString(VideoEncodingProperties prop)
@@ -91,15 +118,19 @@ namespace WpfApp_MediaCapture
             }
             return sb.ToString();
         }
-
+        bool m_skip = false;
         readonly SemaphoreSlim m_Lock = new(1, 1);
         private async void M_MediaFrameReader_FrameArrived(MediaFrameReader sender, MediaFrameArrivedEventArgs args)
         {
             if (!await m_Lock.WaitAsync(0)) return;
             try
             {
+                m_skip = !m_skip;
+                if (m_skip)
+                {
+                    return;
+                }
 
-                
                 using var latestFrame = sender.TryAcquireLatestFrame();
                 if (latestFrame is null) return;
                 if(latestFrame.VideoMediaFrame is null) return;
@@ -108,23 +139,23 @@ namespace WpfApp_MediaCapture
                 using var softwareBitmap = d3d == null ? latestFrame?.VideoMediaFrame?.SoftwareBitmap : await SoftwareBitmap.CreateCopyFromSurfaceAsync(d3d);
                 if (softwareBitmap is not null)
                 {
-                    await this.Dispatcher.InvokeAsync(() =>
-                    {
-                        using var m = softwareBitmap.LockBuffer(BitmapBufferAccessMode.Read);
-                        using var reference = m.CreateReference();
+                    //await this.Dispatcher.InvokeAsync(() =>
+                    //{
+                    //    using var m = softwareBitmap.LockBuffer(BitmapBufferAccessMode.Read);
+                    //    using var reference = m.CreateReference();
 
-                        m_WriteableBitmap.Lock();
+                    //    m_WriteableBitmap.Lock();
 
-                        unsafe
-                        {
-                            (reference.As<IMemoryBufferByteAccess>()).GetBuffer(out var ptr, out var capacity);
+                    //    unsafe
+                    //    {
+                    //        (reference.As<IMemoryBufferByteAccess>()).GetBuffer(out var ptr, out var capacity);
 
-                            NativeMemory.Copy(ptr, (void*)m_WriteableBitmap.BackBuffer, capacity);
-                            m_WriteableBitmap.AddDirtyRect(new Int32Rect(0, 0, m_WriteableBitmap.PixelWidth, m_WriteableBitmap.PixelHeight));
-                        }
-                        m_WriteableBitmap.Unlock();
+                    //        NativeMemory.Copy(ptr, (void*)m_WriteableBitmap.BackBuffer, capacity);
+                    //        m_WriteableBitmap.AddDirtyRect(new Int32Rect(0, 0, m_WriteableBitmap.PixelWidth, m_WriteableBitmap.PixelHeight));
+                    //    }
+                    //    m_WriteableBitmap.Unlock();
 
-                    });
+                    //});
                 }
             }
             catch(Exception ex)
@@ -160,14 +191,39 @@ namespace WpfApp_MediaCapture
             return cameras.Count > 0 ? cameras[0] : null;
         }
 
+        async Task<DeviceInformation?> GetAudioSource()
+        {
+            var audioDevices = await DeviceInformation.FindAllAsync(DeviceClass.AudioCapture);
+            foreach (var oo in audioDevices)
+            {
+                System.Diagnostics.Trace.WriteLine($"Name:{oo.Name} IsEnabled:{oo.IsEnabled} EnclosureLocation:{oo.EnclosureLocation}");
+            }
+            var a = audioDevices.Where(x => x.IsEnabled);
+            return a.FirstOrDefault();
+        }
+
         private async void button_startrecord_Click(object sender, RoutedEventArgs e)
         {
-            var profile = Windows.Media.MediaProperties.MediaEncodingProfile.CreateMp4(Windows.Media.MediaProperties.VideoEncodingQuality.Auto);
-            var myVideos = await Windows.Storage.StorageLibrary.GetLibraryAsync(Windows.Storage.KnownLibraryId.Videos);
-            StorageFile file = await myVideos.SaveFolder.CreateFileAsync("video.mp4", CreationCollisionOption.GenerateUniqueName);
+            try
+            {
+                var profile = Windows.Media.MediaProperties.MediaEncodingProfile.CreateMp4(Windows.Media.MediaProperties.VideoEncodingQuality.Auto);
+                var folder = await StorageFolder.GetFolderFromPathAsync(AppContext.BaseDirectory);
+                var file = await folder.CreateFileAsync("video.mp4", CreationCollisionOption.GenerateUniqueName);
+                //var myVideos = await Windows.Storage.StorageLibrary.GetLibraryAsync(Windows.Storage.KnownLibraryId.Videos);
+                //StorageFile file = await myVideos.SaveFolder.CreateFileAsync("video.mp4", CreationCollisionOption.GenerateUniqueName);
 
-            m_LowLagRecord = await this.m_MediaCapture.PrepareLowLagRecordToStorageFileAsync(profile, file);
-            await m_LowLagRecord.StartAsync();
+
+
+                m_LowLagRecord = await this.m_MediaCapture.PrepareLowLagRecordToStorageFileAsync(profile, file);
+                await m_LowLagRecord.StartAsync();
+
+            }
+            catch (Exception ee)
+            {
+                System.Diagnostics.Trace.WriteLine(ee.Message);
+                System.Diagnostics.Trace.WriteLine(ee.StackTrace);
+            }
+
         }
 
         LowLagMediaRecording? m_LowLagRecord;
@@ -210,8 +266,16 @@ namespace WpfApp_MediaCapture
         {
             if(e.AddedItems.Count>0)
             {
-                var rr = e.AddedItems[0] as VideoEncodingProperties;
-                await this.m_MediaCapture.VideoDeviceController.SetMediaStreamPropertiesAsync(MediaStreamType.VideoRecord, rr);
+                try
+                {
+                    var rr = e.AddedItems[0] as VideoEncodingProperties;
+                    await this.m_MediaCapture.VideoDeviceController.SetMediaStreamPropertiesAsync(MediaStreamType.VideoRecord, rr);
+
+                }
+                catch (Exception ee)
+                {
+                    System.Diagnostics.Trace.WriteLine(ee.Message);
+                }
             }
             
         }
@@ -244,6 +308,29 @@ namespace WpfApp_MediaCapture
         public ObservableCollection<VideoEncodingProperties> Previews { set; get; } = new ObservableCollection<VideoEncodingProperties>();
 
         public ObservableCollection<VideoEncodingProperties> Records { set; get; } = new ObservableCollection<VideoEncodingProperties>();
+
+        public ObservableCollection<MediaFrameSourceGroup> VideoSources { set; get; } = new ObservableCollection<MediaFrameSourceGroup>();
+        MediaFrameSourceGroup m_VideoSource;
+        public MediaFrameSourceGroup VideoSource
+        {
+            set
+            {
+                m_VideoSource = value;
+                this.Update("VideoSource");
+            }
+            get => m_VideoSource;
+        }
+        public ObservableCollection<DeviceInformation> AudioSources { set; get; } = new ObservableCollection<DeviceInformation>();
+        DeviceInformation m_AudioSource;
+        public DeviceInformation AudioSource
+        {
+            set
+            {
+                m_AudioSource = value;
+                this.Update("AudioSource");
+            }
+            get => m_AudioSource;
+        }
 
         public event PropertyChangedEventHandler? PropertyChanged;
         void Update(string name) => this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
