@@ -51,6 +51,7 @@ D3DFORMAT DXGIToCrossAPID3D9Format(DXGI_FORMAT Format)
 CSurfaceQueueDeviceD3D9::CSurfaceQueueDeviceD3D9(IDirect3DDevice9Ex* pD3D9Device) :
     m_pDevice(pD3D9Device)
 {
+    ::OutputDebugStringA("CSurfaceQueueDeviceD3D9::CSurfaceQueueDeviceD3D9\r\n");
     ASSERT(m_pDevice);
 	if(NULL != m_pDevice)
 	{
@@ -69,6 +70,7 @@ HRESULT CSurfaceQueueDeviceD3D9::CreateSharedSurface(
                                 IUnknown** ppTexture,
                                 HANDLE* pHandle)
 {
+    ::OutputDebugStringA("CSurfaceQueueDeviceD3D9::CreateSharedSurface\r\n");
     ASSERT(m_pDevice);
 
 	if(NULL == m_pDevice)
@@ -103,7 +105,7 @@ HRESULT CSurfaceQueueDeviceD3D9::OpenSurface(
                                     UINT Height, 
                                     DXGI_FORMAT Format)
 {
-    
+    ::OutputDebugStringA("CSurfaceQueueDeviceD3D9::OpenSurface\r\n");
     D3DFORMAT D3D9Format;
 
     // If the format is not cross api shareable the utility function will return
@@ -139,6 +141,7 @@ HRESULT CSurfaceQueueDeviceD3D9::OpenSurface(
 
 HRESULT CSurfaceQueueDeviceD3D9::GetSharedHandle(IUnknown* pUnknown, HANDLE* pHandle)
 {
+    ::OutputDebugStringA("CSurfaceQueueDeviceD3D9::GetSharedHandle\r\n");
     ASSERT(pUnknown);
     ASSERT(pHandle);
 
@@ -167,7 +170,7 @@ HRESULT CSurfaceQueueDeviceD3D9::GetSharedHandle(IUnknown* pUnknown, HANDLE* pHa
 
 HRESULT CSurfaceQueueDeviceD3D9::CreateCopyResource(DXGI_FORMAT Format, UINT width, UINT height, IUnknown** ppRes)
 {
-      
+    ::OutputDebugStringA("CSurfaceQueueDeviceD3D9::CreateCopyResource\r\n");
     D3DFORMAT D3D9Format;
 
     if ((D3D9Format = DXGIToCrossAPID3D9Format(Format)) == D3DFMT_UNKNOWN)
@@ -188,6 +191,7 @@ HRESULT CSurfaceQueueDeviceD3D9::CreateCopyResource(DXGI_FORMAT Format, UINT wid
 
 HRESULT CSurfaceQueueDeviceD3D9::CopySurface(IUnknown* pDst, IUnknown* pSrc, UINT width, UINT height)
 {
+    ::OutputDebugStringA("CSurfaceQueueDeviceD3D9::CopySurface\r\n");
     ASSERT(pDst);
     ASSERT(pSrc);
     ASSERT(m_pDevice);
@@ -239,6 +243,7 @@ end:
 
 HRESULT CSurfaceQueueDeviceD3D9::LockSurface(IUnknown* pSurface, DWORD flags)
 {
+    ::OutputDebugStringA("CSurfaceQueueDeviceD3D9::LockSurface\r\n");
     ASSERT(pSurface);
 
 	if(NULL == pSurface)
@@ -278,6 +283,7 @@ end:
 
 HRESULT CSurfaceQueueDeviceD3D9::UnlockSurface(IUnknown* pSurface)
 {
+    ::OutputDebugStringA("CSurfaceQueueDeviceD3D9::UnlockSurface\r\n");
     ASSERT(pSurface);
 
 	if(NULL == pSurface)
@@ -305,6 +311,7 @@ end:
 
 BOOL CSurfaceQueueDeviceD3D9::ValidateREFIID(REFIID id)
 {
+    ::OutputDebugStringA("CSurfaceQueueDeviceD3D9::ValidateREFIID\r\n");
     return id == __uuidof(IDirect3DTexture9);
 }
 

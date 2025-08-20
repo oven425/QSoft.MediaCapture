@@ -117,6 +117,7 @@
     <ProjectReference Include="..\Microsoft.Wpf.Interop.DirectX\Microsoft.Wpf.Interop.DirectX_winsdk.vcxproj">
       <Project>{157a478d-fe02-4eb2-bd7c-8cf3bf1cb9a2}</Project>
       <Name>Microsoft.Wpf.Interop.DirectX_winsdk</Name>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

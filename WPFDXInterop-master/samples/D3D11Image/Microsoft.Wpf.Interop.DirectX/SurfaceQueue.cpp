@@ -46,7 +46,7 @@ HRESULT CreateDeviceWrapper(IUnknown* pUnknown, ISurfaceQueueDevice** ppDevice)
 
     HRESULT hr = S_OK;
     *ppDevice  = NULL;
-
+    ::OutputDebugStringA("CreateDeviceWrapper\r\n");
     if (SUCCEEDED(pUnknown->QueryInterface(__uuidof(IDirect3DDevice9Ex), (void**)&pD3D9Device)))
     {
         pD3D9Device->Release();
@@ -80,6 +80,7 @@ HRESULT CreateDeviceWrapper(IUnknown* pUnknown, ISurfaceQueueDevice** ppDevice)
 //-----------------------------------------------------------------------------
 SharedSurfaceObject::SharedSurfaceObject(UINT Width, UINT Height, DXGI_FORMAT Format)
 {
+    ::OutputDebugStringA("SharedSurfaceObject\r\n");
     hSharedHandle   = NULL;
     state           = SHARED_SURFACE_STATE_UNINITIALIZED;
     queue           = NULL;

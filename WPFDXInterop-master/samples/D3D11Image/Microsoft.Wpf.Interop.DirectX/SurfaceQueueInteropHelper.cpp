@@ -17,6 +17,7 @@ namespace Microsoft {
         namespace Media {
             HRESULT SurfaceQueueInteropHelper::InitD3D10()
             {
+                ::OutputDebugStringA("SurfaceQueueInteropHelper::InitD3D10--\r\n");
                 HRESULT hr;
                 UINT		DeviceFlags = D3D10_CREATE_DEVICE_BGRA_SUPPORT;
                 //DWORD		dwShaderFlags = D3D10_SHADER_ENABLE_STRICTNESS;
@@ -66,6 +67,7 @@ namespace Microsoft {
 
             HRESULT SurfaceQueueInteropHelper::InitD3D9()
             {
+                ::OutputDebugStringA("SurfaceQueueInteropHelper::InitD3D9\r\n");
                 HRESULT hr;
 
                 {
@@ -106,6 +108,7 @@ namespace Microsoft {
 
             void SurfaceQueueInteropHelper::CleanupD3D9()
             {
+                ::OutputDebugStringA("SurfaceQueueInteropHelper::CleanupD3D9\r\n");
                 ReleaseInterface(m_pD3D9Device);
                 ReleaseInterface(m_pD3D9);
             }
@@ -138,6 +141,7 @@ namespace Microsoft {
 
             HRESULT SurfaceQueueInteropHelper::InitD3D()
             {
+                ::OutputDebugStringA("SurfaceQueueInteropHelper::InitD3D\r\n");
                 HRESULT hr = S_OK;
 
                 if (!m_isD3DInitialized)
@@ -159,6 +163,7 @@ namespace Microsoft {
 
             HRESULT SurfaceQueueInteropHelper::InitSurfaces()
             {
+                ::OutputDebugStringA("SurfaceQueueInteropHelper::InitSurfaces\r\n");
                 HRESULT hr = S_OK;
 
                 SURFACE_QUEUE_DESC  desc;
@@ -241,6 +246,7 @@ namespace Microsoft {
             // Returns true if this instance is now initialized.
             bool SurfaceQueueInteropHelper::Initialize()
             {
+                ::OutputDebugStringA("SurfaceQueueInteropHelper::Initialize\r\n");
                 HRESULT hr = S_OK;
 
                 if (m_isD3DInitialized)
@@ -280,6 +286,7 @@ namespace Microsoft {
             // In any case, this method always initializes m_d3dImage which incurrs no cost if this results in no change.
             void SurfaceQueueInteropHelper::QueueHelper(QueueRenderMode renderMode)
             {
+                ::OutputDebugStringA("SurfaceQueueInteropHelper::QueueHelper--\r\n");
                 HRESULT hr = S_OK;
 
                 IDXGISurface*           pDXGISurface = NULL;
@@ -371,11 +378,13 @@ namespace Microsoft {
 
                 ReleaseInterface(pDXGISurface);
                 ReleaseInterface(pUnkDXGISurface);
+                ::OutputDebugStringA("SurfaceQueueInteropHelper::QueueHelper----\r\n");
             }
 
 
             void SurfaceQueueInteropHelper::SetPixelSize(unsigned int pixelWidth, unsigned int pixelHeight)
             {
+                ::OutputDebugStringA("SurfaceQueueInteropHelper::SetPixelSize--\r\n");
                 if ((m_pixelWidth != pixelWidth) ||
                     (m_pixelHeight != pixelHeight))
                 {

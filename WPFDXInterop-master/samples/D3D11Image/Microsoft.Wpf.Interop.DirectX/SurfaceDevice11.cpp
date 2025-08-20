@@ -15,6 +15,7 @@
 CSurfaceQueueDeviceD3D11::CSurfaceQueueDeviceD3D11(ID3D11Device* pD3D11Device) :
     m_pDevice(pD3D11Device)
 {
+    ::OutputDebugStringA("CSurfaceQueueDeviceD3D11::CSurfaceQueueDeviceD3D11\r\n");
     ASSERT(m_pDevice);
 	if (NULL != m_pDevice)
 	{
@@ -36,7 +37,7 @@ HRESULT CSurfaceQueueDeviceD3D11::CreateSharedSurface(
     ASSERT(m_pDevice);
     ASSERT(ppUnknown);
     ASSERT(pHandle);
-
+    ::OutputDebugStringA("CSurfaceQueueDeviceD3D11::CreateSharedSurface\r\n");
 	if(NULL == m_pDevice || NULL == ppUnknown || NULL == pHandle)
 	{
 		return E_FAIL;
@@ -80,11 +81,13 @@ HRESULT CSurfaceQueueDeviceD3D11::OpenSurface(
                                     UINT, 
                                     DXGI_FORMAT)
 {
+    ::OutputDebugStringA("CSurfaceQueueDeviceD3D11::OpenSurface\r\n");
     return m_pDevice->OpenSharedResource(hSharedHandle, __uuidof(ID3D11Texture2D), ppSurface);
 }
 
 HRESULT CSurfaceQueueDeviceD3D11::GetSharedHandle(IUnknown* pUnknown, HANDLE* pHandle)
 {
+	::OutputDebugStringA("CSurfaceQueueDeviceD3D11::GetSharedHandle\n");
     ASSERT(pUnknown);
     ASSERT(pHandle);
 
@@ -111,6 +114,7 @@ HRESULT CSurfaceQueueDeviceD3D11::GetSharedHandle(IUnknown* pUnknown, HANDLE* pH
 
 HRESULT CSurfaceQueueDeviceD3D11::CreateCopyResource(DXGI_FORMAT format, UINT width, UINT height, IUnknown** ppRes)
 {
+    ::OutputDebugStringA("CSurfaceQueueDeviceD3D11::CreateCopyResource\r\n");
     ASSERT(ppRes);
     ASSERT(m_pDevice);
 
@@ -137,6 +141,7 @@ HRESULT CSurfaceQueueDeviceD3D11::CreateCopyResource(DXGI_FORMAT format, UINT wi
 
 HRESULT CSurfaceQueueDeviceD3D11::CopySurface(IUnknown* pDst, IUnknown* pSrc, UINT width, UINT height)
 {
+    ::OutputDebugStringA("CSurfaceQueueDeviceD3D11::CopySurface\r\n");
     HRESULT hr;
     
     D3D11_BOX UnitBox = {0, 0, 0, width, height, 1};
@@ -184,6 +189,7 @@ end:
 
 HRESULT CSurfaceQueueDeviceD3D11::LockSurface(IUnknown* pSurface, DWORD flags)
 {
+    ::OutputDebugStringA("CSurfaceQueueDeviceD3D11::LockSurface\r\n");
     ASSERT(pSurface);
 
 	if(NULL == pSurface)
@@ -227,6 +233,7 @@ end:
 
 HRESULT CSurfaceQueueDeviceD3D11::UnlockSurface(IUnknown* pSurface)
 {
+    ::OutputDebugStringA("CSurfaceQueueDeviceD3D11::UnlockSurface\r\n");
     ASSERT(pSurface);
 
 	if(NULL == pSurface)
@@ -263,6 +270,7 @@ end:
 
 BOOL CSurfaceQueueDeviceD3D11::ValidateREFIID(REFIID id)
 {
+    ::OutputDebugStringA("CSurfaceQueueDeviceD3D11::ValidateREFIID\r\n");
     return (id == __uuidof(ID3D11Texture2D)) ||
 		   (id == __uuidof(IDXGISurface));
 }

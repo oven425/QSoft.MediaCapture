@@ -68,7 +68,7 @@ namespace WpfApp_D3D11
             var presentParams = new PresentParameters
             {
                 Windowed = true,
-                SwapEffect = SwapEffect.Discard,
+                SwapEffect = SharpDX.Direct3D9.SwapEffect.Discard,
                 DeviceWindowHandle = hwnd,
                 PresentationInterval = PresentInterval.Default
             };
@@ -79,26 +79,28 @@ namespace WpfApp_D3D11
 
             // 開啟共享的 D3D9 Surface
             var d3d9Surface = d3d9DeviceEx.CreateRenderTarget(800, 600,
-                Format.A8R8G8B8, MultisampleType.None, 0, true);
+                SharpDX.Direct3D9.Format.A8R8G8B8, MultisampleType.None, 0, true);
 
             // 這裡是關鍵：從 sharedHandle 開啟 D3D9 Surface
             var sharedSurface = SurfaceEx.OpenShared(d3d9DeviceEx, sharedHandle);
-            using (var dxgiRes = _sharedTexture.QueryInterface<Resource1>())
-            {
-                IntPtr sharedHandle = dxgiRes.SharedHandle;
 
-                // 用這個 handle 開啟另一個裝置的 Texture2D
-                var sharedTex = _device.OpenSharedResource<Texture2D>(sharedHandle);
 
-                //IntPtr sharedHandle = dxgiRes.CreateSharedHandle(null, SharedResourceFlags.None, null);
+            //using (var dxgiRes = _sharedTexture.QueryInterface<Resource1>())
+            //{
+            //    IntPtr sharedHandle = dxgiRes.SharedHandle;
 
-                _d3dImage = new D3DImage();
-                _d3dImage.Lock();
-                _d3dImage.SetBackBuffer(D3DResourceType.IDirect3DSurface9, sharedHandle);
-                _d3dImage.Unlock();
+            //    // 用這個 handle 開啟另一個裝置的 Texture2D
+            //    var sharedTex = _device.OpenSharedResource<Texture2D>(sharedHandle);
 
-                DxImage.Source = _d3dImage;
-            }
+            //    //IntPtr sharedHandle = dxgiRes.CreateSharedHandle(null, SharedResourceFlags.None, null);
+
+            //    _d3dImage = new D3DImage();
+            //    _d3dImage.Lock();
+            //    _d3dImage.SetBackBuffer(D3DResourceType.IDirect3DSurface9, sharedHandle);
+            //    _d3dImage.Unlock();
+
+            //    DxImage.Source = _d3dImage;
+            //}
         }
 
         private void OnRendering(object sender, EventArgs e)

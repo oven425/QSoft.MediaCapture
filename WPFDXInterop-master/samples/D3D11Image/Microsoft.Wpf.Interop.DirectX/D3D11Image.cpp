@@ -7,6 +7,7 @@ namespace Microsoft {
 
                 static D3D11Image::D3D11Image()
                 {
+                    ::OutputDebugStringA("static D3D11Image::D3D11Image()\r\n");
                     OnRenderProperty = DependencyProperty::Register("OnRender",
                         Action<IntPtr, bool>::typeid,
                         D3D11Image::typeid,
@@ -33,6 +34,7 @@ namespace Microsoft {
 
                 Freezable^ D3D11Image::CreateInstanceCore()
                 {
+                    ::OutputDebugStringA("Freezable^ D3D11Image::CreateInstanceCore()\r\n");
                     return gcnew D3D11Image();
                 }
 
@@ -51,6 +53,7 @@ namespace Microsoft {
 
                 void D3D11Image::RenderChanged(DependencyObject^ sender, DependencyPropertyChangedEventArgs args)
                 {
+                    ::OutputDebugStringA("void D3D11Image::RenderChanged\r\n");
                     D3D11Image^ image = dynamic_cast<D3D11Image^>(sender);
 
                     if (image != nullptr)
@@ -75,6 +78,7 @@ namespace Microsoft {
 
                 void D3D11Image::RequestRender()
                 {
+                    ::OutputDebugStringA("void D3D11Image::RequestRender()\r\n");
                     this->EnsureHelper();
 
                     // Don't bother with a call if there's no callback registered.

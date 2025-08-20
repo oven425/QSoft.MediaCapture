@@ -250,6 +250,7 @@
             {
                 InteropImage.RequestRender();
                 this.lastRender = args.RenderingTime;
+                System.Diagnostics.Trace.WriteLine(this.lastRender);
             }
         }
 

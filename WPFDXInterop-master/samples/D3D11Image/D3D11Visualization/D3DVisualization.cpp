@@ -125,6 +125,7 @@ extern HRESULT _cdecl SetCameraPhi(float phi)
 /// </summary>
 CCube::CCube()
 {
+    ::OutputDebugStringA("CCube::CCube\r\n");
 	m_Height = 0;
 	m_Width = 0;
 
@@ -164,6 +165,7 @@ CCube::~CCube()
 /// <returns>S_OK for success, or failure code</returns>
 HRESULT CCube::LoadShaders()
 {
+    ::OutputDebugStringA("CCube::LoadShaders\r\n");
 	HRESULT hr = S_OK;
 
 	// Compile the pixel shader
@@ -227,6 +229,7 @@ HRESULT CCube::LoadShaders()
 /// <returns>S_OK for success, or failure code</returns>
 HRESULT CCube::InitDevice()
 {
+	::OutputDebugStringA("CCube::InitDevice\r\n");
     HRESULT hr = S_OK;
 
 	UINT createDeviceFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
@@ -363,6 +366,7 @@ HRESULT CCube::InitDevice()
 
 void CCube::SetUpViewport()
 {
+    ::OutputDebugStringA("CCube::SetUpViewport\r\n");
 	// Setup the viewport
 	D3D11_VIEWPORT vp;
 	vp.Width = (float)m_Width;
@@ -383,6 +387,7 @@ void CCube::SetUpViewport()
 /// <returns>S_OK for success, or failure code</returns>
 HRESULT CCube::InitRenderTarget(void * pResource)
 {
+    ::OutputDebugStringA("CCube::InitRenderTarget\r\n");
     HRESULT hr = S_OK;
 
     IUnknown *pUnk = (IUnknown*)pResource;
@@ -455,6 +460,7 @@ HRESULT CCube::InitRenderTarget(void * pResource)
 /// <returns>S_OK for success, or failure code</returns>
 HRESULT CCube::Render(void * pResource, bool isNewSurface)
 {
+    ::OutputDebugStringA("CCube::Render\r\n");
     HRESULT hr = S_OK;
 
     // If we've gotten a new Surface, need to initialize the renderTarget.
