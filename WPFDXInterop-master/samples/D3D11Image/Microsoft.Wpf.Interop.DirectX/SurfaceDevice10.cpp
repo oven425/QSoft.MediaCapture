@@ -176,6 +176,7 @@ end:
 
 HRESULT CSurfaceQueueDeviceD3D10::LockSurface(IUnknown* pSurface, DWORD flags)
 {
+    ::OutputDebugStringA("CSurfaceQueueDeviceD3D10::LockSurface\r\n");
     ASSERT(pSurface);
 
 	if (NULL == pSurface)

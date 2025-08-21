@@ -51,7 +51,7 @@ namespace WpfApp_D3D11
                 Height = 600,
                 MipLevels = 1,
                 ArraySize = 1,
-                Format = Format.B8G8R8A8_UNorm,
+                Format = SharpDX.DXGI.Format.B8G8R8A8_UNorm,
                 SampleDescription = new SampleDescription(1, 0),
                 Usage = ResourceUsage.Default,
                 BindFlags = BindFlags.RenderTarget | BindFlags.ShaderResource,
@@ -65,24 +65,24 @@ namespace WpfApp_D3D11
         private void InitD3DImage()
         {
             var d3d9Ex = new Direct3DEx();
-            var presentParams = new PresentParameters
-            {
-                Windowed = true,
-                SwapEffect = SharpDX.Direct3D9.SwapEffect.Discard,
-                DeviceWindowHandle = hwnd,
-                PresentationInterval = PresentInterval.Default
-            };
+            //var presentParams = new PresentParameters
+            //{
+            //    Windowed = true,
+            //    SwapEffect = SharpDX.Direct3D9.SwapEffect.Discard,
+            //    DeviceWindowHandle = hwnd,
+            //    PresentationInterval = PresentInterval.Default
+            //};
 
-            var d3d9DeviceEx = new DeviceEx(d3d9Ex, 0, DeviceType.Hardware, hwnd,
-                CreateFlags.HardwareVertexProcessing | CreateFlags.Multithreaded | CreateFlags.FpuPreserve,
-                presentParams);
+            //var d3d9DeviceEx = new DeviceEx(d3d9Ex, 0, DeviceType.Hardware, hwnd,
+            //    CreateFlags.HardwareVertexProcessing | CreateFlags.Multithreaded | CreateFlags.FpuPreserve,
+            //    presentParams);
 
-            // 開啟共享的 D3D9 Surface
-            var d3d9Surface = d3d9DeviceEx.CreateRenderTarget(800, 600,
-                SharpDX.Direct3D9.Format.A8R8G8B8, MultisampleType.None, 0, true);
+            //// 開啟共享的 D3D9 Surface
+            //var d3d9Surface = d3d9DeviceEx.CreateRenderTarget(800, 600,
+            //    SharpDX.Direct3D9.Format.A8R8G8B8, MultisampleType.None, 0, true);
 
-            // 這裡是關鍵：從 sharedHandle 開啟 D3D9 Surface
-            var sharedSurface = SurfaceEx.OpenShared(d3d9DeviceEx, sharedHandle);
+            //// 這裡是關鍵：從 sharedHandle 開啟 D3D9 Surface
+            //var sharedSurface = SurfaceEx.OpenShared(d3d9DeviceEx, sharedHandle);
 
 
             //using (var dxgiRes = _sharedTexture.QueryInterface<Resource1>())

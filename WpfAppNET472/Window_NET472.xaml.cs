@@ -234,6 +234,16 @@ namespace WpfAppNET472
             //m_WebCam.GetMM();
             var capturess = m_WebCam.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
             //System.Diagnostics.Trace.WriteLine($"record types");
+            foreach(var videopin in capturess.GroupBy(x=>x.StreamIndex))
+            {
+                var pinname = $"{videopin.Key}";
+                var pins = new ObservableCollection<ImageEncodingProperties>();
+                this.m_MainUI.VideoPins.Add(Tuple.Create(pinname, pins));
+                foreach (var oo in videopin.OrderByDescending(x => x.ImageSize).ThenByDescending(x => x.Fps))
+                {
+                    pins.Add(oo);
+                }
+            }
             var gg = capturess.GroupBy(x => x.SubType);
             foreach (var oo in capturess.Where(x => x.SubType != DirectN.MFConstants.MFVideoFormat_YUY2)
                 .OrderByDescending(x => x.ImageSize)
@@ -464,6 +474,7 @@ namespace WpfAppNET472
         public bool UseD3D { set; get; }
         public ObservableCollection<ColorTemperaturePreset> ColorTemperaturePresets { set; get; } = new ObservableCollection<ColorTemperaturePreset>();
 
+        public ObservableCollection<Tuple<string, ObservableCollection<ImageEncodingProperties>>> VideoPins { set; get; } = new ObservableCollection<Tuple<string, ObservableCollection<ImageEncodingProperties>>>();
         public ObservableCollection<ImageEncodingProperties> VideoCaptureFormats { set; get; }=new ObservableCollection<ImageEncodingProperties>();
         public ObservableCollection<ImageEncodingProperties> PhotoDependentFormats { set; get; } = new ObservableCollection<ImageEncodingProperties>();
         public ObservableCollection<Tuple<string , string, QSoft.DevCon.CameraPanel>> Cameras { set; get; } = new ObservableCollection<Tuple<string, string, CameraPanel>>();
