@@ -216,27 +216,27 @@ namespace WpfAppNET472
             }
 
             this.m_MainUI.ColorTemperaturePresets.Clear();
-            //if (this.m_WebCam.WhiteBalanceControl.IsSupport)
-            //{
-            //    foreach (var oo in typeof(ColorTemperaturePreset).GetEnumValues().Cast<ColorTemperaturePreset>())
-            //    {
-            //        this.m_MainUI.ColorTemperaturePresets.Add(oo);
-            //    }
-            //    this.m_MainUI.ColorTemperaturePreset = this.m_WebCam.WhiteBalanceControl.Preset;
-            //    this.m_MainUI.WhiteBalance.Value = (int)m_WebCam.WhiteBalanceControl.Value;
-            //    this.m_MainUI.WhiteBalance.IsAuto = m_WebCam.WhiteBalanceControl.IsAuto;
-            //    this.slider_whitebalance.SmallChange = this.m_WebCam.WhiteBalanceControl.Step;
-            //    this.slider_whitebalance.Minimum = this.m_WebCam.WhiteBalanceControl.Min;
 
-            //    this.slider_whitebalance.Maximum = this.m_WebCam.WhiteBalanceControl.Max;
-            //}
             System.Diagnostics.Trace.WriteLine($"{m_WebCam.FriendName}");
-            //m_WebCam.GetMM();
+            this.m_MainUI.VideoPins.Clear();
             var capturess = m_WebCam.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE);
             //System.Diagnostics.Trace.WriteLine($"record types");
-            foreach(var videopin in capturess.GroupBy(x=>x.StreamIndex))
+            foreach(var videopin in capturess.GroupBy(x=>new { x.StreamIndex, x.StreamGategory }))
             {
-                var pinname = $"{videopin.Key}";
+                var str = "";
+                switch(videopin.Key.StreamGategory)
+                {
+                    case MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_CAPTURE:
+                        str = "Capture";
+                        break;
+                    case MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_VIDEO_PREVIEW:
+                        str = "Preview";
+                        break;
+                    default:
+                        str = "";
+                        break;
+                }
+                var pinname = $"{str}({videopin.Key.StreamIndex})";
                 var pins = new ObservableCollection<ImageEncodingProperties>();
                 this.m_MainUI.VideoPins.Add(Tuple.Create(pinname, pins));
                 foreach (var oo in videopin.OrderByDescending(x => x.ImageSize).ThenByDescending(x => x.Fps))
@@ -424,6 +424,15 @@ namespace WpfAppNET472
             {
                 this.m_WebCam.BackgroundSegmentation.SetState(this.m_MainUI.BackgroundSegmentation);
             }
+        }
+
+        async private void ComboBox_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
+        {
+            if(e.AddedItems.Count >0 && e.AddedItems[0] is ImageEncodingProperties ss)
+            {
+                await this.m_WebCam.SetMediaStreamPropertiesAsync(ss);
+            }
+            
         }
     }
 

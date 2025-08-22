@@ -26,7 +26,7 @@
         </Grid>
         
         <StackPanel Grid.Row="1">
-            <WrapPanel ItemWidth="150">
+            <StackPanel Orientation="Horizontal">
                 <ComboBox SelectedItem="{Binding Camrea}" x:Name="combobox_cameras" SelectionChanged="combobox_cameras_SelectionChanged" ItemsSource="{Binding Cameras}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
@@ -38,12 +38,30 @@
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
+                <ItemsControl ItemsSource="{Binding VideoPins}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Item1}" VerticalAlignment="Center"/>
+                                <ComboBox ItemsSource="{Binding Item2}" SelectionChanged="ComboBox_SelectionChanged_1" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </StackPanel>
+            <WrapPanel ItemWidth="150">
+                
                 <Button x:Name="button_stratpreivew" Click="button_stratpreivew_Click">Start preview</Button>
                 <Button x:Name="button_stoppreview" Click="button_stoppreview_Click">Stop preview</Button>
                 <Button x:Name="button_takephoto" Click="button_takephoto_Click">Task photo</Button>
                 <Button x:Name="button_startrecord" Click="button_startrecord_Click">Start Record</Button>
                 <Button x:Name="button_stoprecord" Click="button_stoprecord_Click">Stop Record</Button>
-
+                
                 <ComboBox x:Name="combobox_recordformat" SelectionChanged="combobox_recordformat_SelectionChanged" ItemsSource="{Binding VideoCaptureFormats}" SelectedItem="{Binding RecordFormat}"/>
                 <ComboBox x:Name="combobox_photodepency" SelectedItem="{Binding PhotoDependentFormats}" ItemsSource="{Binding PhotoDependentFormats}"/>
 
