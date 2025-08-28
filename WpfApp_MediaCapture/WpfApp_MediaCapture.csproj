@@ -9,4 +9,9 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="DirectNCore" Version="1.17.3" />
+  </ItemGroup>
+
 </Project>
