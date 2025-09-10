@@ -1,0 +1,7 @@
+DXVA2CreateDirect3DDeviceManager9
+IDirect3DDeviceManager9
+IMFAttributes
+MFCreateAttributes
+MFCreateSourceReaderFromMediaSource
+MFEnumDeviceSources
+CreateFile

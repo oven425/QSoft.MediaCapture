@@ -1,11 +1,4 @@
-﻿using DirectN;
-using SharpDX.Direct3D9;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -15,45 +8,44 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Windows.Win32.Media.MediaFoundation;
+using Windows.Win32;
+using Windows.Win32.Foundation;
+using Windows.Win32.Storage.FileSystem;
 
 namespace WpfApp_D3DImage
 {
     /// <summary>
-    /// MainWindow.xaml 的互動邏輯
+    /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
         public MainWindow()
         {
             InitializeComponent();
+            Windows.Win32.PInvoke.MFCreateAttributes(out var attrs, 2);
+
         }
 
-        async private void Window_Loaded(object sender, RoutedEventArgs e)
+        unsafe private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            var webcam = QSoft.MediaCapture.WebCam_MF.GetAllWebCams()[0];
-            await webcam.InitCaptureEngine();
-            await webcam.SetPreviewSize(x => x.FirstOrDefault(y => y.SubType == DirectN.MFConstants.MFVideoFormat_NV12));
-            await webcam.StartPreview1(new NV12PreviewSink());
-        }
-    }
+            Windows.Win32.PInvoke.MFCreateAttributes(out var pAttributes, 1);
 
-    public class NV12PreviewSink: IMFCaptureEngineOnSampleCallback
-    {
-        public HRESULT OnSample(IMFSample pSample)
-        {
-            //pSample.ConvertToContiguousBuffer(out var buffer);
-            pSample.GetBufferByIndex(0, out var buffer);
-            IDirect3DSurface9 d3d9surface ;
-            var hr = MFFunctions.MFGetService(buffer, MFConstants.MR_BUFFER_SERVICE, new Guid("0cfbaf3a-9ff6-429a-99b3-a2796af8b89b"), out var obj);
+            Guid f1;
+            Guid f2;
+            //Windows.Win32.Media.MediaFoundation.MF_ATTRIBUTES_MATCH_TYPE.
+            //pAttributes.SetGUID(&f1, &f2);
+
             
-            var len = buffer.GetCurrentLength();
-            var ptr = buffer.Lock();
-            var surface = Surface.FromPointer<Surface>(ptr);
-            var device = surface.Device;
-            var d3d = device.Direct3D;
-            buffer.Unlock();
-            Marshal.ReleaseComObject(pSample);
-            return HRESULTS.S_OK;
+
+        //    var hr = pAttributes.SetGUID(
+        //MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE,
+        //MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID
+        //);
+        //    if (FAILED(hr))
+        //    {
+        //        goto done;
+        //    }
         }
     }
 }
