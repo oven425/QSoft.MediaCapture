@@ -1,0 +1,3 @@
+GetTickCount
+IMFAttributes
+MFCreateAttributes
