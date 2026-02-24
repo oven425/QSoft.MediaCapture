@@ -43,16 +43,10 @@ namespace WpfAppNET472
         
         MainUI m_MainUI;
         Dictionary<string, WebCam_MF> m_WebCams = new Dictionary<string, WebCam_MF>();
-        [DllImport("mfsensorgroup", ExactSpelling = true)]
-        public static extern HRESULT MFCreateSensorGroup([MarshalAs(UnmanagedType.LPWStr)] string SensorGroupSymbolicLink, out IMFSensorGroup ppSensorGroup);
         WebCam_MF m_WebCam;
         
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-
-
-            WebCam_MF.EnumAudioCapture();
-
             var orientation = System.Windows.Forms.SystemInformation.ScreenOrientation;
             System.Diagnostics.Trace.WriteLine($"orientation:{orientation}");
 
