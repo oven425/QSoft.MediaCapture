@@ -95,6 +95,8 @@ namespace WpfApp_MediaCapture
                     this.InitD3D9(desc1.Width, desc1.Height);
                     m_D3dImage = new D3DImage();
                     m_D3dImage.Lock();
+                    _D3DSURFACE_DESC desc = new _D3DSURFACE_DESC();
+                    m_d3d9SharedSurface.GetDesc(ref desc);
                     var sp = Marshal.GetIUnknownForObject(this.m_d3d9SharedSurface);
                     m_D3dImage.SetBackBuffer(D3DResourceType.IDirect3DSurface9, sp);
                     m_D3dImage.Unlock();

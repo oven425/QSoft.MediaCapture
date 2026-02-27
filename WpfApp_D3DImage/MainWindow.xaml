@@ -6,8 +6,13 @@
         xmlns:local="clr-namespace:WpfApp_D3DImage"
         mc:Ignorable="d"
         Loaded="Window_Loaded"
+        xmlns:i="clr-namespace:System.Windows.Interop;assembly=PresentationCore"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <Image x:Name="image"/>
+        <Image>
+            <Image.Source>
+                <i:D3DImage x:Name="d3dimage"/>
+            </Image.Source>
+        </Image>
     </Grid>
 </Window>

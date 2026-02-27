@@ -34,17 +34,21 @@ public:
         {
             IMFSourceReader* m_pSourceReader;
             IMFAttributes* pAttributes = NULL;
-            hr = MFCreateAttributes(&pAttributes, 1);
+            hr = MFCreateAttributes(&pAttributes, 5);
+            pAttributes->SetUINT32(MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, TRUE);
+            pAttributes->SetUINT32(MF_SOURCE_READER_DISABLE_DXVA, FALSE);
+            pAttributes->SetUINT32(MF_SOURCE_READER_ENABLE_VIDEO_PROCESSING, FALSE);
+            pAttributes->SetUINT32(MF_SOURCE_READER_ENABLE_ADVANCED_VIDEO_PROCESSING, TRUE);
             pAttributes->SetUnknown(MF_SOURCE_READER_D3D_MANAGER, pDeviceManager);
-			//pAttributes->SetUINT32(MF_SOURCE_READER_ENABLE_ADVANCED_VIDEO_PROCESSING, TRUE);
+			
             hr = ::MFCreateSourceReaderFromMediaSource(pSource, pAttributes, &m_pSourceReader);
 			CComPtr<IMFMediaType> pMediaType;
-			hr = m_pSourceReader->GetCurrentMediaType((DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM, &pMediaType);
+ 			hr = m_pSourceReader->GetCurrentMediaType((DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM, &pMediaType);
 			GUID subtype;
             hr = pMediaType->GetGUID(MF_MT_SUBTYPE, &subtype);
-			//hr = pMediaType->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_ARGB32);
+			hr = pMediaType->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_RGB32);
 
-            //m_pSourceReader->SetCurrentMediaType();
+            hr = m_pSourceReader->SetCurrentMediaType((DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM, NULL, pMediaType);
             while (true)
             {
 
@@ -65,6 +69,7 @@ public:
                 {
                     IDirect3DSurface9* ppSurface = nullptr;
                     hr = MFGetService(pBuffer, MR_BUFFER_SERVICE, IID_PPV_ARGS(&ppSurface));
+                    ppSurface->Release();
                 }
 
             }
@@ -76,9 +81,42 @@ public:
 	}
 private:
     IDirect3D9* pD3D = nullptr;
+    IDirect3D9Ex* pD3D9Ex = nullptr;
     IDirect3DDevice9* pDevice = nullptr;
+    IDirect3DDevice9Ex* pDeviceEx = nullptr;
     IDirect3DDeviceManager9* pDeviceManager = nullptr;
-
+    void InitD3D9Ex()
+    {
+        HRESULT hr = Direct3DCreate9Ex(D3D_SDK_VERSION, &pD3D9Ex);
+        D3DPRESENT_PARAMETERS d3dpp;
+        ZeroMemory(&d3dpp, sizeof(d3dpp));
+        d3dpp.Windowed = TRUE;
+        d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
+        d3dpp.hDeviceWindow = GetDesktopWindow();
+        hr = pD3D9Ex->CreateDeviceEx(
+            D3DADAPTER_DEFAULT,
+            D3DDEVTYPE_HAL,
+            GetDesktopWindow(),
+            D3DCREATE_HARDWARE_VERTEXPROCESSING | D3DCREATE_MULTITHREADED | D3DCREATE_FPU_PRESERVE,
+            &d3dpp,
+            nullptr,
+            &pDeviceEx
+        );
+        UINT resetToken = 0;
+        hr = DXVA2CreateDirect3DDeviceManager9(&resetToken, &pDeviceManager);
+        if (FAILED(hr))
+        {
+            pDevice->Release();
+            return;
+        }
+        hr = pDeviceManager->ResetDevice(pDeviceEx, resetToken);
+        if (FAILED(hr))
+        {
+            pDeviceManager->Release();
+            pDevice->Release();
+            return;
+        }
+	}
     void InitD3D9()
     {
         pD3D = Direct3DCreate9(D3D_SDK_VERSION);
@@ -91,7 +129,7 @@ private:
             D3DADAPTER_DEFAULT,
             D3DDEVTYPE_HAL,
             GetDesktopWindow(),
-            D3DCREATE_HARDWARE_VERTEXPROCESSING| D3DCREATE_MULTITHREADED,
+            D3DCREATE_HARDWARE_VERTEXPROCESSING| D3DCREATE_MULTITHREADED| D3DCREATE_FPU_PRESERVE,
             &d3dpp,
             &pDevice
         );
