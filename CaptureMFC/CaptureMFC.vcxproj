@@ -190,6 +190,7 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="WebCamD3D9.h" />
+    <ClInclude Include="WebCamD3D9Async.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CaptureMFC.cpp" />
@@ -201,6 +202,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="WebCamD3D9.cpp" />
+    <ClCompile Include="WebCamD3D9Async.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CaptureMFC.rc" />

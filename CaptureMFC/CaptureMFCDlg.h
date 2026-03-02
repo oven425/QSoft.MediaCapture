@@ -4,6 +4,7 @@
 
 #pragma once
 #include "WebCamD3D9.h"
+#include "WebCamD3D9Async.h"
 
 // CCaptureMFCDlg 對話方塊
 class CCaptureMFCDlg : public CDialogEx

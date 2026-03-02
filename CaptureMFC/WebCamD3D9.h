@@ -26,13 +26,12 @@ public:
 		::MFStartup(MF_VERSION);
         InitD3D9();
     }
-    void Start()
+    virtual void Start()
     {
         IMFMediaSource* pSource = NULL;
         HRESULT hr = CreateVideoDeviceSource(&pSource);
         if (SUCCEEDED(hr))
         {
-            IMFSourceReader* m_pSourceReader;
             IMFAttributes* pAttributes = NULL;
             hr = MFCreateAttributes(&pAttributes, 5);
             pAttributes->SetUINT32(MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, TRUE);
@@ -79,12 +78,14 @@ public:
             pSource->Release();
         }
 	}
-private:
+protected:
     IDirect3D9* pD3D = nullptr;
     IDirect3D9Ex* pD3D9Ex = nullptr;
     IDirect3DDevice9* pDevice = nullptr;
     IDirect3DDevice9Ex* pDeviceEx = nullptr;
     IDirect3DDeviceManager9* pDeviceManager = nullptr;
+    IMFSourceReader* m_pSourceReader;
+
     void InitD3D9Ex()
     {
         HRESULT hr = Direct3DCreate9Ex(D3D_SDK_VERSION, &pD3D9Ex);

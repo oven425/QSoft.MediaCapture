@@ -36,6 +36,9 @@
     <ClInclude Include="WebCamD3D9.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
+    <ClInclude Include="WebCamD3D9Async.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CaptureMFC.cpp">
@@ -48,6 +51,9 @@
       <Filter>來源檔案</Filter>
     </ClCompile>
     <ClCompile Include="WebCamD3D9.cpp">
+      <Filter>來源檔案</Filter>
+    </ClCompile>
+    <ClCompile Include="WebCamD3D9Async.cpp">
       <Filter>來源檔案</Filter>
     </ClCompile>
   </ItemGroup>

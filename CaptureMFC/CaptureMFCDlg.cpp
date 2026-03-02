@@ -69,7 +69,7 @@ END_MESSAGE_MAP()
 
 
 // CCaptureMFCDlg 訊息處理常式
-
+WebCamD3D9Async webcamAsync(NULL);
 BOOL CCaptureMFCDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
@@ -101,8 +101,11 @@ BOOL CCaptureMFCDlg::OnInitDialog()
 
 	// TODO: 在此加入額外的初始設定
 
-	WebCamD3D9 webcam;
-	webcam.Start();
+	//WebCamD3D9 webcam;
+	//webcam.Start();
+
+	
+	webcamAsync.Start();
 
 	return TRUE;  // 傳回 TRUE，除非您對控制項設定焦點
 }
