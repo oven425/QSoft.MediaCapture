@@ -8,15 +8,52 @@ namespace WpfApp_D3DImage
     /// Direct3D9 DLL Import 和 COM Interface 定義
     /// 統一管理所有 Direct3D9 相關函數和介面
     /// </summary>
-    public static class D3D9DllImport
+    public partial class WebCamD3D9
     {
         #region Direct3D9 DLL Imports
 
-        /// <summary>
-        /// 建立 IDirect3D9 物件
-        /// </summary>
-        [DllImport("d3d9", ExactSpelling = true)]
-        public static extern IntPtr Direct3DCreate9(uint SDKVersion);
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        public struct _D3DSURFACE_DESC
+        {
+            public _D3DFORMAT Format;
+
+            public _D3DRESOURCETYPE Type;
+
+            public uint Usage;
+
+            public _D3DPOOL Pool;
+
+            public _D3DMULTISAMPLE_TYPE MultiSampleType;
+
+            public uint MultiSampleQuality;
+
+            public uint Width;
+
+            public uint Height;
+        }
+        public struct tagRECT
+        {
+            public int left;
+
+            public int top;
+
+            public int right;
+
+            public int bottom;
+
+            public tagRECT(int left, int top, int right, int bottom)
+            {
+                this.left = left;
+                this.top = top;
+                this.right = right;
+                this.bottom = bottom;
+            }
+        }
+            /// <summary>
+            /// 建立 IDirect3D9 物件
+            /// </summary>
+            [DllImport("d3d9", ExactSpelling = true)]
+        public static extern IDirect3D9 Direct3DCreate9(uint SDKVersion);
 
         /// <summary>
         /// 建立 IDirect3D9Ex 物件 (Enhanced version for Vista+)
@@ -426,9 +463,9 @@ namespace WpfApp_D3DImage
             [PreserveSig]
             HRESULT StretchRect(
                 IDirect3DSurface9 pSourceSurface,
-                IntPtr pSourceRect,
+                tagRECT pSourceRect,
                 IDirect3DSurface9 pDestSurface,
-                IntPtr pDestRect,
+                tagRECT pDestRect,
                 uint Filter);
 
             /// <summary>
@@ -967,7 +1004,7 @@ namespace WpfApp_D3DImage
             /// 取得表面描述
             /// </summary>
             [PreserveSig]
-            HRESULT GetDesc(out IntPtr pDesc);
+            HRESULT GetDesc(ref _D3DSURFACE_DESC pDesc);
 
             /// <summary>
             /// 鎖定矩形
