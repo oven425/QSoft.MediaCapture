@@ -27,7 +27,7 @@ namespace WpfApp_D3DImage
             {
                 IMFSourceReader m_pSourceReader;
                 IMFAttributes pAttributes = null;
-                hr = DirectN.MFFunctions.MFCreateAttributes(out pAttributes, 5);
+                hr = MFCreateAttributes(out pAttributes, 5);
                 pAttributes.SetUINT32(DirectN.MFConstants.MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, 1);
                 pAttributes.SetUINT32(DirectN.MFConstants.MF_SOURCE_READER_DISABLE_DXVA, 0);
                 pAttributes.SetUINT32(DirectN.MFConstants.MF_SOURCE_READER_ENABLE_VIDEO_PROCESSING, 0);
@@ -35,7 +35,7 @@ namespace WpfApp_D3DImage
                 pAttributes.SetUnknown(DirectN.MFConstants.MF_SOURCE_READER_D3D_MANAGER, pDeviceManager);
 
 
-                hr = DirectN.Functions.MFCreateSourceReaderFromMediaSource(pSource, pAttributes, out m_pSourceReader);
+                hr = MFCreateSourceReaderFromMediaSource(pSource, pAttributes, out m_pSourceReader);
 
                 hr = m_pSourceReader.GetNativeMediaType(0xFFFFFFFC, 0, out var pMediaType);
                 //GUID subtype;
@@ -53,12 +53,13 @@ namespace WpfApp_D3DImage
                     using (var timestamp = new ComMemory(Marshal.SizeOf<long>()))
                     using (var streamflag = new ComMemory(Marshal.SizeOf<uint>()))
                     {
-                        hr = m_pSourceReader.ReadSample(0, 0, index.Pointer, streamflag.Pointer, timestamp.Pointer, out var sample);
-                        if (sample == null)
+                        IntPtr sampleptr = IntPtr.Zero;
+                        hr = m_pSourceReader.ReadSample(0, 0, index.Pointer, streamflag.Pointer, timestamp.Pointer, sampleptr);
+                        if (sampleptr == IntPtr.Zero)
                         {
                             continue;
                         }
-
+                        var sample = Marshal.GetObjectForIUnknown(sampleptr) as IMFSample;
                         hr = sample.GetBufferByIndex(0, out var pBuffer);
                         //if (SUCCEEDED(hr))
                         {
@@ -169,11 +170,22 @@ namespace WpfApp_D3DImage
                 SwapEffect = _D3DSWAPEFFECT.D3DSWAPEFFECT_DISCARD,
                 hDeviceWindow = m_Helper.Handle
             };
+            //DirectN.Functions.Direct3DCreate9Ex(DirectN.Constants.D3D_SDK_VERSION, out var d3d9ex);
             IntPtr unmanagedAddr = Marshal.AllocHGlobal(Marshal.SizeOf(d3dpp));
             Marshal.StructureToPtr<DirectN._D3DPRESENT_PARAMETERS_64>(d3dpp, unmanagedAddr, false);
+            //hr = d3d9ex.CreateDeviceEx(
+            //    DirectN.Constants.D3DADAPTER_DEFAULT,
+            //    DirectN._D3DDEVTYPE.D3DDEVTYPE_HAL,
+            //    m_Helper.Handle,
+            //    DirectN.Constants.D3DCREATE_HARDWARE_VERTEXPROCESSING | DirectN.Constants.D3DCREATE_MULTITHREADED | DirectN.Constants.D3DCREATE_FPU_PRESERVE,
+            //    unmanagedAddr,
+            //    IntPtr.Zero,
+            //    out var DeviceEx
+            //);
+
             hr = pD3D9Ex.CreateDeviceEx(
                 DirectN.Constants.D3DADAPTER_DEFAULT,
-                (int)DirectN._D3DDEVTYPE.D3DDEVTYPE_HAL,
+                _D3DDEVTYPE.D3DDEVTYPE_HAL,
                 m_Helper.Handle,
                 DirectN.Constants.D3DCREATE_HARDWARE_VERTEXPROCESSING | DirectN.Constants.D3DCREATE_MULTITHREADED | DirectN.Constants.D3DCREATE_FPU_PRESERVE,
                 unmanagedAddr,
@@ -241,7 +253,7 @@ namespace WpfApp_D3DImage
             //IMFActivate ppDevices = null;
             IntPtr ppDevices = IntPtr.Zero;
             // Create an attribute store to specify the enumeration parameters.
-            HRESULT hr = DirectN.MFFunctions.MFCreateAttributes(out pAttributes, 1);
+            HRESULT hr = MFCreateAttributes(out pAttributes, 1);
 
             // Source type: video capture devices
             hr = pAttributes.SetGUID(
@@ -251,7 +263,7 @@ namespace WpfApp_D3DImage
 
 
             // Enumerate devices.
-            hr = DirectN.Functions.MFEnumDeviceSources(pAttributes, out ppDevices, out var count);
+            hr = MFEnumDeviceSources(pAttributes, out ppDevices, out var count);
 
             if (count > 0)
             {
@@ -262,7 +274,10 @@ namespace WpfApp_D3DImage
                 {
                     // 將 IntPtr 轉換為受控介面
                     IMFActivate activate = (IMFActivate)Marshal.GetObjectForIUnknown(ptrs[i]);
-                    ppSource = activate.ActivateObject<IMFMediaSource>().Object;
+
+                    DirectN.IMFActivate dd;
+                    ppSource = Marshal.GetObjectForIUnknown(ptrs[i]) as IMFMediaSource;
+                    //ppSource = activate.ActivateObject<IMFMediaSource>().Object;
                     break;
                     // 這裡可以讀取設備名稱或啟動設備...
 

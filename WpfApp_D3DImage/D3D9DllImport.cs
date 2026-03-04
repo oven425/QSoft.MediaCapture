@@ -175,6 +175,15 @@ namespace WpfApp_D3DImage
         /// IDirect3D9Ex 介面 - Enhanced Direct3D9 (Vista+)
         /// GUID: {02177241-69fc-400c-8ff1-93a44df6861d}
         /// </summary>
+        /// 
+        public enum _D3DDEVTYPE
+        {
+            D3DDEVTYPE_HAL = 1,
+            D3DDEVTYPE_REF = 2,
+            D3DDEVTYPE_SW = 3,
+            D3DDEVTYPE_NULLREF = 4,
+            D3DDEVTYPE_FORCE_DWORD = int.MaxValue
+        }
         [ComImport]
         [Guid("02177241-69fc-400c-8ff1-93a44df6861d")]
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
@@ -191,14 +200,14 @@ namespace WpfApp_D3DImage
             /// </summary>
             [PreserveSig]
             HRESULT GetAdapterDisplayModeEx(uint Adapter, out IntPtr pMode, out IntPtr pRotation);
-
+            
             /// <summary>
             /// 建立設備(Ex版本) - 支援立即上下文和其他增強功能
             /// </summary>
             [PreserveSig]
             HRESULT CreateDeviceEx(
                 uint Adapter,
-                int DeviceType,
+                _D3DDEVTYPE DeviceType,
                 IntPtr hFocusWindow,
                 uint BehaviorFlags,
                 IntPtr pPresentationParameters,

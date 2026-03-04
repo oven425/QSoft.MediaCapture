@@ -283,12 +283,12 @@ namespace WpfApp_D3DImage
         //    [DllImport("dxva2", ExactSpelling = true)]
         //    public static extern int DXVA2CreateDirect3DDeviceManager9(out uint pResetToken, out IDirect3DDeviceManager9 ppDeviceManager);
 
-        WebCamD3D9 m_WebCamD3D9;
-        //WebCamD3D9Async m_WebCamD3D9Async;
+        //WebCamD3D9 m_WebCamD3D9;
+        WebCamD3D9Async m_WebCamD3D9Async;
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            //this.m_WebCamD3D9Async = new WebCamD3D9Async(this.d3dimage, new WindowInteropHelper(System.Windows.Application.Current.MainWindow));
-            //m_WebCamD3D9Async.Start();
+            this.m_WebCamD3D9Async = new WebCamD3D9Async(this.d3dimage, new WindowInteropHelper(System.Windows.Application.Current.MainWindow));
+            m_WebCamD3D9Async.Start();
             //helper = new WindowInteropHelper(System.Windows.Application.Current.MainWindow);
             //InitD3D9Ex();
             //_ = Start();
