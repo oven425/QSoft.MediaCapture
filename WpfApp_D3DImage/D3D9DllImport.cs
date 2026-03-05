@@ -77,923 +77,822 @@ namespace WpfApp_D3DImage
 
         #region COM Interfaces
 
-        /// <summary>
-        /// IDirect3D9 介面 - Direct3D9 物件建立者
-        /// GUID: {81bdcbca-64d4-426d-ae15-e2c3807e7675}
-        /// </summary>
-        [ComImport]
-        [Guid("81bdcbca-64d4-426d-ae15-e2c3807e7675")]
-        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        public interface IDirect3D9
-        {
-            /// <summary>
-            /// 註冊軟體裝置
-            /// </summary>
-            [PreserveSig]
-            HRESULT RegisterSoftwareDevice(IntPtr pInitializeFunction);
-
-            /// <summary>
-            /// 取得介面卡計數
-            /// </summary>
-            [PreserveSig]
-            uint GetAdapterCount();
-
-            /// <summary>
-            /// 取得介面卡識別碼
-            /// </summary>
-            [PreserveSig]
-            HRESULT GetAdapterIdentifier(uint Adapter, uint Flags, out IntPtr pIdentifier);
-
-            /// <summary>
-            /// 取得介面卡顯示模式計數
-            /// </summary>
-            [PreserveSig]
-            uint GetAdapterModeCount(uint Adapter, uint Format);
-
-            /// <summary>
-            /// 列舉介面卡顯示模式
-            /// </summary>
-            [PreserveSig]
-            HRESULT EnumAdapterModes(uint Adapter, uint Format, uint Mode, out IntPtr pMode);
-
-            /// <summary>
-            /// 取得介面卡顯示模式
-            /// </summary>
-            [PreserveSig]
-            HRESULT GetAdapterDisplayMode(uint Adapter, out IntPtr pMode);
-
-            /// <summary>
-            /// 檢查設備相容性
-            /// </summary>
-            [PreserveSig]
-            HRESULT CheckDeviceType(uint Adapter, int DeviceType, uint AdapterFormat, uint BackBufferFormat, [MarshalAs(UnmanagedType.Bool)] bool Windowed);
-
-            /// <summary>
-            /// 檢查表面格式相容性
-            /// </summary>
-            [PreserveSig]
-            HRESULT CheckSurfaceFormat(uint Adapter, int DeviceType, uint SurfaceFormat, [MarshalAs(UnmanagedType.Bool)] bool Windowed);
-
-            /// <summary>
-            /// 檢查深度/樣板格式相容性
-            /// </summary>
-            [PreserveSig]
-            HRESULT CheckDepthStencilMatch(uint Adapter, int DeviceType, uint AdapterFormat, uint RenderTargetFormat, uint DepthStencilFormat);
-
-            /// <summary>
-            /// 檢查格式轉換
-            /// </summary>
-            [PreserveSig]
-            HRESULT CheckFormatConversion(uint Adapter, int DeviceType, uint SourceFormat, uint TargetFormat);
-
-            /// <summary>
-            /// 取得設備上限
-            /// </summary>
-            [PreserveSig]
-            HRESULT GetDeviceCaps(uint Adapter, int DeviceType, out IntPtr pCaps);
-
-            /// <summary>
-            /// 取得監視器
-            /// </summary>
-            [PreserveSig]
-            IntPtr GetAdapterMonitor(uint Adapter);
-
-            /// <summary>
-            /// 建立設備
-            /// </summary>
-            [PreserveSig]
-            HRESULT CreateDevice(
-                uint Adapter,
-                int DeviceType,
-                IntPtr hFocusWindow,
-                uint BehaviorFlags,
-                IntPtr pPresentationParameters,
-                out IDirect3DDevice9 ppReturnedDeviceInterface);
-        }
-
-        /// <summary>
-        /// IDirect3D9Ex 介面 - Enhanced Direct3D9 (Vista+)
-        /// GUID: {02177241-69fc-400c-8ff1-93a44df6861d}
-        /// </summary>
-        /// 
-        public enum _D3DDEVTYPE
-        {
-            D3DDEVTYPE_HAL = 1,
-            D3DDEVTYPE_REF = 2,
-            D3DDEVTYPE_SW = 3,
-            D3DDEVTYPE_NULLREF = 4,
-            D3DDEVTYPE_FORCE_DWORD = int.MaxValue
-        }
         [ComImport]
         [Guid("02177241-69fc-400c-8ff1-93a44df6861d")]
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
         public interface IDirect3D9Ex : IDirect3D9
         {
-            /// <summary>
-            /// 列舉介面卡模式(Ex版本)
-            /// </summary>
             [PreserveSig]
-            HRESULT EnumAdapterModesEx(uint Adapter, ref IntPtr pFilter, uint Mode, out IntPtr pMode);
+            new HRESULT RegisterSoftwareDevice(IntPtr pInitializeFunction);
 
-            /// <summary>
-            /// 取得介面卡顯示模式(Ex版本)
-            /// </summary>
             [PreserveSig]
-            HRESULT GetAdapterDisplayModeEx(uint Adapter, out IntPtr pMode, out IntPtr pRotation);
-            
-            /// <summary>
-            /// 建立設備(Ex版本) - 支援立即上下文和其他增強功能
-            /// </summary>
-            [PreserveSig]
-            HRESULT CreateDeviceEx(
-                uint Adapter,
-                _D3DDEVTYPE DeviceType,
-                IntPtr hFocusWindow,
-                uint BehaviorFlags,
-                IntPtr pPresentationParameters,
-                IntPtr pFullscreenDisplayMode,
-                out IDirect3DDevice9Ex ppReturnedDeviceInterface);
+            new uint GetAdapterCount();
 
-            /// <summary>
-            /// 建立設備狀態區塊
-            /// </summary>
             [PreserveSig]
-            HRESULT CreateStateBlock(int Type, out IntPtr ppSB);
+            new HRESULT GetAdapterIdentifier(uint Adapter, uint Flags, IntPtr pIdentifier);
 
-            /// <summary>
-            /// 列舉設備和裝置
-            /// </summary>
             [PreserveSig]
-            HRESULT EnumDevices(uint Adapter, out IntPtr pDevicesOut);
+            new uint GetAdapterModeCount(uint Adapter, _D3DFORMAT Format);
 
-            /// <summary>
-            /// 取得副本間隔資訊
-            /// </summary>
             [PreserveSig]
-            HRESULT GetAdapterLUID(uint Adapter, out IntPtr pLUID);
+            new HRESULT EnumAdapterModes(uint Adapter, _D3DFORMAT Format, uint Mode, ref _D3DDISPLAYMODE pMode);
+
+            [PreserveSig]
+            new HRESULT GetAdapterDisplayMode(uint Adapter, ref _D3DDISPLAYMODE pMode);
+
+            [PreserveSig]
+            new HRESULT CheckDeviceType(uint Adapter, _D3DDEVTYPE DevType, _D3DFORMAT AdapterFormat, _D3DFORMAT BackBufferFormat, bool bWindowed);
+
+            [PreserveSig]
+            new HRESULT CheckDeviceFormat(uint Adapter, _D3DDEVTYPE DeviceType, _D3DFORMAT AdapterFormat, uint Usage, _D3DRESOURCETYPE RType, _D3DFORMAT CheckFormat);
+
+            [PreserveSig]
+            new HRESULT CheckDeviceMultiSampleType(uint Adapter, _D3DDEVTYPE DeviceType, _D3DFORMAT SurfaceFormat, bool Windowed, _D3DMULTISAMPLE_TYPE MultiSampleType, ref uint pQualityLevels);
+
+            [PreserveSig]
+            new HRESULT CheckDepthStencilMatch(uint Adapter, _D3DDEVTYPE DeviceType, _D3DFORMAT AdapterFormat, _D3DFORMAT RenderTargetFormat, _D3DFORMAT DepthStencilFormat);
+
+            [PreserveSig]
+            new HRESULT CheckDeviceFormatConversion(uint Adapter, _D3DDEVTYPE DeviceType, _D3DFORMAT SourceFormat, _D3DFORMAT TargetFormat);
+
+            [PreserveSig]
+            new HRESULT GetDeviceCaps(uint Adapter, _D3DDEVTYPE DeviceType, ref _D3DCAPS9 pCaps);
+
+            [PreserveSig]
+            new IntPtr GetAdapterMonitor(uint Adapter);
+
+            [PreserveSig]
+            new HRESULT CreateDevice(uint Adapter, _D3DDEVTYPE DeviceType, IntPtr hFocusWindow, uint BehaviorFlags, IntPtr pPresentationParameters, out IDirect3DDevice9 ppReturnedDeviceInterface);
+
+            [PreserveSig]
+            uint GetAdapterModeCountEx(uint Adapter, ref D3DDISPLAYMODEFILTER pFilter);
+
+            [PreserveSig]
+            HRESULT EnumAdapterModesEx(uint Adapter, ref D3DDISPLAYMODEFILTER pFilter, uint Mode, ref D3DDISPLAYMODEEX pMode);
+
+            [PreserveSig]
+            HRESULT GetAdapterDisplayModeEx(uint Adapter, ref D3DDISPLAYMODEEX pMode, ref D3DDISPLAYROTATION pRotation);
+
+            [PreserveSig]
+            HRESULT CreateDeviceEx(uint Adapter, _D3DDEVTYPE DeviceType, IntPtr hFocusWindow, uint BehaviorFlags, IntPtr pPresentationParameters, IntPtr pFullscreenDisplayMode, out IDirect3DDevice9Ex ppReturnedDeviceInterface);
+
+            [PreserveSig]
+            HRESULT GetAdapterLUID(uint Adapter, ref _LUID pLUID);
         }
 
-        /// <summary>
-        /// IDirect3DDevice9 介面 - Direct3D9 設備
-        /// GUID: {d0223b63-bf15-4d47-a8a6-fbaf2d53fe33}
-        /// </summary>
+
         [ComImport]
-        [Guid("d0223b63-bf15-4d47-a8a6-fbaf2d53fe33")]
+        [Guid("d0223b96-bf7a-43fd-92bd-a43b0d82b9eb")]
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
         public interface IDirect3DDevice9
         {
-            /// <summary>
-            /// 測試合作級別
-            /// </summary>
             [PreserveSig]
             HRESULT TestCooperativeLevel();
 
-            /// <summary>
-            /// 取得可用紋理記憶體
-            /// </summary>
             [PreserveSig]
             uint GetAvailableTextureMem();
 
-            /// <summary>
-            /// 逐項驅逐管理資源
-            /// </summary>
             [PreserveSig]
             HRESULT EvictManagedResources();
 
-            /// <summary>
-            /// 取得直接上下文
-            /// </summary>
             [PreserveSig]
             HRESULT GetDirect3D(out IDirect3D9 ppD3D9);
 
-            /// <summary>
-            /// 取得設備上限
-            /// </summary>
             [PreserveSig]
-            HRESULT GetDeviceCaps(out IntPtr pCaps);
+            HRESULT GetDeviceCaps(ref _D3DCAPS9 pCaps);
 
-            /// <summary>
-            /// 取得顯示格式
-            /// </summary>
             [PreserveSig]
-            HRESULT GetDisplayMode(uint iSwapChain, out IntPtr pMode);
+            HRESULT GetDisplayMode(uint iSwapChain, ref _D3DDISPLAYMODE pMode);
 
-            /// <summary>
-            /// 取得建立參數
-            /// </summary>
             [PreserveSig]
-            HRESULT GetCreationParameters(out IntPtr pParameters);
+            HRESULT GetCreationParameters(IntPtr pParameters);
 
-            /// <summary>
-            /// 設定游標屬性
-            /// </summary>
             [PreserveSig]
-            HRESULT SetCursorProperties(uint XHotSpot, uint YHotSpot, IntPtr pCursorBitmap);
+            HRESULT SetCursorProperties(uint XHotSpot, uint YHotSpot, IDirect3DSurface9 pCursorBitmap);
 
-            /// <summary>
-            /// 設定游標位置
-            /// </summary>
             [PreserveSig]
             void SetCursorPosition(int X, int Y, uint Flags);
 
-            /// <summary>
-            /// 顯示游標
-            /// </summary>
             [PreserveSig]
-            [return: MarshalAs(UnmanagedType.Bool)]
-            bool ShowCursor([MarshalAs(UnmanagedType.Bool)] bool bShow);
+            bool ShowCursor(bool bShow);
 
-            /// <summary>
-            /// 建立額外的交換鏈結
-            /// </summary>
             [PreserveSig]
-            HRESULT CreateAdditionalSwapChain(IntPtr pPresentationParameters, out IntPtr pSwapChain);
+            HRESULT CreateAdditionalSwapChain(IntPtr pPresentationParameters, out IDirect3DSwapChain9 pSwapChain);
 
-            /// <summary>
-            /// 取得交換鏈結
-            /// </summary>
             [PreserveSig]
-            HRESULT GetSwapChain(uint iSwapChain, out IntPtr pSwapChain);
+            HRESULT GetSwapChain(uint iSwapChain, out IDirect3DSwapChain9 pSwapChain);
 
-            /// <summary>
-            /// 取得交換鏈結計數
-            /// </summary>
             [PreserveSig]
             uint GetNumberOfSwapChains();
 
-            /// <summary>
-            /// 重設設備
-            /// </summary>
             [PreserveSig]
             HRESULT Reset(IntPtr pPresentationParameters);
 
-            /// <summary>
-            /// 呈現場景
-            /// </summary>
             [PreserveSig]
-            HRESULT Present(IntPtr pSourceRect, IntPtr pDestRect, IntPtr hDestWindowOverride, IntPtr pDirtyRegion);
+            HRESULT Present(ref tagRECT pSourceRect, ref tagRECT pDestRect, IntPtr hDestWindowOverride, ref _RGNDATA pDirtyRegion);
 
-            /// <summary>
-            /// 取得後台緩衝
-            /// </summary>
             [PreserveSig]
-            HRESULT GetBackBuffer(uint iSwapChain, uint iBackBuffer, int Type, out IDirect3DSurface9 ppBackBuffer);
+            HRESULT GetBackBuffer(uint iSwapChain, uint iBackBuffer, _D3DBACKBUFFER_TYPE Type, out IDirect3DSurface9 ppBackBuffer);
 
-            /// <summary>
-            /// 取得光柵狀態
-            /// </summary>
             [PreserveSig]
-            HRESULT GetRasterStatus(uint iSwapChain, out IntPtr pRasterStatus);
+            HRESULT GetRasterStatus(uint iSwapChain, ref _D3DRASTER_STATUS pRasterStatus);
 
-            /// <summary>
-            /// 設定對話框
-            /// </summary>
             [PreserveSig]
-            HRESULT SetDialogBoxMode([MarshalAs(UnmanagedType.Bool)] bool bEnableDialogs);
+            HRESULT SetDialogBoxMode(bool bEnableDialogs);
 
-            /// <summary>
-            /// 設定遊戲選項
-            /// </summary>
             [PreserveSig]
-            void SetGammaRamp(uint iSwapChain, uint Flags, IntPtr pRamp);
+            void SetGammaRamp(uint iSwapChain, uint Flags, ref _D3DGAMMARAMP pRamp);
 
-            /// <summary>
-            /// 取得遊戲選項
-            /// </summary>
             [PreserveSig]
-            void GetGammaRamp(uint iSwapChain, IntPtr pRamp);
+            void GetGammaRamp(uint iSwapChain, ref _D3DGAMMARAMP pRamp);
 
-            /// <summary>
-            /// 建立材質
-            /// </summary>
             [PreserveSig]
-            HRESULT CreateTexture(
-                uint Width,
-                uint Height,
-                uint Levels,
-                uint Usage,
-                uint Format,
-                uint Pool,
-                out IDirect3DTexture9 ppTexture,
-                IntPtr pSharedHandle);
+            HRESULT CreateTexture(uint Width, uint Height, uint Levels, uint Usage, _D3DFORMAT Format, _D3DPOOL Pool, out IDirect3DTexture9 ppTexture, IntPtr pSharedHandle);
 
-            /// <summary>
-            /// 建立音量材質
-            /// </summary>
             [PreserveSig]
-            HRESULT CreateVolumeTexture(
-                uint Width,
-                uint Height,
-                uint Depth,
-                uint Levels,
-                uint Usage,
-                uint Format,
-                uint Pool,
-                out IntPtr ppVolumeTexture,
-                IntPtr pSharedHandle);
+            HRESULT CreateVolumeTexture(uint Width, uint Height, uint Depth, uint Levels, uint Usage, _D3DFORMAT Format, _D3DPOOL Pool, out IDirect3DVolumeTexture9 ppVolumeTexture, IntPtr pSharedHandle);
 
-            /// <summary>
-            /// 建立立方體材質
-            /// </summary>
             [PreserveSig]
-            HRESULT CreateCubeTexture(
-                uint EdgeLength,
-                uint Levels,
-                uint Usage,
-                uint Format,
-                uint Pool,
-                out IntPtr ppCubeTexture,
-                IntPtr pSharedHandle);
+            HRESULT CreateCubeTexture(uint EdgeLength, uint Levels, uint Usage, _D3DFORMAT Format, _D3DPOOL Pool, out IDirect3DCubeTexture9 ppCubeTexture, IntPtr pSharedHandle);
 
-            /// <summary>
-            /// 建立表面
-            /// </summary>
             [PreserveSig]
-            HRESULT CreateOffscreenPlainSurface(
-                uint Width,
-                uint Height,
-                uint Format,
-                uint Pool,
-                out IDirect3DSurface9 ppSurface,
-                IntPtr pSharedHandle);
+            HRESULT CreateVertexBuffer(uint Length, uint Usage, uint FVF, _D3DPOOL Pool, out IDirect3DVertexBuffer9 ppVertexBuffer, IntPtr pSharedHandle);
 
-            /// <summary>
-            /// 建立渲染目標表面
-            /// </summary>
             [PreserveSig]
-            HRESULT CreateRenderTarget(
-                uint Width,
-                uint Height,
-                uint Format,
-                uint MultiSample,
-                uint MultisampleQuality,
-                [MarshalAs(UnmanagedType.Bool)] bool Lockable,
-                out IDirect3DSurface9 ppSurface,
-                IntPtr pSharedHandle);
+            HRESULT CreateIndexBuffer(uint Length, uint Usage, _D3DFORMAT Format, _D3DPOOL Pool, out IDirect3DIndexBuffer9 ppIndexBuffer, IntPtr pSharedHandle);
 
-            /// <summary>
-            /// 建立深度/樣板表面
-            /// </summary>
             [PreserveSig]
-            HRESULT CreateDepthStencilSurface(
-                uint Width,
-                uint Height,
-                uint Format,
-                uint MultiSample,
-                uint MultisampleQuality,
-                [MarshalAs(UnmanagedType.Bool)] bool Discard,
-                out IDirect3DSurface9 ppSurface,
-                IntPtr pSharedHandle);
+            HRESULT CreateRenderTarget(uint Width, uint Height, _D3DFORMAT Format, _D3DMULTISAMPLE_TYPE MultiSample, uint MultisampleQuality, bool Lockable, out IDirect3DSurface9 ppSurface, IntPtr pSharedHandle);
 
-            /// <summary>
-            /// 更新表面
-            /// </summary>
             [PreserveSig]
-            HRESULT UpdateSurface(
-                IDirect3DSurface9 pSourceSurface,
-                IntPtr pSourceRect,
-                IDirect3DSurface9 pDestinationSurface,
-                IntPtr pDestPoint);
+            HRESULT CreateDepthStencilSurface(uint Width, uint Height, _D3DFORMAT Format, _D3DMULTISAMPLE_TYPE MultiSample, uint MultisampleQuality, bool Discard, out IDirect3DSurface9 ppSurface, IntPtr pSharedHandle);
 
-            /// <summary>
-            /// 複製矩形
-            /// </summary>
             [PreserveSig]
-            HRESULT CopyRects(
-                IDirect3DSurface9 pSourceSurface,
-                IntPtr pSourceRectsArray,
-                uint cRects,
-                IDirect3DSurface9 pDestinationSurface,
-                IntPtr pDestPointsArray);
+            HRESULT UpdateSurface(IDirect3DSurface9 pSourceSurface, ref tagRECT pSourceRect, IDirect3DSurface9 pDestinationSurface, ref tagPOINT pDestPoint);
 
-            /// <summary>
-            /// 伸縮矩形 - 用於複製和縮放表面
-            /// </summary>
             [PreserveSig]
-            HRESULT StretchRect(
-                IDirect3DSurface9 pSourceSurface,
-                tagRECT pSourceRect,
-                IDirect3DSurface9 pDestSurface,
-                tagRECT pDestRect,
-                uint Filter);
+            HRESULT UpdateTexture(IDirect3DBaseTexture9 pSourceTexture, IDirect3DBaseTexture9 pDestinationTexture);
 
-            /// <summary>
-            /// 顏色填充
-            /// </summary>
             [PreserveSig]
-            HRESULT ColorFill(IDirect3DSurface9 pSurface, IntPtr pRect, uint color);
+            HRESULT GetRenderTargetData(IDirect3DSurface9 pRenderTarget, IDirect3DSurface9 pDestSurface);
 
-            /// <summary>
-            /// 建立頂點緩衝
-            /// </summary>
             [PreserveSig]
-            HRESULT CreateVertexBuffer(
-                uint Length,
-                uint Usage,
-                uint FVF,
-                uint Pool,
-                out IntPtr ppVertexBuffer,
-                IntPtr pSharedHandle);
+            HRESULT GetFrontBufferData(uint iSwapChain, IDirect3DSurface9 pDestSurface);
 
-            /// <summary>
-            /// 建立索引緩衝
-            /// </summary>
             [PreserveSig]
-            HRESULT CreateIndexBuffer(
-                uint Length,
-                uint Usage,
-                uint Format,
-                uint Pool,
-                out IntPtr ppIndexBuffer,
-                IntPtr pSharedHandle);
+            HRESULT StretchRect(IDirect3DSurface9 pSourceSurface, ref tagRECT pSourceRect, IDirect3DSurface9 pDestSurface, ref tagRECT pDestRect, _D3DTEXTUREFILTERTYPE Filter);
 
-            /// <summary>
-            /// 建立頂點宣告
-            /// </summary>
             [PreserveSig]
-            HRESULT CreateVertexDeclaration(
-                IntPtr pVertexElements,
-                out IntPtr ppDecl);
+            HRESULT ColorFill(IDirect3DSurface9 pSurface, ref tagRECT pRect, uint color);
 
-            /// <summary>
-            /// 取得頂點宣告
-            /// </summary>
             [PreserveSig]
-            HRESULT GetVertexDeclaration(out IntPtr ppDecl);
+            HRESULT CreateOffscreenPlainSurface(uint Width, uint Height, _D3DFORMAT Format, _D3DPOOL Pool, out IDirect3DSurface9 ppSurface, IntPtr pSharedHandle);
 
-            /// <summary>
-            /// 設定頂點宣告
-            /// </summary>
             [PreserveSig]
-            HRESULT SetVertexDeclaration(IntPtr pDecl);
+            HRESULT SetRenderTarget(uint RenderTargetIndex, IDirect3DSurface9 pRenderTarget);
 
-            /// <summary>
-            /// 取得頂點著色器常數寄存器大小
-            /// </summary>
             [PreserveSig]
-            HRESULT GetFVFVertexSize(uint FVF, out uint pSize);
+            HRESULT GetRenderTarget(uint RenderTargetIndex, out IDirect3DSurface9 ppRenderTarget);
 
-            /// <summary>
-            /// 建立頂點著色器
-            /// </summary>
             [PreserveSig]
-            HRESULT CreateVertexShader(IntPtr pFunction, out IntPtr ppShader);
+            HRESULT SetDepthStencilSurface(IDirect3DSurface9 pNewZStencil);
 
-            /// <summary>
-            /// 設定頂點著色器
-            /// </summary>
             [PreserveSig]
-            HRESULT SetVertexShader(IntPtr pShader);
+            HRESULT GetDepthStencilSurface(out IDirect3DSurface9 ppZStencilSurface);
 
-            /// <summary>
-            /// 取得頂點著色器
-            /// </summary>
-            [PreserveSig]
-            HRESULT GetVertexShader(out IntPtr ppShader);
-
-            /// <summary>
-            /// 設定頂點著色器常數
-            /// </summary>
-            [PreserveSig]
-            HRESULT SetVertexShaderConstantF(uint StartRegister, IntPtr pConstantData, uint Vector4fCount);
-
-            /// <summary>
-            /// 取得頂點著色器常數
-            /// </summary>
-            [PreserveSig]
-            HRESULT GetVertexShaderConstantF(uint StartRegister, IntPtr pConstantData, uint Vector4fCount);
-
-            /// <summary>
-            /// 設定頂點著色器常數(整數)
-            /// </summary>
-            [PreserveSig]
-            HRESULT SetVertexShaderConstantI(uint StartRegister, IntPtr pConstantData, uint Vector4iCount);
-
-            /// <summary>
-            /// 取得頂 vertex著色器常數(整數)
-            /// </summary>
-            [PreserveSig]
-            HRESULT GetVertexShaderConstantI(uint StartRegister, IntPtr pConstantData, uint Vector4iCount);
-
-            /// <summary>
-            /// 設定頂 vertex著色器常數(布林)
-            /// </summary>
-            [PreserveSig]
-            HRESULT SetVertexShaderConstantB(uint StartRegister, IntPtr pConstantData, uint BoolCount);
-
-            /// <summary>
-            /// 取得頂 vertex著色器常數(布林)
-            /// </summary>
-            [PreserveSig]
-            HRESULT GetVertexShaderConstantB(uint StartRegister, IntPtr pConstantData, uint BoolCount);
-
-            /// <summary>
-            /// 設定頂點資料流來源
-            /// </summary>
-            [PreserveSig]
-            HRESULT SetStreamSource(uint StreamNumber, IntPtr pStreamData, uint OffsetInBytes, uint Stride);
-
-            /// <summary>
-            /// 取得頂點資料流來源
-            /// </summary>
-            [PreserveSig]
-            HRESULT GetStreamSource(uint StreamNumber, out IntPtr ppStreamData, out uint pOffsetInBytes, out uint pStride);
-
-            /// <summary>
-            /// 設定頂點資料流頻率
-            /// </summary>
-            [PreserveSig]
-            HRESULT SetStreamSourceFreq(uint StreamNumber, uint Divider);
-
-            /// <summary>
-            /// 取得頂點資料流頻率
-            /// </summary>
-            [PreserveSig]
-            HRESULT GetStreamSourceFreq(uint StreamNumber, out uint pDivider);
-
-            /// <summary>
-            /// 設定索引緩衝
-            /// </summary>
-            [PreserveSig]
-            HRESULT SetIndices(IntPtr pIndexData);
-
-            /// <summary>
-            /// 取得索引緩衝
-            /// </summary>
-            [PreserveSig]
-            HRESULT GetIndices(out IntPtr ppIndexData);
-
-            /// <summary>
-            /// 建立像素著色器
-            /// </summary>
-            [PreserveSig]
-            HRESULT CreatePixelShader(IntPtr pFunction, out IntPtr ppShader);
-
-            /// <summary>
-            /// 設定像素著色器
-            /// </summary>
-            [PreserveSig]
-            HRESULT SetPixelShader(IntPtr pShader);
-
-            /// <summary>
-            /// 取得像素著色器
-            /// </summary>
-            [PreserveSig]
-            HRESULT GetPixelShader(out IntPtr ppShader);
-
-            /// <summary>
-            /// 設定像素著色器常數
-            /// </summary>
-            [PreserveSig]
-            HRESULT SetPixelShaderConstantF(uint StartRegister, IntPtr pConstantData, uint Vector4fCount);
-
-            /// <summary>
-            /// 取得像素著色器常數
-            /// </summary>
-            [PreserveSig]
-            HRESULT GetPixelShaderConstantF(uint StartRegister, IntPtr pConstantData, uint Vector4fCount);
-
-            /// <summary>
-            /// 設定像素著色器常數(整數)
-            /// </summary>
-            [PreserveSig]
-            HRESULT SetPixelShaderConstantI(uint StartRegister, IntPtr pConstantData, uint Vector4iCount);
-
-            /// <summary>
-            /// 取得像素著色器常數(整數)
-            /// </summary>
-            [PreserveSig]
-            HRESULT GetPixelShaderConstantI(uint StartRegister, IntPtr pConstantData, uint Vector4iCount);
-
-            /// <summary>
-            /// 設定像素著色器常數(布林)
-            /// </summary>
-            [PreserveSig]
-            HRESULT SetPixelShaderConstantB(uint StartRegister, IntPtr pConstantData, uint BoolCount);
-
-            /// <summary>
-            /// 取得像素著色器常數(布林)
-            /// </summary>
-            [PreserveSig]
-            HRESULT GetPixelShaderConstantB(uint StartRegister, IntPtr pConstantData, uint BoolCount);
-
-            /// <summary>
-            /// 設定剪裁平面
-            /// </summary>
-            [PreserveSig]
-            HRESULT SetClipPlane(uint Index, IntPtr pPlane);
-
-            /// <summary>
-            /// 取得剪裁平面
-            /// </summary>
-            [PreserveSig]
-            HRESULT GetClipPlane(uint Index, IntPtr pPlane);
-
-            /// <summary>
-            /// 設定呈現狀態
-            /// </summary>
-            [PreserveSig]
-            HRESULT SetRenderState(uint State, uint Value);
-
-            /// <summary>
-            /// 取得呈現狀態
-            /// </summary>
-            [PreserveSig]
-            HRESULT GetRenderState(uint State, out uint pValue);
-
-            /// <summary>
-            /// 建立狀態區塊
-            /// </summary>
-            [PreserveSig]
-            HRESULT CreateStateBlock(int Type, out IntPtr ppSB);
-
-            /// <summary>
-            /// 開始場景
-            /// </summary>
             [PreserveSig]
             HRESULT BeginScene();
 
-            /// <summary>
-            /// 結束場景
-            /// </summary>
             [PreserveSig]
             HRESULT EndScene();
 
-            /// <summary>
-            /// 清空
-            /// </summary>
             [PreserveSig]
-            HRESULT Clear(uint Count, IntPtr pRects, uint Flags, uint Color, float Z, uint Stencil);
+            HRESULT Clear(uint Count, ref _D3DRECT pRects, uint Flags, uint Color, float Z, uint Stencil);
 
-            /// <summary>
-            /// 設定轉換矩陣
-            /// </summary>
             [PreserveSig]
-            HRESULT SetTransform(uint State, IntPtr pMatrix);
+            HRESULT SetTransform(_D3DTRANSFORMSTATETYPE State, ref _D3DMATRIX pMatrix);
 
-            /// <summary>
-            /// 取得轉換矩陣
-            /// </summary>
             [PreserveSig]
-            HRESULT GetTransform(uint State, IntPtr pMatrix);
+            HRESULT GetTransform(_D3DTRANSFORMSTATETYPE State, ref _D3DMATRIX pMatrix);
 
-            /// <summary>
-            /// 乘法轉換矩陣
-            /// </summary>
             [PreserveSig]
-            HRESULT MultiplyTransform(uint State, IntPtr pMatrix);
+            HRESULT MultiplyTransform(_D3DTRANSFORMSTATETYPE unnamed__0, ref _D3DMATRIX unnamed__1);
 
-            /// <summary>
-            /// 設定視埠
-            /// </summary>
             [PreserveSig]
-            HRESULT SetViewport(IntPtr pViewport);
+            HRESULT SetViewport(ref _D3DVIEWPORT9 pViewport);
 
-            /// <summary>
-            /// 取得視埠
-            /// </summary>
             [PreserveSig]
-            HRESULT GetViewport(IntPtr pViewport);
+            HRESULT GetViewport(ref _D3DVIEWPORT9 pViewport);
 
-            /// <summary>
-            /// 設定材質
-            /// </summary>
             [PreserveSig]
-            HRESULT SetMaterial(IntPtr pMaterial);
+            HRESULT SetMaterial(ref _D3DMATERIAL9 pMaterial);
 
-            /// <summary>
-            /// 取得材質
-            /// </summary>
             [PreserveSig]
-            HRESULT GetMaterial(IntPtr pMaterial);
+            HRESULT GetMaterial(ref _D3DMATERIAL9 pMaterial);
 
-            /// <summary>
-            /// 設定光線
-            /// </summary>
             [PreserveSig]
-            HRESULT SetLight(uint Index, IntPtr pLight);
+            HRESULT SetLight(uint Index, ref _D3DLIGHT9 unnamed__1);
 
-            /// <summary>
-            /// 取得光線
-            /// </summary>
             [PreserveSig]
-            HRESULT GetLight(uint Index, IntPtr pLight);
+            HRESULT GetLight(uint Index, ref _D3DLIGHT9 unnamed__1);
 
-            /// <summary>
-            /// 啟用光線
-            /// </summary>
             [PreserveSig]
-            HRESULT LightEnable(uint Index, [MarshalAs(UnmanagedType.Bool)] bool Enable);
+            HRESULT LightEnable(uint Index, bool Enable);
 
-            /// <summary>
-            /// 取得光線啟用狀態
-            /// </summary>
             [PreserveSig]
-            HRESULT GetLightEnable(uint Index, out bool pEnable);
+            HRESULT GetLightEnable(uint Index, ref bool pEnable);
 
-            /// <summary>
-            /// 設定紋理貼圖狀態
-            /// </summary>
             [PreserveSig]
-            HRESULT SetTextureStageState(uint Stage, uint Type, uint Value);
+            HRESULT SetClipPlane(uint Index, ref float pPlane);
 
-            /// <summary>
-            /// 取得紋理貼圖狀態
-            /// </summary>
             [PreserveSig]
-            HRESULT GetTextureStageState(uint Stage, uint Type, out uint pValue);
+            HRESULT GetClipPlane(uint Index, ref float pPlane);
 
-            /// <summary>
-            /// 取得樣本狀態
-            /// </summary>
             [PreserveSig]
-            HRESULT GetSamplerState(uint Sampler, uint Type, out uint pValue);
+            HRESULT SetRenderState(_D3DRENDERSTATETYPE State, uint Value);
 
-            /// <summary>
-            /// 設定樣本狀態
-            /// </summary>
             [PreserveSig]
-            HRESULT SetSamplerState(uint Sampler, uint Type, uint Value);
+            HRESULT GetRenderState(_D3DRENDERSTATETYPE State, ref uint pValue);
 
-            /// <summary>
-            /// 驗證設備狀態
-            /// </summary>
             [PreserveSig]
-            HRESULT ValidateDevice(out uint pNumPasses);
+            HRESULT CreateStateBlock(_D3DSTATEBLOCKTYPE Type, out IDirect3DStateBlock9 ppSB);
 
-            /// <summary>
-            /// 設定調色板項
-            /// </summary>
             [PreserveSig]
-            HRESULT SetPaletteEntries(uint PaletteNumber, IntPtr pEntries);
+            HRESULT BeginStateBlock();
 
-            /// <summary>
-            /// 取得調色板項
-            /// </summary>
             [PreserveSig]
-            HRESULT GetPaletteEntries(uint PaletteNumber, IntPtr pEntries);
+            HRESULT EndStateBlock(out IDirect3DStateBlock9 ppSB);
 
-            /// <summary>
-            /// 設定目前調色板
-            /// </summary>
+            [PreserveSig]
+            HRESULT SetClipStatus(ref _D3DCLIPSTATUS9 pClipStatus);
+
+            [PreserveSig]
+            HRESULT GetClipStatus(ref _D3DCLIPSTATUS9 pClipStatus);
+
+            [PreserveSig]
+            HRESULT GetTexture(uint Stage, out IDirect3DBaseTexture9 ppTexture);
+
+            [PreserveSig]
+            HRESULT SetTexture(uint Stage, IDirect3DBaseTexture9 pTexture);
+
+            [PreserveSig]
+            HRESULT GetTextureStageState(uint Stage, _D3DTEXTURESTAGESTATETYPE Type, ref uint pValue);
+
+            [PreserveSig]
+            HRESULT SetTextureStageState(uint Stage, _D3DTEXTURESTAGESTATETYPE Type, uint Value);
+
+            [PreserveSig]
+            HRESULT GetSamplerState(uint Sampler, _D3DSAMPLERSTATETYPE Type, ref uint pValue);
+
+            [PreserveSig]
+            HRESULT SetSamplerState(uint Sampler, _D3DSAMPLERSTATETYPE Type, uint Value);
+
+            [PreserveSig]
+            HRESULT ValidateDevice(ref uint pNumPasses);
+
+            [PreserveSig]
+            HRESULT SetPaletteEntries(uint PaletteNumber, ref tagPALETTEENTRY pEntries);
+
+            [PreserveSig]
+            HRESULT GetPaletteEntries(uint PaletteNumber, ref tagPALETTEENTRY pEntries);
+
             [PreserveSig]
             HRESULT SetCurrentTexturePalette(uint PaletteNumber);
 
-            /// <summary>
-            /// 取得目前調色板
-            /// </summary>
             [PreserveSig]
-            HRESULT GetCurrentTexturePalette(out uint PaletteNumber);
+            HRESULT GetCurrentTexturePalette(ref uint PaletteNumber);
 
-            /// <summary>
-            /// 設定紋理材質
-            /// </summary>
             [PreserveSig]
-            HRESULT SetTexture(uint Stage, IntPtr pTexture);
+            HRESULT SetScissorRect(ref tagRECT pRect);
 
-            /// <summary>
-            /// 取得紋理材質
-            /// </summary>
             [PreserveSig]
-            HRESULT GetTexture(uint Stage, out IntPtr ppTexture);
+            HRESULT GetScissorRect(ref tagRECT pRect);
 
-            /// <summary>
-            /// 繪製基本元素
-            /// </summary>
             [PreserveSig]
-            HRESULT DrawPrimitive(int PrimitiveType, uint StartVertex, uint PrimitiveCount);
+            HRESULT SetSoftwareVertexProcessing(bool bSoftware);
 
-            /// <summary>
-            /// 繪製基本元素(索引版本)
-            /// </summary>
             [PreserveSig]
-            HRESULT DrawIndexedPrimitive(int Type, int BaseVertexIndex, uint MinVertexIndex, uint NumVertices, uint startIndex, uint primCount);
+            bool GetSoftwareVertexProcessing();
 
-            /// <summary>
-            /// 繪製基本元素(使用者記憶體版本)
-            /// </summary>
             [PreserveSig]
-            HRESULT DrawPrimitiveUP(int PrimitiveType, uint PrimitiveCount, IntPtr pVertexStreamZeroData, uint VertexStreamZeroStride);
+            HRESULT SetNPatchMode(float nSegments);
 
-            /// <summary>
-            /// 繪製基本元素(使用者記憶體，索引版本)
-            /// </summary>
             [PreserveSig]
-            HRESULT DrawIndexedPrimitiveUP(int PrimitiveType, uint MinVertexIndex, uint NumVertices, uint PrimitiveCount, IntPtr pIndexData, uint IndexDataFormat, IntPtr pVertexStreamZeroData, uint VertexStreamZeroStride);
+            void GetNPatchMode();
 
-            /// <summary>
-            /// 處理頂點
-            /// </summary>
             [PreserveSig]
-            HRESULT ProcessVertices(uint SrcStartIndex, uint DestIndex, uint VertexCount, IntPtr pDestBuffer, IntPtr pVertexDecl, uint Flags);
+            HRESULT DrawPrimitive(_D3DPRIMITIVETYPE PrimitiveType, uint StartVertex, uint PrimitiveCount);
 
-            /// <summary>
-            /// 建立查詢
-            /// </summary>
             [PreserveSig]
-            HRESULT CreateQuery(int Type, out IntPtr ppQuery);
+            HRESULT DrawIndexedPrimitive(_D3DPRIMITIVETYPE unnamed__0, int BaseVertexIndex, uint MinVertexIndex, uint NumVertices, uint startIndex, uint primCount);
+
+            [PreserveSig]
+            HRESULT DrawPrimitiveUP(_D3DPRIMITIVETYPE PrimitiveType, uint PrimitiveCount, IntPtr pVertexStreamZeroData, uint VertexStreamZeroStride);
+
+            [PreserveSig]
+            HRESULT DrawIndexedPrimitiveUP(_D3DPRIMITIVETYPE PrimitiveType, uint MinVertexIndex, uint NumVertices, uint PrimitiveCount, IntPtr pIndexData, _D3DFORMAT IndexDataFormat, IntPtr pVertexStreamZeroData, uint VertexStreamZeroStride);
+
+            [PreserveSig]
+            HRESULT ProcessVertices(uint SrcStartIndex, uint DestIndex, uint VertexCount, IDirect3DVertexBuffer9 pDestBuffer, IDirect3DVertexDeclaration9 pVertexDecl, uint Flags);
+
+            [PreserveSig]
+            HRESULT CreateVertexDeclaration(ref _D3DVERTEXELEMENT9 pVertexElements, out IDirect3DVertexDeclaration9 ppDecl);
+
+            [PreserveSig]
+            HRESULT SetVertexDeclaration(IDirect3DVertexDeclaration9 pDecl);
+
+            [PreserveSig]
+            HRESULT GetVertexDeclaration(out IDirect3DVertexDeclaration9 ppDecl);
+
+            [PreserveSig]
+            HRESULT SetFVF(uint FVF);
+
+            [PreserveSig]
+            HRESULT GetFVF(ref uint pFVF);
+
+            [PreserveSig]
+            HRESULT CreateVertexShader(IntPtr pFunction, out IDirect3DVertexShader9 ppShader);
+
+            [PreserveSig]
+            HRESULT SetVertexShader(IDirect3DVertexShader9 pShader);
+
+            [PreserveSig]
+            HRESULT GetVertexShader(out IDirect3DVertexShader9 ppShader);
+
+            [PreserveSig]
+            HRESULT SetVertexShaderConstantF(uint StartRegister, IntPtr pConstantData, uint Vector4fCount);
+
+            [PreserveSig]
+            HRESULT GetVertexShaderConstantF(uint StartRegister, IntPtr pConstantData, uint Vector4fCount);
+
+            [PreserveSig]
+            HRESULT SetVertexShaderConstantI(uint StartRegister, IntPtr pConstantData, uint Vector4iCount);
+
+            [PreserveSig]
+            HRESULT GetVertexShaderConstantI(uint StartRegister, IntPtr pConstantData, uint Vector4iCount);
+
+            [PreserveSig]
+            HRESULT SetVertexShaderConstantB(uint StartRegister, IntPtr pConstantData, uint BoolCount);
+
+            [PreserveSig]
+            HRESULT GetVertexShaderConstantB(uint StartRegister, IntPtr pConstantData, uint BoolCount);
+
+            [PreserveSig]
+            HRESULT SetStreamSource(uint StreamNumber, IDirect3DVertexBuffer9 pStreamData, uint OffsetInBytes, uint Stride);
+
+            [PreserveSig]
+            HRESULT GetStreamSource(uint StreamNumber, out IDirect3DVertexBuffer9 ppStreamData, ref uint pOffsetInBytes, ref uint pStride);
+
+            [PreserveSig]
+            HRESULT SetStreamSourceFreq(uint StreamNumber, uint Setting);
+
+            [PreserveSig]
+            HRESULT GetStreamSourceFreq(uint StreamNumber, ref uint pSetting);
+
+            [PreserveSig]
+            HRESULT SetIndices(IDirect3DIndexBuffer9 pIndexData);
+
+            [PreserveSig]
+            HRESULT GetIndices(out IDirect3DIndexBuffer9 ppIndexData);
+
+            [PreserveSig]
+            HRESULT CreatePixelShader(IntPtr pFunction, out IDirect3DPixelShader9 ppShader);
+
+            [PreserveSig]
+            HRESULT SetPixelShader(IDirect3DPixelShader9 pShader);
+
+            [PreserveSig]
+            HRESULT GetPixelShader(out IDirect3DPixelShader9 ppShader);
+
+            [PreserveSig]
+            HRESULT SetPixelShaderConstantF(uint StartRegister, IntPtr pConstantData, uint Vector4fCount);
+
+            [PreserveSig]
+            HRESULT GetPixelShaderConstantF(uint StartRegister, IntPtr pConstantData, uint Vector4fCount);
+
+            [PreserveSig]
+            HRESULT SetPixelShaderConstantI(uint StartRegister, IntPtr pConstantData, uint Vector4iCount);
+
+            [PreserveSig]
+            HRESULT GetPixelShaderConstantI(uint StartRegister, IntPtr pConstantData, uint Vector4iCount);
+
+            [PreserveSig]
+            HRESULT SetPixelShaderConstantB(uint StartRegister, IntPtr pConstantData, uint BoolCount);
+
+            [PreserveSig]
+            HRESULT GetPixelShaderConstantB(uint StartRegister, IntPtr pConstantData, uint BoolCount);
+
+            [PreserveSig]
+            HRESULT DrawRectPatch(uint Handle, ref float pNumSegs, ref _D3DRECTPATCH_INFO pRectPatchInfo);
+
+            [PreserveSig]
+            HRESULT DrawTriPatch(uint Handle, ref float pNumSegs, ref _D3DTRIPATCH_INFO pTriPatchInfo);
+
+            [PreserveSig]
+            HRESULT DeletePatch(uint Handle);
+
+            [PreserveSig]
+            HRESULT CreateQuery(_D3DQUERYTYPE Type, out IDirect3DQuery9 ppQuery);
         }
 
-        /// <summary>
-        /// IDirect3DDevice9Ex 介面 - Enhanced Direct3D9 Device (Vista+)
-        /// GUID: {b18b10ce-2649-405a-8f3b-1708f6545290}
-        /// </summary>
         [ComImport]
-        [Guid("b18b10ce-2649-405a-8f3b-1708f6545290")]
+        [Guid("b18b10ce-2649-405a-870f-95f777d4313a")]
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
         public interface IDirect3DDevice9Ex : IDirect3DDevice9
         {
-            /// <summary>
-            /// 設定呈現狀態(Ex版本)
-            /// </summary>
             [PreserveSig]
-            HRESULT SetConvolutionMonoKernel(uint width, uint height, IntPtr rows, IntPtr columns);
+            new HRESULT TestCooperativeLevel();
 
-            /// <summary>
-            /// 複製紋理至記憶體
-            /// </summary>
             [PreserveSig]
-            HRESULT ComposeRects(IDirect3DSurface9 pSrc, IDirect3DSurface9 pDst, IDirect3DVertexBuffer9 pSrcRectDescs, uint NumRects, IDirect3DVertexBuffer9 pDstRectDescs, int Operation, int Xoffset, int Yoffset);
+            new uint GetAvailableTextureMem();
 
-            /// <summary>
-            /// 取得 GPU 執行緒優先度
-            /// </summary>
             [PreserveSig]
-            HRESULT GetGPUThreadPriority(out int pPriority);
+            new HRESULT EvictManagedResources();
 
-            /// <summary>
-            /// 設定 GPU 執行緒優先度
-            /// </summary>
+            [PreserveSig]
+            new HRESULT GetDirect3D(out IDirect3D9 ppD3D9);
+
+            [PreserveSig]
+            new HRESULT GetDeviceCaps(ref _D3DCAPS9 pCaps);
+
+            [PreserveSig]
+            new HRESULT GetDisplayMode(uint iSwapChain, ref _D3DDISPLAYMODE pMode);
+
+            [PreserveSig]
+            new HRESULT GetCreationParameters(IntPtr pParameters);
+
+            [PreserveSig]
+            new HRESULT SetCursorProperties(uint XHotSpot, uint YHotSpot, IDirect3DSurface9 pCursorBitmap);
+
+            [PreserveSig]
+            new void SetCursorPosition(int X, int Y, uint Flags);
+
+            [PreserveSig]
+            new bool ShowCursor(bool bShow);
+
+            [PreserveSig]
+            new HRESULT CreateAdditionalSwapChain(IntPtr pPresentationParameters, out IDirect3DSwapChain9 pSwapChain);
+
+            [PreserveSig]
+            new HRESULT GetSwapChain(uint iSwapChain, out IDirect3DSwapChain9 pSwapChain);
+
+            [PreserveSig]
+            new uint GetNumberOfSwapChains();
+
+            [PreserveSig]
+            new HRESULT Reset(IntPtr pPresentationParameters);
+
+            [PreserveSig]
+            new HRESULT Present(ref tagRECT pSourceRect, ref tagRECT pDestRect, IntPtr hDestWindowOverride, ref _RGNDATA pDirtyRegion);
+
+            [PreserveSig]
+            new HRESULT GetBackBuffer(uint iSwapChain, uint iBackBuffer, _D3DBACKBUFFER_TYPE Type, out IDirect3DSurface9 ppBackBuffer);
+
+            [PreserveSig]
+            new HRESULT GetRasterStatus(uint iSwapChain, ref _D3DRASTER_STATUS pRasterStatus);
+
+            [PreserveSig]
+            new HRESULT SetDialogBoxMode(bool bEnableDialogs);
+
+            [PreserveSig]
+            new void SetGammaRamp(uint iSwapChain, uint Flags, ref _D3DGAMMARAMP pRamp);
+
+            [PreserveSig]
+            new void GetGammaRamp(uint iSwapChain, ref _D3DGAMMARAMP pRamp);
+
+            [PreserveSig]
+            new HRESULT CreateTexture(uint Width, uint Height, uint Levels, uint Usage, _D3DFORMAT Format, _D3DPOOL Pool, out IDirect3DTexture9 ppTexture, out IntPtr pSharedHandle);
+
+            [PreserveSig]
+            new HRESULT CreateVolumeTexture(uint Width, uint Height, uint Depth, uint Levels, uint Usage, _D3DFORMAT Format, _D3DPOOL Pool, out IDirect3DVolumeTexture9 ppVolumeTexture, IntPtr pSharedHandle);
+
+            [PreserveSig]
+            new HRESULT CreateCubeTexture(uint EdgeLength, uint Levels, uint Usage, _D3DFORMAT Format, _D3DPOOL Pool, out IDirect3DCubeTexture9 ppCubeTexture, IntPtr pSharedHandle);
+
+            [PreserveSig]
+            new HRESULT CreateVertexBuffer(uint Length, uint Usage, uint FVF, _D3DPOOL Pool, out IDirect3DVertexBuffer9 ppVertexBuffer, IntPtr pSharedHandle);
+
+            [PreserveSig]
+            new HRESULT CreateIndexBuffer(uint Length, uint Usage, _D3DFORMAT Format, _D3DPOOL Pool, out IDirect3DIndexBuffer9 ppIndexBuffer, IntPtr pSharedHandle);
+
+            [PreserveSig]
+            new HRESULT CreateRenderTarget(uint Width, uint Height, _D3DFORMAT Format, _D3DMULTISAMPLE_TYPE MultiSample, uint MultisampleQuality, bool Lockable, out IDirect3DSurface9 ppSurface, IntPtr pSharedHandle);
+
+            [PreserveSig]
+            new HRESULT CreateDepthStencilSurface(uint Width, uint Height, _D3DFORMAT Format, _D3DMULTISAMPLE_TYPE MultiSample, uint MultisampleQuality, bool Discard, out IDirect3DSurface9 ppSurface, IntPtr pSharedHandle);
+
+            [PreserveSig]
+            new HRESULT UpdateSurface(IDirect3DSurface9 pSourceSurface, ref tagRECT pSourceRect, IDirect3DSurface9 pDestinationSurface, ref tagPOINT pDestPoint);
+
+            [PreserveSig]
+            new HRESULT UpdateTexture(IDirect3DBaseTexture9 pSourceTexture, IDirect3DBaseTexture9 pDestinationTexture);
+
+            [PreserveSig]
+            new HRESULT GetRenderTargetData(IDirect3DSurface9 pRenderTarget, IDirect3DSurface9 pDestSurface);
+
+            [PreserveSig]
+            new HRESULT GetFrontBufferData(uint iSwapChain, IDirect3DSurface9 pDestSurface);
+
+            [PreserveSig]
+            new HRESULT StretchRect(IDirect3DSurface9 pSourceSurface, ref tagRECT pSourceRect, IDirect3DSurface9 pDestSurface, ref tagRECT pDestRect, _D3DTEXTUREFILTERTYPE Filter);
+
+            [PreserveSig]
+            new HRESULT ColorFill(IDirect3DSurface9 pSurface, ref tagRECT pRect, uint color);
+
+            [PreserveSig]
+            new HRESULT CreateOffscreenPlainSurface(uint Width, uint Height, _D3DFORMAT Format, _D3DPOOL Pool, out IDirect3DSurface9 ppSurface, IntPtr pSharedHandle);
+
+            [PreserveSig]
+            new HRESULT SetRenderTarget(uint RenderTargetIndex, IDirect3DSurface9 pRenderTarget);
+
+            [PreserveSig]
+            new HRESULT GetRenderTarget(uint RenderTargetIndex, out IDirect3DSurface9 ppRenderTarget);
+
+            [PreserveSig]
+            new HRESULT SetDepthStencilSurface(IDirect3DSurface9 pNewZStencil);
+
+            [PreserveSig]
+            new HRESULT GetDepthStencilSurface(out IDirect3DSurface9 ppZStencilSurface);
+
+            [PreserveSig]
+            new HRESULT BeginScene();
+
+            [PreserveSig]
+            new HRESULT EndScene();
+
+            [PreserveSig]
+            new HRESULT Clear(uint Count, ref _D3DRECT pRects, uint Flags, uint Color, float Z, uint Stencil);
+
+            [PreserveSig]
+            new HRESULT SetTransform(_D3DTRANSFORMSTATETYPE State, ref _D3DMATRIX pMatrix);
+
+            [PreserveSig]
+            new HRESULT GetTransform(_D3DTRANSFORMSTATETYPE State, ref _D3DMATRIX pMatrix);
+
+            [PreserveSig]
+            new HRESULT MultiplyTransform(_D3DTRANSFORMSTATETYPE unnamed__0, ref _D3DMATRIX unnamed__1);
+
+            [PreserveSig]
+            new HRESULT SetViewport(ref _D3DVIEWPORT9 pViewport);
+
+            [PreserveSig]
+            new HRESULT GetViewport(ref _D3DVIEWPORT9 pViewport);
+
+            [PreserveSig]
+            new HRESULT SetMaterial(ref _D3DMATERIAL9 pMaterial);
+
+            [PreserveSig]
+            new HRESULT GetMaterial(ref _D3DMATERIAL9 pMaterial);
+
+            [PreserveSig]
+            new HRESULT SetLight(uint Index, ref _D3DLIGHT9 unnamed__1);
+
+            [PreserveSig]
+            new HRESULT GetLight(uint Index, ref _D3DLIGHT9 unnamed__1);
+
+            [PreserveSig]
+            new HRESULT LightEnable(uint Index, bool Enable);
+
+            [PreserveSig]
+            new HRESULT GetLightEnable(uint Index, ref bool pEnable);
+
+            [PreserveSig]
+            new HRESULT SetClipPlane(uint Index, ref float pPlane);
+
+            [PreserveSig]
+            new HRESULT GetClipPlane(uint Index, ref float pPlane);
+
+            [PreserveSig]
+            new HRESULT SetRenderState(_D3DRENDERSTATETYPE State, uint Value);
+
+            [PreserveSig]
+            new HRESULT GetRenderState(_D3DRENDERSTATETYPE State, ref uint pValue);
+
+            [PreserveSig]
+            new HRESULT CreateStateBlock(_D3DSTATEBLOCKTYPE Type, out IDirect3DStateBlock9 ppSB);
+
+            [PreserveSig]
+            new HRESULT BeginStateBlock();
+
+            [PreserveSig]
+            new HRESULT EndStateBlock(out IDirect3DStateBlock9 ppSB);
+
+            [PreserveSig]
+            new HRESULT SetClipStatus(ref _D3DCLIPSTATUS9 pClipStatus);
+
+            [PreserveSig]
+            new HRESULT GetClipStatus(ref _D3DCLIPSTATUS9 pClipStatus);
+
+            [PreserveSig]
+            new HRESULT GetTexture(uint Stage, out IDirect3DBaseTexture9 ppTexture);
+
+            [PreserveSig]
+            new HRESULT SetTexture(uint Stage, IDirect3DBaseTexture9 pTexture);
+
+            [PreserveSig]
+            new HRESULT GetTextureStageState(uint Stage, _D3DTEXTURESTAGESTATETYPE Type, ref uint pValue);
+
+            [PreserveSig]
+            new HRESULT SetTextureStageState(uint Stage, _D3DTEXTURESTAGESTATETYPE Type, uint Value);
+
+            [PreserveSig]
+            new HRESULT GetSamplerState(uint Sampler, _D3DSAMPLERSTATETYPE Type, ref uint pValue);
+
+            [PreserveSig]
+            new HRESULT SetSamplerState(uint Sampler, _D3DSAMPLERSTATETYPE Type, uint Value);
+
+            [PreserveSig]
+            new HRESULT ValidateDevice(ref uint pNumPasses);
+
+            [PreserveSig]
+            new HRESULT SetPaletteEntries(uint PaletteNumber, ref tagPALETTEENTRY pEntries);
+
+            [PreserveSig]
+            new HRESULT GetPaletteEntries(uint PaletteNumber, ref tagPALETTEENTRY pEntries);
+
+            [PreserveSig]
+            new HRESULT SetCurrentTexturePalette(uint PaletteNumber);
+
+            [PreserveSig]
+            new HRESULT GetCurrentTexturePalette(ref uint PaletteNumber);
+
+            [PreserveSig]
+            new HRESULT SetScissorRect(ref tagRECT pRect);
+
+            [PreserveSig]
+            new HRESULT GetScissorRect(ref tagRECT pRect);
+
+            [PreserveSig]
+            new HRESULT SetSoftwareVertexProcessing(bool bSoftware);
+
+            [PreserveSig]
+            new bool GetSoftwareVertexProcessing();
+
+            [PreserveSig]
+            new HRESULT SetNPatchMode(float nSegments);
+
+            [PreserveSig]
+            new void GetNPatchMode();
+
+            [PreserveSig]
+            new HRESULT DrawPrimitive(_D3DPRIMITIVETYPE PrimitiveType, uint StartVertex, uint PrimitiveCount);
+
+            [PreserveSig]
+            new HRESULT DrawIndexedPrimitive(_D3DPRIMITIVETYPE unnamed__0, int BaseVertexIndex, uint MinVertexIndex, uint NumVertices, uint startIndex, uint primCount);
+
+            [PreserveSig]
+            new HRESULT DrawPrimitiveUP(_D3DPRIMITIVETYPE PrimitiveType, uint PrimitiveCount, IntPtr pVertexStreamZeroData, uint VertexStreamZeroStride);
+
+            [PreserveSig]
+            new HRESULT DrawIndexedPrimitiveUP(_D3DPRIMITIVETYPE PrimitiveType, uint MinVertexIndex, uint NumVertices, uint PrimitiveCount, IntPtr pIndexData, _D3DFORMAT IndexDataFormat, IntPtr pVertexStreamZeroData, uint VertexStreamZeroStride);
+
+            [PreserveSig]
+            new HRESULT ProcessVertices(uint SrcStartIndex, uint DestIndex, uint VertexCount, IDirect3DVertexBuffer9 pDestBuffer, IDirect3DVertexDeclaration9 pVertexDecl, uint Flags);
+
+            [PreserveSig]
+            new HRESULT CreateVertexDeclaration(ref _D3DVERTEXELEMENT9 pVertexElements, out IDirect3DVertexDeclaration9 ppDecl);
+
+            [PreserveSig]
+            new HRESULT SetVertexDeclaration(IDirect3DVertexDeclaration9 pDecl);
+
+            [PreserveSig]
+            new HRESULT GetVertexDeclaration(out IDirect3DVertexDeclaration9 ppDecl);
+
+            [PreserveSig]
+            new HRESULT SetFVF(uint FVF);
+
+            [PreserveSig]
+            new HRESULT GetFVF(ref uint pFVF);
+
+            [PreserveSig]
+            new HRESULT CreateVertexShader(IntPtr pFunction, out IDirect3DVertexShader9 ppShader);
+
+            [PreserveSig]
+            new HRESULT SetVertexShader(IDirect3DVertexShader9 pShader);
+
+            [PreserveSig]
+            new HRESULT GetVertexShader(out IDirect3DVertexShader9 ppShader);
+
+            [PreserveSig]
+            new HRESULT SetVertexShaderConstantF(uint StartRegister, IntPtr pConstantData, uint Vector4fCount);
+
+            [PreserveSig]
+            new HRESULT GetVertexShaderConstantF(uint StartRegister, IntPtr pConstantData, uint Vector4fCount);
+
+            [PreserveSig]
+            new HRESULT SetVertexShaderConstantI(uint StartRegister, IntPtr pConstantData, uint Vector4iCount);
+
+            [PreserveSig]
+            new HRESULT GetVertexShaderConstantI(uint StartRegister, IntPtr pConstantData, uint Vector4iCount);
+
+            [PreserveSig]
+            new HRESULT SetVertexShaderConstantB(uint StartRegister, IntPtr pConstantData, uint BoolCount);
+
+            [PreserveSig]
+            new HRESULT GetVertexShaderConstantB(uint StartRegister, IntPtr pConstantData, uint BoolCount);
+
+            [PreserveSig]
+            new HRESULT SetStreamSource(uint StreamNumber, IDirect3DVertexBuffer9 pStreamData, uint OffsetInBytes, uint Stride);
+
+            [PreserveSig]
+            new HRESULT GetStreamSource(uint StreamNumber, out IDirect3DVertexBuffer9 ppStreamData, ref uint pOffsetInBytes, ref uint pStride);
+
+            [PreserveSig]
+            new HRESULT SetStreamSourceFreq(uint StreamNumber, uint Setting);
+
+            [PreserveSig]
+            new HRESULT GetStreamSourceFreq(uint StreamNumber, ref uint pSetting);
+
+            [PreserveSig]
+            new HRESULT SetIndices(IDirect3DIndexBuffer9 pIndexData);
+
+            [PreserveSig]
+            new HRESULT GetIndices(out IDirect3DIndexBuffer9 ppIndexData);
+
+            [PreserveSig]
+            new HRESULT CreatePixelShader(IntPtr pFunction, out IDirect3DPixelShader9 ppShader);
+
+            [PreserveSig]
+            new HRESULT SetPixelShader(IDirect3DPixelShader9 pShader);
+
+            [PreserveSig]
+            new HRESULT GetPixelShader(out IDirect3DPixelShader9 ppShader);
+
+            [PreserveSig]
+            new HRESULT SetPixelShaderConstantF(uint StartRegister, IntPtr pConstantData, uint Vector4fCount);
+
+            [PreserveSig]
+            new HRESULT GetPixelShaderConstantF(uint StartRegister, IntPtr pConstantData, uint Vector4fCount);
+
+            [PreserveSig]
+            new HRESULT SetPixelShaderConstantI(uint StartRegister, IntPtr pConstantData, uint Vector4iCount);
+
+            [PreserveSig]
+            new HRESULT GetPixelShaderConstantI(uint StartRegister, IntPtr pConstantData, uint Vector4iCount);
+
+            [PreserveSig]
+            new HRESULT SetPixelShaderConstantB(uint StartRegister, IntPtr pConstantData, uint BoolCount);
+
+            [PreserveSig]
+            new HRESULT GetPixelShaderConstantB(uint StartRegister, IntPtr pConstantData, uint BoolCount);
+
+            [PreserveSig]
+            new HRESULT DrawRectPatch(uint Handle, ref float pNumSegs, ref _D3DRECTPATCH_INFO pRectPatchInfo);
+
+            [PreserveSig]
+            new HRESULT DrawTriPatch(uint Handle, ref float pNumSegs, ref _D3DTRIPATCH_INFO pTriPatchInfo);
+
+            [PreserveSig]
+            new HRESULT DeletePatch(uint Handle);
+
+            [PreserveSig]
+            new HRESULT CreateQuery(_D3DQUERYTYPE Type, out IDirect3DQuery9 ppQuery);
+
+            [PreserveSig]
+            HRESULT SetConvolutionMonoKernel(uint width, uint height, ref float rows, ref float columns);
+
+            [PreserveSig]
+            HRESULT ComposeRects(IDirect3DSurface9 pSrc, IDirect3DSurface9 pDst, IDirect3DVertexBuffer9 pSrcRectDescs, uint NumRects, IDirect3DVertexBuffer9 pDstRectDescs, _D3DCOMPOSERECTSOP Operation, int Xoffset, int Yoffset);
+
+            [PreserveSig]
+            HRESULT PresentEx(ref tagRECT pSourceRect, ref tagRECT pDestRect, IntPtr hDestWindowOverride, ref _RGNDATA pDirtyRegion, uint dwFlags);
+
+            [PreserveSig]
+            HRESULT GetGPUThreadPriority(ref int pPriority);
+
             [PreserveSig]
             HRESULT SetGPUThreadPriority(int Priority);
 
-            /// <summary>
-            /// 設定視訊處理渲染狀態
-            /// </summary>
-            [PreserveSig]
-            HRESULT SetMaximumFrameLatency(uint MaxLatency);
-
-            /// <summary>
-            /// 取得視訊處理渲染狀態
-            /// </summary>
-            [PreserveSig]
-            HRESULT GetMaximumFrameLatency(out uint pMaxLatency);
-
-            /// <summary>
-            /// 檢查資源格式支援
-            /// </summary>
-            [PreserveSig]
-            HRESULT CheckResourceResidency(IntPtr pResourceArray, uint NumResources);
-
-            /// <summary>
-            /// 取得顯示模式顏色值 (更新版)
-            /// </summary>
-            [PreserveSig]
-            HRESULT GetDisplayModeEx(uint iSwapChain, out IntPtr pMode, out IntPtr pRotation);
-
-            /// <summary>
-            /// 建立紋理材質(增強版)
-            /// </summary>
-            [PreserveSig]
-            HRESULT CreateOffscreenPlainSurfaceEx(uint Width, uint Height, uint Format, uint Pool, out IDirect3DSurface9 ppSurface, IntPtr pSharedHandle, uint Usage);
-
-            /// <summary>
-            /// 建立渲染目標(增強版)
-            /// </summary>
-            [PreserveSig]
-            HRESULT CreateRenderTargetEx(uint Width, uint Height, uint Format, uint MultiSample, uint MultisampleQuality, [MarshalAs(UnmanagedType.Bool)] bool Lockable, out IDirect3DSurface9 ppSurface, IntPtr pSharedHandle, uint Usage);
-
-            /// <summary>
-            /// 建立深度/樣板表面(增強版)
-            /// </summary>
-            [PreserveSig]
-            HRESULT CreateDepthStencilSurfaceEx(uint Width, uint Height, uint Format, uint MultiSample, uint MultisampleQuality, [MarshalAs(UnmanagedType.Bool)] bool Discard, out IDirect3DSurface9 ppSurface, IntPtr pSharedHandle, uint Usage);
-
-            /// <summary>
-            /// 重設設備(增強版)
-            /// </summary>
-            [PreserveSig]
-            HRESULT ResetEx(IntPtr pPresentationParameters, IntPtr pFullscreenDisplayMode);
-
-            /// <summary>
-            /// 取得顯示表面鎖定矩形(增強版)
-            /// </summary>
-            [PreserveSig]
-            HRESULT GetDisplaySurfaceData(IDirect3DSurface9 pDestSurface);
-
-            /// <summary>
-            /// 等待 GPU 完成指定查詢
-            /// </summary>
             [PreserveSig]
             HRESULT WaitForVBlank(uint iSwapChain);
 
-            /// <summary>
-            /// 檢查程式設計相關支援
-            /// </summary>
+            [PreserveSig]
+            HRESULT CheckResourceResidency(out IDirect3DResource9 pResourceArray, uint NumResources);
+
+            [PreserveSig]
+            HRESULT SetMaximumFrameLatency(uint MaxLatency);
+
+            [PreserveSig]
+            HRESULT GetMaximumFrameLatency(ref uint pMaxLatency);
+
             [PreserveSig]
             HRESULT CheckDeviceState(IntPtr hDestinationWindow);
-        }
 
+            [PreserveSig]
+            HRESULT CreateRenderTargetEx(uint Width, uint Height, _D3DFORMAT Format, _D3DMULTISAMPLE_TYPE MultiSample, uint MultisampleQuality, bool Lockable, out IDirect3DSurface9 ppSurface, IntPtr pSharedHandle, uint Usage);
+
+            [PreserveSig]
+            HRESULT CreateOffscreenPlainSurfaceEx(uint Width, uint Height, _D3DFORMAT Format, _D3DPOOL Pool, out IDirect3DSurface9 ppSurface, IntPtr pSharedHandle, uint Usage);
+
+            [PreserveSig]
+            HRESULT CreateDepthStencilSurfaceEx(uint Width, uint Height, _D3DFORMAT Format, _D3DMULTISAMPLE_TYPE MultiSample, uint MultisampleQuality, bool Discard, out IDirect3DSurface9 ppSurface, IntPtr pSharedHandle, uint Usage);
+
+            [PreserveSig]
+            HRESULT ResetEx(IntPtr pPresentationParameters, ref D3DDISPLAYMODEEX pFullscreenDisplayMode);
+
+            [PreserveSig]
+            HRESULT GetDisplayModeEx(uint iSwapChain, ref D3DDISPLAYMODEEX pMode, ref D3DDISPLAYROTATION pRotation);
+        }
         /// <summary>
         /// IDirect3DSurface9 介面 - Direct3D9 表面
         /// GUID: {0cfbaf3a-9ff6-429a-99b3-a2796af8b89b}

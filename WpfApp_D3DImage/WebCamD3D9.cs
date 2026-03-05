@@ -134,7 +134,7 @@ namespace WpfApp_D3DImage
                 desc.Height,
                 1,
                 DirectN.Constants.D3DUSAGE_RENDERTARGET,
-                (uint)desc.Format,
+                desc.Format,
                 (uint)DirectN._D3DPOOL.D3DPOOL_DEFAULT,
                 out pRenderTexture,
                 IntPtr.Zero
@@ -151,7 +151,7 @@ namespace WpfApp_D3DImage
                 desc.Height,
                 1,
                 DirectN.Constants.D3DUSAGE_RENDERTARGET,
-                (uint)desc.Format,
+                desc.Format,
                 D3DPOOL_DEFAULT,
                 out pRenderTexture,
                 IntPtr.Zero
@@ -275,8 +275,9 @@ namespace WpfApp_D3DImage
                     // 將 IntPtr 轉換為受控介面
                     IMFActivate activate = (IMFActivate)Marshal.GetObjectForIUnknown(ptrs[i]);
 
-                    DirectN.IMFActivate dd;
-                    ppSource = Marshal.GetObjectForIUnknown(ptrs[i]) as IMFMediaSource;
+                    
+                    activate.ActivateObject(typeof(IMFMediaSource).GUID, out var obj);
+                    ppSource = obj as IMFMediaSource;
                     //ppSource = activate.ActivateObject<IMFMediaSource>().Object;
                     break;
                     // 這裡可以讀取設備名稱或啟動設備...
