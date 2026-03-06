@@ -137,28 +137,13 @@ namespace WpfApp_D3DImage
                 desc.Format,
                 (uint)DirectN._D3DPOOL.D3DPOOL_DEFAULT,
                 out pRenderTexture,
-                IntPtr.Zero
+                out IntPtr aa
             );
 
             pRenderTexture.GetSurfaceLevel(0, out pRenderSurface);
         }
 
-        protected void CreateWPFCompatibleSurface(DirectN._D3DSURFACE_DESC desc)
-        {
-            // 關鍵參數設定
-            HRESULT hr = pDeviceEx.CreateTexture(
-                desc.Width,
-                desc.Height,
-                1,
-                DirectN.Constants.D3DUSAGE_RENDERTARGET,
-                desc.Format,
-                D3DPOOL_DEFAULT,
-                out pRenderTexture,
-                IntPtr.Zero
-            );
 
-            pRenderTexture.GetSurfaceLevel(0, out pRenderSurface);
-        }
 
         WindowInteropHelper m_Helper;
         void InitD3D9Ex()
