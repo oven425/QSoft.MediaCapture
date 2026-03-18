@@ -123,11 +123,14 @@ namespace WpfApp_D3DImage
 
         protected IDirect3DTexture9 pRenderTexture = null;
         protected IDirect3DSurface9 pRenderSurface = null;
-
+        int m_Width = 1280;
+        int m_Height = 720;
+        public tagRECT m_Rect = new tagRECT(0, 0, 1280, 720);
         protected void CreateWPFCompatibleSurface(IDirect3DSurface9 surface)
         {
             _D3DSURFACE_DESC desc = new _D3DSURFACE_DESC();
             surface.GetDesc(ref desc);
+            m_Rect = new tagRECT(0, 0, (int)desc.Width, (int)desc.Height);
             // 關鍵參數設定
             HRESULT hr = pDeviceEx.CreateTexture(
                 desc.Width,
@@ -194,41 +197,6 @@ namespace WpfApp_D3DImage
         }
 
 
-        //void InitD3D9()
-        //{
-        //    pD3D = Direct3DCreate9(DirectN.Constants.D3D_SDK_VERSION);
-        //    DirectN._D3DPRESENT_PARAMETERS_64 d3dpp = new DirectN._D3DPRESENT_PARAMETERS_64
-        //    {
-        //        Windowed = true,
-        //        SwapEffect = _D3DSWAPEFFECT.D3DSWAPEFFECT_DISCARD,
-        //        hDeviceWindow = DirectN.WindowsFunctions.GetDesktopWindow()
-        //    };
-        //    IntPtr unmanagedAddr = Marshal.AllocHGlobal(Marshal.SizeOf(d3dpp));
-        //    Marshal.StructureToPtr<DirectN._D3DPRESENT_PARAMETERS_64>(d3dpp, unmanagedAddr, false);
-        //    HRESULT hr = pD3D.CreateDevice(
-        //        DirectN.Constants.D3DADAPTER_DEFAULT,
-        //        DirectN._D3DDEVTYPE.D3DDEVTYPE_HAL,
-        //        DirectN.WindowsFunctions.GetDesktopWindow(),
-        //        DirectN.Constants.D3DCREATE_HARDWARE_VERTEXPROCESSING | DirectN.Constants.D3DCREATE_FPU_PRESERVE | DirectN.Constants.D3DCREATE_MULTITHREADED,
-        //        unmanagedAddr,
-        //        out pDevice
-        //    );
-        //    uint resetToken = 0;
-        //    hr = DXVA2CreateDirect3DDeviceManager9(out resetToken, out pDeviceManager);
-        //    //if (FAILED(hr))
-        //    //{
-        //    //    pDevice->Release();
-        //    //    return;
-        //    //}
-
-        //    hr = pDeviceManager.ResetDevice(pDevice, resetToken);
-        //    //if (FAILED(hr))
-        //    //{
-        //    //    pDeviceManager->Release();
-        //    //    pDevice->Release();
-        //    //    return;
-        //    //}
-        //}
 
         protected HRESULT CreateVideoDeviceSource(out IMFMediaSource ppSource)
         {
@@ -275,21 +243,6 @@ namespace WpfApp_D3DImage
 
             return hr;
         }
-        //[ComImport]
-        //[Guid("a0cade0f-06d5-4cf4-a1c7-f3cdd725aa75")]
-        //[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        //public interface IDirect3DDeviceManager9
-        //{
-        //    int ResetDevice(IDirect3DDevice9 pDevice, uint resetToken);
-        //    int OpenDeviceHandle(out IntPtr phDevice);
-        //    int CloseDeviceHandle(IntPtr hDevice);
-        //    int TestDevice(IntPtr hDevice);
-        //    int LockDevice(IntPtr hDevice, out IntPtr ppDevice, bool fBlock);
-        //    int UnlockDevice(IntPtr hDevice, bool fSaveState);
-        //    int GetVideoService(IntPtr hDevice, ref Guid riid, out IntPtr ppService);
-        //}
-        //[DllImport("dxva2", ExactSpelling = true)]
-        //public static extern int DXVA2CreateDirect3DDeviceManager9(out uint pResetToken, out IDirect3DDeviceManager9 ppDeviceManager);
 
     }
 }

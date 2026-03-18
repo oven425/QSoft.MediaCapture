@@ -14,5 +14,6 @@
                 <i:D3DImage x:Name="d3dimage"/>
             </Image.Source>
         </Image>
+        <TextBlock x:Name="textblock_info" Foreground="Pink"/>
     </Grid>
 </Window>

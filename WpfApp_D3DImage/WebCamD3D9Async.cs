@@ -23,11 +23,12 @@ namespace WpfApp_D3DImage
         public void Start()
         {
             var hr = CreateVideoDeviceSource(out var pSource);
+            var sourcex = pSource as DirectN.IMFSourceReaderEx;
             //if (SUCCEEDED(hr))
 
             IMFAttributes pAttributes = null;
             hr = MFCreateAttributes(out pAttributes, 6);
-            pAttributes.SetUINT32(DirectN.MFConstants.MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, 1);
+            //pAttributes.SetUINT32(DirectN.MFConstants.MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, 1);
             pAttributes.SetUINT32(DirectN.MFConstants.MF_SOURCE_READER_DISABLE_DXVA, 0);
             pAttributes.SetUINT32(DirectN.MFConstants.MF_SOURCE_READER_ENABLE_VIDEO_PROCESSING, 0);
             pAttributes.SetUINT32(DirectN.MFConstants.MF_SOURCE_READER_ENABLE_ADVANCED_VIDEO_PROCESSING, 1);
@@ -36,16 +37,40 @@ namespace WpfApp_D3DImage
 
 
             hr = MFCreateSourceReaderFromMediaSource(pSource, pAttributes, out m_pSourceReader);
-
-            hr = m_pSourceReader.GetNativeMediaType(0xFFFFFFFC, 0, out var pMediaType);
-            //GUID subtype;
-            hr = pMediaType.GetGUID(DirectN.MFConstants.MF_MT_SUBTYPE, out var subtype);
-            hr = pMediaType.SetGUID(DirectN.MFConstants.MF_MT_SUBTYPE, DirectN.MFConstants.MFVideoFormat_ARGB32);
+            List<(IMFMediaType, uint width, uint height)> mediaTypes = new List<(IMFMediaType, uint width, uint height)>();
+            uint index = 0;
+            while (true)
+            {
+                hr = m_pSourceReader.GetNativeMediaType(0xFFFFFFFC, index, out var pMediaType);
+                if(hr == 0 )
+                {
+                    pMediaType.TryGetSize(DirectN.MFConstants.MF_MT_FRAME_SIZE, out var width, out var height);
+                    hr = pMediaType.GetGUID(DirectN.MFConstants.MF_MT_SUBTYPE, out var subtype);
+                    System.Diagnostics.Trace.WriteLine($"MediaType {index}: subtype={subtype}, width={width}, height={height}");
+                    mediaTypes.Add((pMediaType, width, height));
+                }
+                else
+                {
+                    break;
+                }
+                index++;
+            }
+            var pMediaType1 = mediaTypes.OrderBy(x => x.width * x.height).Last();
             hr = DirectN.MFFunctions.MFCreateMediaType(out var tt);
             tt.SetGUID(DirectN.MFConstants.MF_MT_MAJOR_TYPE, DirectN.MFConstants.MFMediaType_Video);
             tt.SetGUID(DirectN.MFConstants.MF_MT_SUBTYPE, DirectN.MFConstants.MFVideoFormat_RGB32);
+            tt.SetSize(DirectN.MFConstants.MF_MT_FRAME_SIZE, pMediaType1.width, pMediaType1.height);
             hr = m_pSourceReader.SetCurrentMediaType(0xFFFFFFFC, IntPtr.Zero, tt);
-
+            IMFSourceReaderEx sourceReaderEx = m_pSourceReader as IMFSourceReaderEx;
+            var videoprocesstype = Type.GetTypeFromCLSID(DirectN.MFConstants.CLSID_VideoProcessorMFT);
+            var videoprocessmft = Activator.CreateInstance(videoprocesstype) as IMFVideoProcessorControl;
+            hr = videoprocessmft.SetMirror(_MF_VIDEO_PROCESSOR_MIRROR.MIRROR_HORIZONTAL);
+            if (videoprocessmft is IMFTransform mft)
+            {
+                hr = mft.SetInputType(0, tt, 0);
+                hr = mft.SetOutputType(0, tt, 0);
+            }
+            hr = sourceReaderEx.AddTransformForStream(0xFFFFFFFC, videoprocessmft);
             hr = m_pSourceReader.ReadSample(0xFFFFFFFC, 0, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
 
         }
@@ -78,11 +103,9 @@ namespace WpfApp_D3DImage
                             }
 
 
-                            pDeviceEx.StretchRect(
-                surface,
-                new tagRECT(0, 0, 1280, 720), pRenderSurface, new tagRECT(0, 0, 1280, 720), (uint)DirectN._D3DTEXTUREFILTERTYPE.D3DTEXF_NONE);
+                            pDeviceEx.StretchRect(surface, m_Rect, pRenderSurface, m_Rect, (uint)DirectN._D3DTEXTUREFILTERTYPE.D3DTEXF_NONE);
                             this.m_D3DImage.Lock();
-                            this.m_D3DImage.AddDirtyRect(new Int32Rect(0, 0, 1280, 720));
+                            this.m_D3DImage.AddDirtyRect(new Int32Rect(0, 0, m_Rect.right, m_Rect.bottom));
                             this.m_D3DImage.Unlock();
                             Marshal.ReleaseComObject(surface);
                             Marshal.ReleaseComObject(pBuffer);

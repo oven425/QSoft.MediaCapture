@@ -13,6 +13,54 @@ namespace WpfApp_D3DImage
         #region Media Foundation DLL Imports
 
         [ComImport]
+        [Guid("7b981cf0-560e-4116-9875-b099895f23d7")]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        public interface IMFSourceReaderEx : IMFSourceReader
+        {
+            [PreserveSig]
+            new HRESULT GetStreamSelection(uint dwStreamIndex, out bool pfSelected);
+
+            [PreserveSig]
+            new HRESULT SetStreamSelection(uint dwStreamIndex, bool fSelected);
+
+            [PreserveSig]
+            new HRESULT GetNativeMediaType(uint dwStreamIndex, uint dwMediaTypeIndex, out IMFMediaType ppMediaType);
+
+            [PreserveSig]
+            new HRESULT GetCurrentMediaType(uint dwStreamIndex, out IMFMediaType ppMediaType);
+
+            [PreserveSig]
+            new HRESULT SetCurrentMediaType(uint dwStreamIndex, IntPtr pdwReserved, IMFMediaType pMediaType);
+
+            [PreserveSig]
+            new HRESULT SetCurrentPosition([MarshalAs(UnmanagedType.LPStruct)] Guid guidTimeFormat, [In][Out] PROPVARIANT varPosition);
+
+            [PreserveSig]
+            new HRESULT ReadSample(uint dwStreamIndex, uint dwControlFlags, IntPtr pdwActualStreamIndex, IntPtr pdwStreamFlags, IntPtr pllTimestamp, out IMFSample ppSample);
+
+            [PreserveSig]
+            new HRESULT Flush(uint dwStreamIndex);
+
+            [PreserveSig]
+            new HRESULT GetServiceForStream(uint dwStreamIndex, [MarshalAs(UnmanagedType.LPStruct)] Guid guidService, [MarshalAs(UnmanagedType.LPStruct)] Guid riid, out IntPtr ppvObject);
+
+            [PreserveSig]
+            new HRESULT GetPresentationAttribute(uint dwStreamIndex, [MarshalAs(UnmanagedType.LPStruct)] Guid guidAttribute, [In][Out] PROPVARIANT pvarAttribute);
+
+            [PreserveSig]
+            HRESULT SetNativeMediaType(uint dwStreamIndex, IMFMediaType pMediaType, out uint pdwStreamFlags);
+
+            [PreserveSig]
+            HRESULT AddTransformForStream(uint dwStreamIndex, [MarshalAs(UnmanagedType.IUnknown)] object pTransformOrActivate);
+
+            [PreserveSig]
+            HRESULT RemoveAllTransformsForStream(uint dwStreamIndex);
+
+            [PreserveSig]
+            HRESULT GetTransformForStream(uint dwStreamIndex, uint dwTransformIndex, out Guid pGuidCategory, out IMFTransform ppTransform);
+        }
+
+        [ComImport]
         [Guid("7fee9e9a-4a89-47a6-899c-b6a53a70fb67")]
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
         public interface IMFActivate : IMFAttributes
@@ -528,85 +576,26 @@ namespace WpfApp_D3DImage
 
         #endregion
 
-        #region Media Foundation Constants (常用的 GUID)
-
-        /// <summary>
-        /// 表示視訊格式 RGB32 的 GUID
-        /// </summary>
+        #region Media Foundation Constants
         public static readonly Guid MFVideoFormat_RGB32 = DirectN.MFConstants.MFVideoFormat_RGB32;
-
-        /// <summary>
-        /// 表示視訊格式 ARGB32 的 GUID
-        /// </summary>
         public static readonly Guid MFVideoFormat_ARGB32 = DirectN.MFConstants.MFVideoFormat_ARGB32;
-
-        /// <summary>
-        /// 媒體類型主要類型屬性
-        /// </summary>
         public static readonly Guid MF_MT_MAJOR_TYPE = DirectN.MFConstants.MF_MT_MAJOR_TYPE;
-
-        /// <summary>
-        /// 媒體類型子類型屬性
-        /// </summary>
         public static readonly Guid MF_MT_SUBTYPE = DirectN.MFConstants.MF_MT_SUBTYPE;
-
-        /// <summary>
-        /// 來源讀取器非同步回調屬性
-        /// </summary>
         public static readonly Guid MF_SOURCE_READER_ASYNC_CALLBACK = DirectN.MFConstants.MF_SOURCE_READER_ASYNC_CALLBACK;
-
-        /// <summary>
-        /// 來源讀取器 D3D 設備管理器屬性
-        /// </summary>
         public static readonly Guid MF_SOURCE_READER_D3D_MANAGER = DirectN.MFConstants.MF_SOURCE_READER_D3D_MANAGER;
-
-        /// <summary>
-        /// 來源讀取器禁用 DXVA 屬性
-        /// </summary>
         public static readonly Guid MF_SOURCE_READER_DISABLE_DXVA = DirectN.MFConstants.MF_SOURCE_READER_DISABLE_DXVA;
-
-        /// <summary>
-        /// 來源讀取器啟用視訊處理屬性
-        /// </summary>
         public static readonly Guid MF_SOURCE_READER_ENABLE_VIDEO_PROCESSING = DirectN.MFConstants.MF_SOURCE_READER_ENABLE_VIDEO_PROCESSING;
-
-        /// <summary>
-        /// 來源讀取器啟用高級視訊處理屬性
-        /// </summary>
         public static readonly Guid MF_SOURCE_READER_ENABLE_ADVANCED_VIDEO_PROCESSING = DirectN.MFConstants.MF_SOURCE_READER_ENABLE_ADVANCED_VIDEO_PROCESSING;
-
-        /// <summary>
-        /// 緩衝區服務 GUID - 用於從 IMFMediaBuffer 獲取 Direct3D Surface
-        /// </summary>
         public static readonly Guid MR_BUFFER_SERVICE = DirectN.MFConstants.MR_BUFFER_SERVICE;
-
-        /// <summary>
-        /// Direct3D Surface GUID - 用於 MFGetService 查詢
-        /// </summary>
         public static readonly Guid IID_IDirect3DSurface9 = new Guid("0cfbaf3a-9ff6-429a-99b3-a2796af8b89b");
-
-        /// <summary>
-        /// 讀寫啟用硬體轉換屬性
-        /// </summary>
         public static readonly Guid MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS = DirectN.MFConstants.MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS;
 
         #endregion
 
-        #region 來源讀取器常數
+        #region
 
-        /// <summary>
-        /// 來源讀取器第一個視訊串流索引
-        /// </summary>
         public const uint MF_SOURCE_READER_FIRST_VIDEO_STREAM = 0xFFFFFFFC;
-
-        /// <summary>
-        /// 來源讀取器所有流索引
-        /// </summary>
         public const uint MF_SOURCE_READER_ALL_STREAMS = 0xFFFFFFFE;
-
-        /// <summary>
-        /// 來源讀取器媒體類型索引
-        /// </summary>
         public const uint MF_SOURCE_READER_CURRENT_TYPE_INDEX = 0xFFFFFFFF;
 
         #endregion

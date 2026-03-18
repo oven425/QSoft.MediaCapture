@@ -246,7 +246,7 @@ namespace WpfAppNET472
             {
                 this.m_MainUI.VideoCaptureFormats.Add(oo);
             }
-            this.m_MainUI.RecordFormat = this.m_MainUI.VideoCaptureFormats[0];
+            this.m_MainUI.RecordFormat = this.m_MainUI.VideoCaptureFormats.FirstOrDefault();
             //await m_WebCam.SetMediaStreamPropertiesAsync(this.m_MainUI.VideoCaptureFormats[0]);
 
             var photoss = m_WebCam.GetAvailableMediaStreamProperties(MF_CAPTURE_ENGINE_STREAM_CATEGORY.MF_CAPTURE_ENGINE_STREAM_CATEGORY_PHOTO_DEPENDENT);

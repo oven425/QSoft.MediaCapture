@@ -1,5 +1,0 @@
-{
-  "allowUnsafe": true,
-  "generatePollFreeMarshaling": true,
-  "emitComInterfaces": true
-}
