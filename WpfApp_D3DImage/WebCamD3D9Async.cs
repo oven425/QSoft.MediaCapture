@@ -11,7 +11,7 @@ using System.Windows.Interop;
 
 namespace WpfApp_D3DImage
 {
-    public class WebCamD3D9Async : WebCamD3D9, WpfApp_D3DImage.WebCamD3D9Async.IMFSourceReaderCallback
+    public class WebCamD3D9Async : WebCamD3D9, WpfApp_D3DImage.WebCamD3D9.IMFSourceReaderCallback
     {
         IMFSourceReader m_pSourceReader;
 
@@ -135,60 +135,60 @@ namespace WpfApp_D3DImage
             return HRESULTS.S_OK;
         }
 
-        [DllImport("mfreadwrite", ExactSpelling = true)]
-        static extern HRESULT MFCreateSourceReaderFromMediaSource(IMFMediaSource pMediaSource, IMFAttributes pAttributes, out IMFSourceReader ppSourceReader);
+        //[DllImport("mfreadwrite", ExactSpelling = true)]
+        //static extern HRESULT MFCreateSourceReaderFromMediaSource(IMFMediaSource pMediaSource, IMFAttributes pAttributes, out IMFSourceReader ppSourceReader);
 
 
-        [ComImport]
-        [Guid("70ae66f2-c809-4e4f-8915-bdcb406b7993")]
-        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        public interface IMFSourceReader
-        {
-            [PreserveSig]
-            HRESULT GetStreamSelection(uint dwStreamIndex, out bool pfSelected);
+        //[ComImport]
+        //[Guid("70ae66f2-c809-4e4f-8915-bdcb406b7993")]
+        //[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        //public interface IMFSourceReader
+        //{
+        //    [PreserveSig]
+        //    HRESULT GetStreamSelection(uint dwStreamIndex, out bool pfSelected);
 
-            [PreserveSig]
-            HRESULT SetStreamSelection(uint dwStreamIndex, bool fSelected);
+        //    [PreserveSig]
+        //    HRESULT SetStreamSelection(uint dwStreamIndex, bool fSelected);
 
-            [PreserveSig]
-            HRESULT GetNativeMediaType(uint dwStreamIndex, uint dwMediaTypeIndex, out IMFMediaType ppMediaType);
+        //    [PreserveSig]
+        //    HRESULT GetNativeMediaType(uint dwStreamIndex, uint dwMediaTypeIndex, out IMFMediaType ppMediaType);
 
-            [PreserveSig]
-            HRESULT GetCurrentMediaType(uint dwStreamIndex, out IMFMediaType ppMediaType);
+        //    [PreserveSig]
+        //    HRESULT GetCurrentMediaType(uint dwStreamIndex, out IMFMediaType ppMediaType);
 
-            [PreserveSig]
-            HRESULT SetCurrentMediaType(uint dwStreamIndex, IntPtr pdwReserved, IMFMediaType pMediaType);
+        //    [PreserveSig]
+        //    HRESULT SetCurrentMediaType(uint dwStreamIndex, IntPtr pdwReserved, IMFMediaType pMediaType);
 
-            [PreserveSig]
-            HRESULT SetCurrentPosition([MarshalAs(UnmanagedType.LPStruct)] Guid guidTimeFormat, [In][Out] PROPVARIANT varPosition);
+        //    [PreserveSig]
+        //    HRESULT SetCurrentPosition([MarshalAs(UnmanagedType.LPStruct)] Guid guidTimeFormat, [In][Out] PROPVARIANT varPosition);
 
-            [PreserveSig]
-            HRESULT ReadSample(uint dwStreamIndex, uint dwControlFlags, IntPtr pdwActualStreamIndex, IntPtr pdwStreamFlags, IntPtr pllTimestamp, IntPtr ppSample);
+        //    [PreserveSig]
+        //    HRESULT ReadSample(uint dwStreamIndex, uint dwControlFlags, IntPtr pdwActualStreamIndex, IntPtr pdwStreamFlags, IntPtr pllTimestamp, IntPtr ppSample);
 
-            [PreserveSig]
-            HRESULT Flush(uint dwStreamIndex);
+        //    [PreserveSig]
+        //    HRESULT Flush(uint dwStreamIndex);
 
-            [PreserveSig]
-            HRESULT GetServiceForStream(uint dwStreamIndex, [MarshalAs(UnmanagedType.LPStruct)] Guid guidService, [MarshalAs(UnmanagedType.LPStruct)] Guid riid, out IntPtr ppvObject);
+        //    [PreserveSig]
+        //    HRESULT GetServiceForStream(uint dwStreamIndex, [MarshalAs(UnmanagedType.LPStruct)] Guid guidService, [MarshalAs(UnmanagedType.LPStruct)] Guid riid, out IntPtr ppvObject);
 
-            [PreserveSig]
-            HRESULT GetPresentationAttribute(uint dwStreamIndex, [MarshalAs(UnmanagedType.LPStruct)] Guid guidAttribute, [In][Out] PROPVARIANT pvarAttribute);
-        }
+        //    [PreserveSig]
+        //    HRESULT GetPresentationAttribute(uint dwStreamIndex, [MarshalAs(UnmanagedType.LPStruct)] Guid guidAttribute, [In][Out] PROPVARIANT pvarAttribute);
+        //}
 
-        [ComImport]
-        [Guid("deec8d99-fa1d-4d82-84c2-2c8969944867")]
-        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        public interface IMFSourceReaderCallback
-        {
-            [PreserveSig]
-            HRESULT OnReadSample(HRESULT hrStatus, uint dwStreamIndex, uint dwStreamFlags, long llTimestamp, IntPtr pSampleptr);
+        //[ComImport]
+        //[Guid("deec8d99-fa1d-4d82-84c2-2c8969944867")]
+        //[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        //public interface IMFSourceReaderCallback
+        //{
+        //    [PreserveSig]
+        //    HRESULT OnReadSample(HRESULT hrStatus, uint dwStreamIndex, uint dwStreamFlags, long llTimestamp, IntPtr pSampleptr);
 
-            [PreserveSig]
-            HRESULT OnFlush(uint dwStreamIndex);
+        //    [PreserveSig]
+        //    HRESULT OnFlush(uint dwStreamIndex);
 
-            [PreserveSig]
-            HRESULT OnEvent(uint dwStreamIndex, IMFMediaEvent pEvent);
-        }
+        //    [PreserveSig]
+        //    HRESULT OnEvent(uint dwStreamIndex, IMFMediaEvent pEvent);
+        //}
 
     }
 }

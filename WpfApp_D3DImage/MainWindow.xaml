@@ -9,11 +9,22 @@
         xmlns:i="clr-namespace:System.Windows.Interop;assembly=PresentationCore"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <Image>
-            <Image.Source>
-                <i:D3DImage x:Name="d3dimage"/>
-            </Image.Source>
-        </Image>
-        <TextBlock x:Name="textblock_info" Foreground="Pink"/>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Image>
+                <Image.Source>
+                    <i:D3DImage x:Name="d3dimage"/>
+                </Image.Source>
+            </Image>
+            <TextBlock x:Name="textblock_info" Foreground="Pink"/>
+        </Grid>
+        <StackPanel Grid.Row="1">
+            <ComboBox>
+                
+            </ComboBox>
+        </StackPanel>
     </Grid>
 </Window>
