@@ -1,4 +1,5 @@
 ﻿using DirectN;
+using QSoft.MediaCapture.WPF;
 using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
@@ -29,10 +30,10 @@ namespace WpfApp_D3DImage
             InitializeComponent();
         }
 
-        WebCamD3D9Async m_WebCamD3D9Async;
+        WebCamD3D9 m_WebCamD3D9Async;
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            this.m_WebCamD3D9Async = new WebCamD3D9Async(this.d3dimage, new WindowInteropHelper(System.Windows.Application.Current.MainWindow));
+            this.m_WebCamD3D9Async = new WebCamD3D9(this.d3dimage, new WindowInteropHelper(System.Windows.Application.Current.MainWindow));
             m_WebCamD3D9Async.Start();
             await Task.Delay(3000);
             this.textblock_info.Text = $"{m_WebCamD3D9Async.m_Rect.right}x{m_WebCamD3D9Async.m_Rect.bottom}";

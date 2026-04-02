@@ -2,7 +2,7 @@ using DirectN;
 using System;
 using System.Runtime.InteropServices;
 
-namespace WpfApp_D3DImage
+namespace QSoft.MediaCapture.WPF
 {
     /// <summary>
     /// Direct3D9 DLL Import ©M COM Interface ©w¸q
@@ -894,7 +894,13 @@ namespace WpfApp_D3DImage
             HRESULT GetDisplayModeEx(uint iSwapChain, ref D3DDISPLAYMODEEX pMode, ref D3DDISPLAYROTATION pRotation);
         }
 
-        [ComImport]
+        public struct D3DLOCKED_RECT 
+        {
+            public int Pitch;
+            public IntPtr pBits;
+        }
+
+    [ComImport]
         [Guid("0cfbaf3a-9ff6-429a-99b3-a2796af8b89b")]
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
         public interface IDirect3DSurface9 : IDirect3DResource9
@@ -930,7 +936,7 @@ namespace WpfApp_D3DImage
             HRESULT GetDesc(ref _D3DSURFACE_DESC pDesc);
 
             [PreserveSig]
-            HRESULT LockRect(IntPtr pLockedRect, IntPtr pRect, uint Flags);
+            HRESULT LockRect(out D3DLOCKED_RECT pLockedRect, tagRECT pRect, uint Flags);
 
             [PreserveSig]
             HRESULT UnlockRect();

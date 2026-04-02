@@ -69,7 +69,6 @@
     <Compile Include="D3D9DllImport.cs" />
     <Compile Include="MF_DllImport.cs" />
     <Compile Include="WebCamD3D9.cs" />
-    <Compile Include="WebCamD3D9Async.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

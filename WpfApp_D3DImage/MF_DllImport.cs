@@ -2,7 +2,7 @@ using DirectN;
 using System;
 using System.Runtime.InteropServices;
 
-namespace WpfApp_D3DImage
+namespace QSoft.MediaCapture.WPF
 {
     /// <summary>
     /// Media Foundation DLL Import ©M COM Interface ©w¸q
@@ -11,6 +11,35 @@ namespace WpfApp_D3DImage
     public partial class WebCamD3D9
     {
         #region Media Foundation DLL Imports
+
+        [DllImport("mfplat", ExactSpelling = true)]
+        public static extern HRESULT MFCreateCollection(out IMFCollection ppIMFCollection);
+
+        [ComImport]
+        [Guid("5bc8a76b-869a-46a3-9b03-fa218a66aebe")]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        public interface IMFCollection
+        {
+            [PreserveSig]
+            HRESULT GetElementCount(out uint pcElements);
+
+            [PreserveSig]
+            HRESULT GetElement(uint dwElementIndex, [MarshalAs(UnmanagedType.IUnknown)] out object ppUnkElement);
+
+            [PreserveSig]
+            HRESULT AddElement([MarshalAs(UnmanagedType.IUnknown)] object pUnkElement);
+
+            [PreserveSig]
+            HRESULT RemoveElement(uint dwElementIndex, [MarshalAs(UnmanagedType.IUnknown)] out object ppUnkElement);
+
+            [PreserveSig]
+            HRESULT InsertElementAt(uint dwIndex, [MarshalAs(UnmanagedType.IUnknown)] object pUnknown);
+
+            [PreserveSig]
+            HRESULT RemoveAllElements();
+        }
+
+
 
         [ComImport]
         [Guid("7b981cf0-560e-4116-9875-b099895f23d7")]
